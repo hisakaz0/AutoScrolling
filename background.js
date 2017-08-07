@@ -11,7 +11,7 @@ browser.browserAction.onClicked.addListener((tab) => {
       {isScroll: browser_action.isScroll});
 });
 
-browser.tabs.onActivated.addListener( function (tabId, windowId) {
+browser.tabs.onActivated.addListener(function (tabId, windowId) {
   if (browser_action.isScroll) {
     browser.tabs.sendMessage(browser_action.tid, {isScroll: false});
   }

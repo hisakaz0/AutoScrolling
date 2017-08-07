@@ -8,7 +8,7 @@ let autoScroll = {
     let _this = this;
     this.tid = setTimeout(function () {
       _this.start();
-    }, this.speed);
+    }, 100 - this.speed);
   },
   stop: function () {
     clearTimeout(this.tid);
@@ -25,3 +25,14 @@ function autoScrollFunction (msg) {
 }
 
 browser.runtime.onMessage.addListener(autoScrollFunction);
+
+browser.storage.onChanged.addListener(function(changes, area) {
+  var changedItems = Object.keys(changes);
+  console.log(changes)
+  for (var item of changedItems) {
+    if (item == "speed") {
+      autoScroll.speed = parseInt(changes[item]["newValue"]);
+      console.log(autoScroll.speed);
+    }
+  }
+});

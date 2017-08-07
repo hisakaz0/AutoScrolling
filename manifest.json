@@ -3,7 +3,16 @@
   "name": "AutoScrolling",
   "version": "1.1.1",
 
-  "description": "Auto-scroll in any web pages",
+  "author": "pinkienort",
+  "homepage_url": "https://github.com/pinkienort/AutoScrolling",
+
+  "description": "Auto-scrolling without mouse-wheel",
+
+  "permissions": [ "storage" ],
+
+  "options_ui": {
+    "page": "options/options.html"
+  },
 
   "icons": {
     "48": "icons/mouse-48.png",
@@ -27,11 +36,5 @@
 
   "background": {
     "scripts": [ "background.js" ]
-  },
-
-  "options_ui": {
-    "page": "options/options.html"
-  },
-
-  "permissions": [ "storage" ]
+  }
 }

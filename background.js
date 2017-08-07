@@ -1,20 +1,19 @@
 
-let brower_action_icon = {
-  click_cnt: 0,
-  clicked_tab_id: -1
+let browser_action = {
+  isScroll: false,
+  tid: -1
 };
 
 browser.browserAction.onClicked.addListener((tab) => {
-  brower_action_icon.clicked_tab_id = tab.id;
-  brower_action_icon.click_cnt += 1;
-  browser.tabs.sendMessage(tab.id, 0);
+  browser_action.isScroll = !browser_action.isScroll;
+  browser_action.tid = tab.id;
+  browser.tabs.sendMessage(tab.id,
+      {isScroll: browser_action.isScroll});
 });
 
-browser.tabs.onActivated.addListener(
-    function (tabId, windowId) {
-      if (brower_action_icon.click_cnt%2 == 1) {
-        browser.tabs.sendMessage(
-          brower_action_icon.clicked_tab_id, 0);
-      }
-      brower_action_icon.click_cnt = 0;
-    });
+browser.tabs.onActivated.addListener( function (tabId, windowId) {
+  if (browser_action.isScroll) {
+    browser.tabs.sendMessage(browser_action.tid, {isScroll: false});
+  }
+  browser_action.isScroll = false;
+});

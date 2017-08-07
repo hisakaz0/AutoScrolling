@@ -17,7 +17,7 @@ let autoScroll = {
 };
 
 function autoScrollFunction (msg) {
-  if (autoScroll.tid == -1) {
+  if (msg.isScroll) {
     autoScroll.start();
   } else {
     autoScroll.stop();

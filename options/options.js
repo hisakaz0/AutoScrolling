@@ -1,4 +1,6 @@
 
+"use strict";
+
 let speed_el = document.getElementById('speed');
 speed_el.addEventListener('change', function(ev) {
   if (ev.target.name == "speed") {

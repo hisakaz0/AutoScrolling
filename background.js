@@ -1,4 +1,6 @@
 
+"use strict";
+
 let browser_action = {
   isScroll: false,
   tid: -1

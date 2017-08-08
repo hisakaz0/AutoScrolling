@@ -1,4 +1,6 @@
 
+"use strict";
+
 let autoScroll = {
   speed: 50,
   step: 1,

@@ -1,5 +1,5 @@
 
-PACKAGE_FILES = background.js content.js icons/* manifest.json options/* LICENSE README.md
+PACKAGE_FILES = background.js content.js icons/* manifest.json options/* LICENSE README.md CHNAGELOG.md
 PACKAGE_ARCHIVE = package/autoscroll.zip
 PACKAGE_DIR = package
 

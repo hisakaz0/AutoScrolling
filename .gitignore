@@ -1,3 +1,4 @@
 
-/package
+/web-ext-artifacts
 test/kill-server.sh
+.web-extension-id

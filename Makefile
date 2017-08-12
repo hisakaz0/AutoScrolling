@@ -1,13 +1,17 @@
 
-PACKAGE_FILES = background.js content.js icons/* manifest.json options/* LICENSE README.md CHNAGELOG.md
-PACKAGE_ARCHIVE = package/autoscroll.zip
-PACKAGE_DIR = package
+PACKAGE_DIR = web-ext-artifacts
+IGNORE_FILES = test
+API_KEY = $(shell cat ~/.firefox/add-on/JWT_issuer)
+API_SECRET = $(shell cat ~/.firefox/add-on/JWT_secret)
 
-.PHONY: package
-package:
-	mkdir -p $(PACKAGE_DIR)
-	zip $(PACKAGE_ARCHIVE) $(PACKAGE_FILES)
+.PHONY: build
+build:
+	web-ext build -o -i $(IGNORE_FILES)
 
-.PHONY: remove_package
-remove_package:
-	rm -f $(PACKAGE_ARCHIVE)
+.PHONY: sign
+sign:
+	web-ext sign --api-key=$(API_KEY) --api-secret=$(API_SECRET) -i $(IGNORE_FILES)
+
+.PHONY: lint
+lint:
+	web-ext lint -i $(IGNORE_FILES)

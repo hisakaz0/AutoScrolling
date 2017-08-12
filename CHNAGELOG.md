@@ -17,3 +17,7 @@
 2017-08-09: Version 1.1.2
 
     Fix bugs.
+
+2017-08-12: Version 1.1.3
+
+    Registered application id.

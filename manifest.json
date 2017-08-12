@@ -1,7 +1,13 @@
 {
   "manifest_version": 2,
   "name": "AutoScrolling",
-  "version": "1.1.2",
+  "version": "1.1.3",
+
+  "applications": {
+    "gecko": {
+      "id": "{7E24C81F-CA02-4291-977F-C672411ECDCF}"
+    }
+  },
 
   "author": "pinkienort",
   "homepage_url": "https://github.com/pinkienort/AutoScrolling",

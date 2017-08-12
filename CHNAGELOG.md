@@ -27,3 +27,8 @@
 2017-08-12: Version 1.1.4
 
     Loggin failure.
+
+
+2017-08-12: Version 1.1.5
+
+    Settings are stored sync storage.

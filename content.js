@@ -7,9 +7,8 @@ let autoScroll = {
   tid: -1,
   start: function () {
     window.scroll(window.scrollX, window.scrollY + this.step);
-    let _this = this;
-    this.tid = setTimeout(function () {
-      _this.start();
+    this.tid = setTimeout(() => {
+      this.start();
     }, 100 - this.speed);
   },
   stop: function () {
@@ -18,23 +17,19 @@ let autoScroll = {
   }
 };
 
-function autoScrollFunction (msg) {
+browser.runtime.onMessage.addListener(function (msg) {
   if (msg.isScroll) {
     autoScroll.start();
   } else {
     autoScroll.stop();
   }
-}
-
-browser.runtime.onMessage.addListener(autoScrollFunction);
+});
 
 browser.storage.onChanged.addListener(function(changes, area) {
   var changedItems = Object.keys(changes);
-  console.log(changes)
   for (var item of changedItems) {
     if (item == "speed") {
       autoScroll.speed = parseInt(changes[item]["newValue"]);
-      console.log(autoScroll.speed);
     }
   }
 });

@@ -18,6 +18,12 @@
 
     Fix bugs.
 
+
 2017-08-12: Version 1.1.3
 
     Registered application id.
+
+
+2017-08-12: Version 1.1.4
+
+    Loggin failure.

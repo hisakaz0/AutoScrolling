@@ -11,8 +11,8 @@ speed_el.addEventListener('change', function(ev) {
     if (speed < 0) {
       speed = 1;
     }
-    let setting = browser.storage.local.set({"speed": speed});
-    setting.then(null, onError);
+    browser.storage.local.set({"speed": speed})
+      .catch(onError);
   }
 });
 

@@ -42,3 +42,8 @@
 2017-08-13: Version 1.2.6
 
     Stop scolling by click.
+
+
+2017-08-13: Version 1.2.7
+
+    Improve of visibility of icon.

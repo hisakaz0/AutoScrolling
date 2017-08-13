@@ -32,3 +32,8 @@
 2017-08-12: Version 1.1.5
 
     Settings are stored sync storage.
+
+
+2017-08-12: Version 1.1.5
+
+    Fix bugs: true guid is issued by AMO.

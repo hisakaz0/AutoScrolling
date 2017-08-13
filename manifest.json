@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
   "name": "AutoScrolling",
-  "version": "1.1.5",
+  "version": "1.1.6",
 
   "applications": {
     "gecko": {
-      "id": "{7E24C81F-CA02-4291-977F-C672411ECDCF}"
+      "id": "{41968ea4-72de-4f01-bb3b-69c1e481c229}"
     }
   },
 

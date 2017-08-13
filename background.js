@@ -2,28 +2,32 @@
 "use strict";
 
 let browser_action = {
-  isScroll: false,
+  isScrolling: false,
   tid: -1,
   wid: -1
 };
 
 browser.browserAction.onClicked.addListener((tab) => {
-  browser_action.isScroll = !browser_action.isScroll;
+  browser_action.isScrolling = !browser_action.isScrolling;
   browser_action.tid = tab.id;
   browser_action.wid = tab.windowId;
   browser.tabs.sendMessage(tab.id,
-      {isScroll: browser_action.isScroll})
+      {isScrolling: browser_action.isScrolling})
   .catch(onError);
 });
 
 browser.tabs.onActivated.addListener((activeInfo) => {
-  if (browser_action.isScroll &&
+  if (browser_action.isScrolling &&
     browser_action.wid == activeInfo.windowId) {
     browser.tabs.sendMessage(
-      browser_action.tid, {isScroll: false})
+      browser_action.tid, {isScrolling: false})
     .catch(onError);
-    browser_action.isScroll = false;
+    browser_action.isScrolling = false;
   }
+});
+
+browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  browser_action.isScrolling = msg.isScrolling;
 });
 
 function onError(err) {

@@ -34,6 +34,11 @@
     Settings are stored sync storage.
 
 
-2017-08-12: Version 1.1.5
+2017-08-13: Version 1.1.6
 
     Fix bugs: true guid is issued by AMO.
+
+
+2017-08-13: Version 1.2.6
+
+    Stop scolling by click.

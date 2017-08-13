@@ -1,10 +1,11 @@
 
 "use strict";
 
-let autoScroll = {
+let autoScrolling = {
   speed: 50,
   step: 1,
   tid: -1,
+  stopByClick: true,
   start: function () {
     window.scroll(window.scrollX, window.scrollY + this.step);
     this.tid = setTimeout(() => {
@@ -17,19 +18,31 @@ let autoScroll = {
   }
 };
 
-browser.runtime.onMessage.addListener(function (msg) {
-  if (msg.isScroll) {
-    autoScroll.start();
-  } else {
-    autoScroll.stop();
+browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.isScrolling) {
+    autoScrolling.start();
+  }
+  else if (!msg.isScrolling && autoScrolling.tid !== -1) {
+    autoScrolling.stop();
   }
 });
 
-browser.storage.onChanged.addListener(function(changes, area) {
+browser.storage.onChanged.addListener((changes, area) => {
   var changedItems = Object.keys(changes);
   for (var item of changedItems) {
-    if (item == "speed") {
-      autoScroll.speed = parseInt(changes[item]["newValue"]);
+    if (item == "scrollingSpeed") {
+      autoScrolling.speed = parseInt(changes[item]["newValue"]);
+    }
+    if (item == "stopScrollingByClick") {
+      autoScrolling.stopByClick = changes[item]["newValue"];
     }
   }
 });
+
+window.document.body.addEventListener("click", (ev) => {
+  if (autoScrolling.tid !== -1 && autoScrolling.stopByClick == true) {
+    autoScrolling.stop();
+    browser.runtime.sendMessage({"isScrolling": false});
+  }
+});
+

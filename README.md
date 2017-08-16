@@ -1,7 +1,6 @@
-AutoScrolling
-=============
+![icon][icon] AutoScrolling  
+============================
 
-![icon][icon]
 
 
 [AutoScrolling] for Firefox browser enables you auto-scrolling without using

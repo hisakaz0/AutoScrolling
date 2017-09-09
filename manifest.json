@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "AutoScrolling",
-  "version": "1.2.7",
+  "version": "1.2.8",
 
   "applications": {
     "gecko": {
@@ -35,7 +35,7 @@
 
   "content_scripts": [
     {
-      "matches": [ "*://*/*" ],
+      "matches": [ "<all_urls>" ],
       "js": [ "content.js" ]
     }
   ],

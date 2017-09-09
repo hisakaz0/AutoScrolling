@@ -47,3 +47,8 @@
 2017-08-13: Version 1.2.7
 
     Improve of visibility of icon.
+
+
+2017-08-13: Version 1.2.8
+
+    Fix bugs.

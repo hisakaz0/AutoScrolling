@@ -49,6 +49,14 @@
     Improve of visibility of icon.
 
 
-2017-08-13: Version 1.2.8
+2017-09-09: Version 1.2.8
 
-    Fix bugs.
+    Fix bugs: Scrolling does not work on any sites.
+
+
+2017-09-10: Version 1.2.9
+
+    Fix bugs, and improve functionality.
+      - User defined scrolling speed and stop-by-click is not worked.
+
+

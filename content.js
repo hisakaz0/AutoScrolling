@@ -10,22 +10,20 @@ function getScrollingElement () {
 }
 
 function getStopScrollingByClick() {
-  return browser.storage.sync.set(
+  return browser.storage.sync.get(
     { "stopScrollingByClick": defaultStopScrollingByClick }).catch(error);
 }
 
 function getScrollingSpeed () {
-  return browser.storage.sync.set(
+  return browser.storage.sync.get(
     { "scrollingSpeed": defaultScrollingSpeed }).catch(onError);
 }
 
-function setStopScrollingByClick(ev){
-
 const autoScrolling = {
-  speed: getScrollingSpeed()
+  speed: getScrollingSpeed(),
   step: 1,
   tid: -1,
-  scrollingElement: document.scrollingElement,
+  scrollingElement: getScrollingElement(),
   start: function () {
     this.y = this.y + this.step;
     this.scrollingElement.scroll(this.x, this.y);
@@ -39,7 +37,7 @@ const autoScrolling = {
   },
   x: 0,
   y: 0,
-  stopByClick: getStopScrollingByClick()
+  stopByClick: getStopScrollingByClick(),
 };
 
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {

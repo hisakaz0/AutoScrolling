@@ -1,13 +1,28 @@
 
 "use strict";
 
+const defaultScrollingSpeed = 50;
+const defaultStopScrollingByClick = true;
+
 function getScrollingElement () {
   return document.scrollingElement ?
     document.scrollingElement : document.documentElement;
 }
 
+function getStopScrollingByClick() {
+  return browser.storage.sync.set(
+    { "stopScrollingByClick": defaultStopScrollingByClick }).catch(error);
+}
+
+function getScrollingSpeed () {
+  return browser.storage.sync.set(
+    { "scrollingSpeed": defaultScrollingSpeed }).catch(onError);
+}
+
+function setStopScrollingByClick(ev){
+
 const autoScrolling = {
-  speed: 50,
+  speed: getScrollingSpeed()
   step: 1,
   tid: -1,
   scrollingElement: document.scrollingElement,
@@ -24,14 +39,14 @@ const autoScrolling = {
   },
   x: 0,
   y: 0,
-  stopByClick: true
+  stopByClick: getStopScrollingByClick()
 };
 
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.isScrolling) {
     autoScrolling.x = window.scrollX;
     autoScrolling.y = window.scrollY;
-    autoScrolling.scrollingElement = getScrollingElement;
+    autoScrolling.scrollingElement = getScrollingElement();
     autoScrolling.start();
   }
   else if (!msg.isScrolling && autoScrolling.tid !== -1) {

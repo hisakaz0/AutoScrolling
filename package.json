@@ -1,0 +1,29 @@
+{
+  "name": "autoscrolling",
+  "version": "1.0.0",
+  "description": "Browser extension for Firefox",
+  "main": "background.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pinkienort/AutoScrolling.git"
+  },
+  "keywords": [
+    "webextension"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pinkienort/AutoScrolling/issues"
+  },
+  "homepage": "https://github.com/pinkienort/AutoScrolling#readme",
+  "dependencies": {
+    "eslint": "^4.7.0"
+  }
+}

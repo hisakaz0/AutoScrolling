@@ -23,9 +23,20 @@ documents of above web-ext page.
 ## Test and Build
 
 ```sh
-### Test
+### Lint
+
+Currently `eslint` is used intead of `web-ext lint` .
+
+```sh
+npm run lint
+# or
 make lint
+```
+
+
 ### Build
+
+```sh
 make build
 ```
 

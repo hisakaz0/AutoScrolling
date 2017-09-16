@@ -1,5 +1,5 @@
 
-"use strict";
+'use strict';
 
 /*
  *  It is consists of the following specification of this object, 'addon_options'.
@@ -10,11 +10,11 @@
  *  };
  */
 let addon_options = {
-  "scrollingSpeed": 50,
-  "stopScrollingByClick": true
+  'scrollingSpeed': 50,
+  'stopScrollingByClick': true
 };
 
-document.addEventListener("DOMContentLoaded", (ev) => {
+document.addEventListener('DOMContentLoaded', () => {
   let scrolling_speed_el = document.getElementById('scrolling-speed');
   let stop_scrolling_by_click_el = document.getElementById('stop-scrolling-by-click');
 
@@ -22,14 +22,14 @@ document.addEventListener("DOMContentLoaded", (ev) => {
   stop_scrolling_by_click_el.addEventListener('change', setStopScrollingByClick);
 
   browser.storage.sync.get(addon_options)
-  .then((items) => {
-    scrolling_speed_el.value = parseInt(items.scrollingSpeed);
-    stop_scrolling_by_click_el.checked = items.stopScrollingByClick;
-  }, onError);
+    .then((items) => {
+      scrolling_speed_el.value = parseInt(items.scrollingSpeed);
+      stop_scrolling_by_click_el.checked = items.stopScrollingByClick;
+    }, onError);
 });
 
 function setScrollingSpeed(ev) {
-  if (ev.target.name != "scrolling-speed") {
+  if (ev.target.name != 'scrolling-speed') {
     return;
   }
   let scrollingSpeed = ev.target.value;
@@ -39,20 +39,20 @@ function setScrollingSpeed(ev) {
   else if (scrollingSpeed < 0) {
     scrollingSpeed = 1;
   }
-  browser.storage.sync.set({"scrollingSpeed": scrollingSpeed})
+  browser.storage.sync.set({'scrollingSpeed': scrollingSpeed})
     .catch(onError);
 }
 
 function setStopScrollingByClick(ev){
-  if (ev.target.name != "stop-scrolling-by-click") {
+  if (ev.target.name != 'stop-scrolling-by-click') {
     return;
   }
   let stopScrollingByClick = ev.target.checked;
-  browser.storage.sync.set({"stopScrollingByClick": stopScrollingByClick})
+  browser.storage.sync.set({'stopScrollingByClick': stopScrollingByClick})
     .catch(onError);
 }
 
 function onError(err) {
-  console.log(`Error: ${err}`);
+  console.error(`Error: ${err}`);
 }
 

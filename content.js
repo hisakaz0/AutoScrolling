@@ -1,5 +1,5 @@
 
-"use strict";
+'use strict';
 
 const defaultScrollingSpeed = 50;
 const defaultStopScrollingByClick = true;
@@ -11,12 +11,12 @@ function getScrollingElement () {
 
 function getStopScrollingByClick() {
   return browser.storage.sync.get(
-    { "stopScrollingByClick": defaultStopScrollingByClick }).catch(error);
+    { 'stopScrollingByClick': defaultStopScrollingByClick }).catch(error);
 }
 
 function getScrollingSpeed () {
   return browser.storage.sync.get(
-    { "scrollingSpeed": defaultScrollingSpeed }).catch(onError);
+    { 'scrollingSpeed': defaultScrollingSpeed }).catch(onError);
 }
 
 const autoScrolling = {
@@ -40,7 +40,7 @@ const autoScrolling = {
   stopByClick: getStopScrollingByClick(),
 };
 
-browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((msg) => {
   if (msg.isScrolling) {
     autoScrolling.x = window.scrollX;
     autoScrolling.y = window.scrollY;
@@ -52,27 +52,27 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
-browser.storage.onChanged.addListener((changes, area) => {
+browser.storage.onChanged.addListener((changes) => {
   var changedItems = Object.keys(changes);
   for (var item of changedItems) {
-    if (item == "scrollingSpeed") {
-      autoScrolling.speed = parseInt(changes[item]["newValue"]);
+    if (item == 'scrollingSpeed') {
+      autoScrolling.speed = parseInt(changes[item]['newValue']);
     }
-    if (item == "stopScrollingByClick") {
-      autoScrolling.stopByClick = changes[item]["newValue"];
+    if (item == 'stopScrollingByClick') {
+      autoScrolling.stopByClick = changes[item]['newValue'];
     }
   }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.body.addEventListener("click", (ev) => {
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.addEventListener('click', () => {
     if (autoScrolling.tid !== -1 && autoScrolling.stopByClick == true) {
       autoScrollingStop();
-      browser.runtime.sendMessage({"isScrolling": false}).catch(onError);
+      browser.runtime.sendMessage({'isScrolling': false}).catch(onError);
     }
   });
 });
 
 function onError(err) {
-  console.log(`Error: ${err}`);
+  console.error(`Error: ${err}`);
 }

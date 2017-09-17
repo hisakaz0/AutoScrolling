@@ -4,6 +4,8 @@ test/kill-server.sh
 .web-extension-id
 /dist
 
+Session.vim
+
 ### Node.gitignore
 # Logs
 logs

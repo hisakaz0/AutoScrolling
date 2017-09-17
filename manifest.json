@@ -17,7 +17,7 @@
   "permissions": [ "storage" ],
 
   "options_ui": {
-    "page": "options/options.html"
+    "page": "dist/options.html"
   },
 
   "icons": {
@@ -36,11 +36,11 @@
   "content_scripts": [
     {
       "matches": [ "<all_urls>" ],
-      "js": [ "content.js" ]
+      "js": [ "dist/content.js" ]
     }
   ],
 
   "background": {
-    "scripts": [ "background.js" ]
+    "scripts": [ "dist/background.js" ]
   }
 }

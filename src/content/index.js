@@ -1,6 +1,8 @@
 
 'use strict';
 
+import { getValueFromStorage, onError } from '../utils';
+
 const defaultScrollingSpeed = 50;
 const defaultStopScrollingByClick = true;
 
@@ -11,13 +13,15 @@ function getScrollingElement () {
 }
 
 function getStopScrollingByClick() {
-  return browser.storage.sync.get(
-    { "stopScrollingByClick": defaultStopScrollingByClick }).catch(onError);
+  return getValueFromStorage({
+    stopScrollingByClick: defaultStopScrollingByClick
+  });
 }
 
 function getScrollingSpeed () {
-  return browser.storage.sync.get(
-    { 'scrollingSpeed': defaultScrollingSpeed }).catch(onError);
+  return getValueFromStorage({
+    scrollingSpeed: defaultScrollingSpeed
+  });
 }
 
 const autoScrolling = {
@@ -69,11 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.addEventListener('click', () => {
     if (autoScrolling.tid !== -1 && autoScrolling.stopByClick == true) {
       autoScrollingStop();
-      browser.runtime.sendMessage({'isScrolling': false}).catch(onError);
+      browser.runtime.sendMessage({ isScrolling: false }).catch(onError);
     }
+    browser.runtime.sendMessage({ bodyClicked: true }).catch(onError);
   });
 });
 
-function onError(err) {
-  console.error(`Error: ${err}`);
-}

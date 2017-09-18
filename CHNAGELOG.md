@@ -59,4 +59,8 @@
     Fix bugs, and improve functionality.
       - User defined scrolling speed and stop-by-click is not worked.
 
+2017-09-18: Version 1.3.9
+
+    Overlay window to access addon options quickly.
+
 

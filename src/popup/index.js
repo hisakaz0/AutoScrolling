@@ -4,3 +4,4 @@
 import { setupOnDOMContentLoaded } from '../options';
 
 setupOnDOMContentLoaded();
+

@@ -4,21 +4,23 @@
     <title>Options | AutoScrolling</title>
   </head>
   <body>
-    <div>
-      <h2>Scrolling speed</h2>
-      <p>The value is scrolling speed. Max is 99, and min is 1.</p>
-      <p><strong>Scrolling speed:</strong>
-        <input type="text" id="scrolling-speed" name="scrolling-speed" value=50 />
-      </p>
+    <div id="auto-scrolling-overlay-wrapper" class="wrapper">
+      <div>
+        <h2>Scrolling speed</h2>
+        <p>The value is scrolling speed. Max is 99, and min is 1.</p>
+        <p><strong>Scrolling speed:</strong>
+          <input type="text" id="scrolling-speed" name="scrolling-speed" value=50 />
+        </p>
+      </div>
+      <div>
+        <h2>To stop scrolling by click</h2>
+        <p>The value decides the weather stoppling the scrolling when you click the scrolling window.</p>
+        <p><strong>Scrolling stop by click:</strong>
+          <input type="checkbox" id='stop-scrolling-by-click'
+            name='stop-scrolling-by-click' value=true checked=true />
+        </p>
+      </div>
     </div>
-    <div>
-      <h2>To stop scrolling by click</h2>
-      <p>The value decides the weather stoppling the scrolling when you click the scrolling window.</p>
-      <p><strong>Scrolling stop by click:</strong>
-        <input type="checkbox" id='stop-scrolling-by-click'
-          name='stop-scrolling-by-click' value=true checked=true />
-      </p>
-    </div>
+    <script type="text/javascript" src="options.js"></script>
   </body>
-  <script type="text/javascript" src="options.js"></script>
 </html>

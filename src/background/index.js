@@ -1,31 +1,48 @@
 
 'use strict';
 
-import { getValueFromStorage, onError } from '../utils';
+import { onError } from '../utils';
 
 //////////////////////////////////////////////////////////////////////////////
 // Constant / Variables
 
-const autoScrollingStates = [];
+let autoScrollingStates = [];
 const initAutoScrollingState = {
   tabId: -1,
   windowId: -1,
   isScrolling: false,
   isWaitingDoubleClick: false,
-  isOpenPopup: false
+  isOpenOverlay: false
 };
+
+browser.windows.getAll().then((windowArray) => {
+  windowArray.map((window) => {
+    const windowId = window.id;
+    createAutoScrollingState(windowId);
+  });
+}).catch(onError);
 
 // Unit of both of 'intervalDoubleClick' and 'defaultIntervalDoubleClick' is
 // second. defaultIntervalDoubleClick is 1.00 second.
-const defaultIntervalDoubleClick = 1.00;
-const intervalDoubleClick =
-  getValueFromStorage({ intervalDoubleClick: defaultIntervalDoubleClick });
+const defaultIntervalDoubleClick = Number(0.50);
+const backgroundOptions = {
+  intervalDoubleClick: defaultIntervalDoubleClick
+};
+browser.storage.sync.get({
+  intervalDoubleClick: defaultIntervalDoubleClick
+}).then((data) => {
+  const { intervalDoubleClick } = data;
+  backgroundOptions.intervalDoubleClick = intervalDoubleClick;
+}).catch(onError);
+
 
 //////////////////////////////////////////////////////////////////////////////
 // AutoScrolling functions
-function createAutoScrollingState (window) {
+function createAutoScrollingState (windowId) {
   // Constructor. This function is called when new window is opened.
-  const windowId = window.id;
+  if (autoScrollingStates[ windowId ] != undefined) {
+    return;
+  }
   autoScrollingStates[ windowId ] = Object.assign(
     {}, initAutoScrollingState, { windowId: windowId });
 }
@@ -44,16 +61,11 @@ function toggleAutoScrolling (tab) {
   const windowId = tab.windowId;
   const willIsScrolling = ! autoScrollingStates[ windowId ].isScrolling;
   browser.tabs.sendMessage(tabId, {
-    tabId: tabId,
-    windowId: windowId,
     isScrolling: willIsScrolling
-  })
-    .then(() => {
-      autoScrollingStates[ windowId ].tabId = tabId;
-      autoScrollingStates[ windowId ].windowId = windowId;
-      autoScrollingStates[ windowId ].isScrolling = willIsScrolling;
-    })
-    .catch(onError);
+  }).then((response) => {
+    autoScrollingStates[ windowId ].tabId = tabId;
+    autoScrollingStates[ windowId ].isScrolling = willIsScrolling;
+  }).catch(onError);
 }
 
 function receiveAutoScrollingStatus (msg, sender, sendResponse) {
@@ -64,39 +76,28 @@ function receiveAutoScrollingStatus (msg, sender, sendResponse) {
 function stopAutoScrolling (activeInfo) {
   const tabId = activeInfo.tabId;
   const windowId = activeInfo.windowId;
-  browser.tabs.sendMessage(tabId, { isScrolling: false })
-    .then( (results) => {
-      autoScrollingStates[ windowId ].isScrolling = false;
-    })
-    .catch(onError);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Popup functions
-
-function openPopup(tab) {
-  const tabId = tab.id;
-  const windowId = tab.windowId;
-  browser.browserAction.setPopup(
-    { tabId: tabId,
-      popup: browser.extension.getURL('popup/index.html') }
-  ).then( (results) => {
-    autoScrollingStates[ windowId ].isOpenPopup = true;
+  browser.tabs.sendMessage(tabId, {
+    isScrolling: false
+  }).then((response) => {
+    autoScrollingStates[ windowId ].isScrolling = false;
   }).catch(onError);
 }
 
-function disableBrowserActionPopup (msg, sender, sendResponse) {
-  const tabId = sender.tab.id;
-  const windowId = sender.tab.windowId;
-  browser.browserAction.setPopup({ tabId: tabId, popup: '' })
-    .then( (results) => {
-      autoScrollingStates[ windowId ].isOpenPopup = false;
-    })
-    .catch(onError);
-}
+//////////////////////////////////////////////////////////////////////////////
+// Overlay functions
 
-function resetIsWaitingDoubleClick (tab) {
-  const windowId = tab.windowId;
+// function disableBrowserActionPopup (msg, sender, sendResponse) {
+//   const tabId = sender.tab.id;
+//   const windowId = sender.tab.windowId;
+//   browser.browserAction.setPopup({
+//     tabId: tabId,
+//     popup: ''
+//   }).then((results) => {
+//     autoScrollingStates[ windowId ].isOpenPopup = false;
+//   }) .catch(onError);
+// }
+
+function resetIsWaitingDoubleClick (windowId) {
   autoScrollingStates[ windowId ].isWaitingDoubleClick = false;
 }
 
@@ -105,7 +106,8 @@ function resetIsWaitingDoubleClick (tab) {
 // Event listeners / event functions
 
 browser.windows.onCreated.addListener((window) => {
-  createAutoScrollingState(window);
+  const windowId = window.id;
+  createAutoScrollingState(windowId);
 });
 
 browser.windows.onRemoved.addListener((window) => {
@@ -116,20 +118,27 @@ browser.browserAction.onClicked.addListener((tab) => {
   // This function is fired when browser icon is clicked.
   const windowId = tab.windowId;
   if (autoScrollingStates[ windowId ].isWaitingDoubleClick) {
-    openPopup(tab);
+    browser.tabs.sendMessage(tab.id, {
+      isOpenOverlay: true
+    }).then((response) => {
+      autoScrollingStates[ windowId ].isOpenOverlay = true;
+    });
   }
   setTimeout(() => {
-    resetIsWaitingDoubleClick(tab);
-    if (!autoScrollingStates[ windowId ].isOpenPopup) {
+    resetIsWaitingDoubleClick(tab.windowId);
+    if (!autoScrollingStates[ windowId ].isOpenOverlay) {
       toggleAutoScrolling(tab);
     }
-  }, intervalDoubleClick * 1000 );
+  }, backgroundOptions.intervalDoubleClick * 1000 );
   autoScrollingStates[ windowId ].isWaitingDoubleClick = true;
 });
 
 browser.tabs.onActivated.addListener((activeInfo) => {
   const windowId = activeInfo.windowId;
   const tabId = activeInfo.tabId;
+  if (autoScrollingStates[ windowId ] == undefined) {
+    createAutoScrollingState(windowId);
+  }
   if (autoScrollingStates[ windowId ].isScrolling &&
       autoScrollingStates[ windowId ].tabId != tabId ) {
     stopAutoScrolling(activeInfo);
@@ -141,8 +150,8 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.isScrolling != undefined) {
     receiveAutoScrollingStatus(msg, sender, sendResponse);
   }
-  if (msg.bodyClicked != undefined) {
-    disableBrowserActionPopup(msg, sender, sendResponse);
+  if (msg.isOpenOverlay == false) {
+    autoScrollingStates[ sender.tab.windowId ].isOpenOverlay = false;
   }
 });
 

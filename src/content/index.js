@@ -1,59 +1,68 @@
 
 'use strict';
 
-import { getValueFromStorage, onError } from '../utils';
-
-const defaultScrollingSpeed = 50;
-const defaultStopScrollingByClick = true;
-
-function getScrollingElement () {
-  // https://developer.mozilla.org/en-US/docs/Web/API/Document/scrollingElement
-  return document.scrollingElement ?
-    document.scrollingElement : document.documentElement;
-}
-
-function getStopScrollingByClick() {
-  return getValueFromStorage({
-    stopScrollingByClick: defaultStopScrollingByClick
-  });
-}
-
-function getScrollingSpeed () {
-  return getValueFromStorage({
-    scrollingSpeed: defaultScrollingSpeed
-  });
-}
+import { onError } from '../utils';
+import './index.css';
 
 const autoScrolling = {
-  speed: getScrollingSpeed(),
-  step: 1,
   tid: -1,
-  scrollingElement: getScrollingElement(),
+  x: 0,
+  y: 0,
+  scrollingStep: 1,
+  scrollingSpeed: 50,
+  scrollingElement: document.documentElement,
+  stopScrollingByClick: true,
   start: function () {
-    this.y = this.y + this.step;
+    this.y = this.y + this.scrollingStep;
     this.scrollingElement.scroll(this.x, this.y);
     this.tid = setTimeout(() => {
       this.start();
-    }, 100 - this.speed);
+    }, 100 - this.scrollingSpeed);
   },
   stop: function () {
     clearTimeout(this.tid);
     this.tid = -1;
   },
-  x: 0,
-  y: 0,
-  stopByClick: getStopScrollingByClick(),
 };
 
+const getScrollingElement = () => {
+  return document.scrollingElement ?
+    document.scrollingElement : document.documentElement;
+};
+
+const defaultStopScrollingByClick = true;
+browser.storage.sync.get({
+  stopScrollingByClick: defaultStopScrollingByClick
+}).then((data) => {
+  const { stopScrollingByClick } = data;
+  autoScrolling.stopScrollingByClick = stopScrollingByClick;
+}).catch(onError);
+
+const defaultScrollingSpeed = 50;
+browser.storage.sync.get({
+  scrollingSpeed: defaultScrollingSpeed
+}).then((data) => {
+  const { scrollingSpeed } = data;
+  autoScrolling.scrollingSpeed= scrollingSpeed;
+}).catch(onError);
+
+
 browser.runtime.onMessage.addListener((msg) => {
-  if (msg.isScrolling) {
-    autoScrolling.x = window.scrollX;
-    autoScrolling.y = window.scrollY;
-    autoScrolling.scrollingElement = getScrollingElement();
-    autoScrolling.start();
-  }
-  else if (!msg.isScrolling && autoScrolling.tid !== -1) {
+  if (!msg.isScrolling && autoScrolling.tid !== -1) {
     autoScrolling.stop();
+  } else if (msg.isScrolling) {
+    new Promise((resolve, reject) => {
+      autoScrolling.x = window.scrollX;
+      autoScrolling.y = window.scrollY;
+      autoScrolling.scrollingElement = getScrollingElement();
+      return resolve();
+    }).then(() => {
+      autoScrolling.start();
+    });
+  }
+
+  if (msg.isOpenOverlay) {
+    openOverlay();
   }
 });
 
@@ -61,21 +70,92 @@ browser.storage.onChanged.addListener((changes) => {
   var changedItems = Object.keys(changes);
   for (var item of changedItems) {
     if (item == 'scrollingSpeed') {
-      autoScrolling.speed = parseInt(changes[item]['newValue']);
+      autoScrolling.scrollingSpeed = parseInt(changes[item]['newValue']);
     }
     if (item == 'stopScrollingByClick') {
-      autoScrolling.stopByClick = changes[item]['newValue'];
+      autoScrolling.stopScrollingByClick = changes[item]['newValue'];
     }
   }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.body.addEventListener('click', () => {
-    if (autoScrolling.tid !== -1 && autoScrolling.stopByClick == true) {
-      autoScrollingStop();
-      browser.runtime.sendMessage({ isScrolling: false }).catch(onError);
-    }
-    browser.runtime.sendMessage({ bodyClicked: true }).catch(onError);
-  });
+document.body.addEventListener('click', () => {
+  if (autoScrolling.tid !== -1 &&
+      autoScrolling.stopScrollingByClick == true) {
+    browser.runtime.sendMessage({
+      isScrolling: false
+    }).then(() => {
+      autoScrolling.stop();
+    }).catch(onError);
+  }
 });
 
+const openOverlay = () => {
+  let overlayEle = document.getElementById('auto-scrolling-overlay');
+  overlayEle.classList = [ 'auto-scrolling-overlay is-open' ];
+};
+
+const closeOverlay = () => {
+  let overlayEle = document.getElementById('auto-scrolling-overlay');
+  overlayEle.classList = [ 'auto-scrolling-overlay' ];
+};
+
+const insertOverlayEle = () => {
+  let overlayEle = document.createElement('div');
+  overlayEle.id = 'auto-scrolling-overlay';
+  overlayEle.classList = [ 'auto-scrolling-overlay' ];
+  overlayEle.innerHTML = require('html-loader!./index.html');
+  overlayEle.addEventListener('click', (ev) => {
+    browser.runtime.sendMessage({
+      isOpenOverlay: false
+    }).then((response) => {
+      closeOverlay();
+    });
+  });
+  document.body.appendChild(overlayEle);
+
+  let overlayWrapperEle =
+    document.getElementById('auto-scrolling-overlay-wrapper');
+  overlayWrapperEle.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+  });
+};
+
+insertOverlayEle();
+
+const setupOverlayWindow= () => {
+  const scrollingSpeedEl = document.getElementById(
+    'auto-scrolling-overlay-scrolling-speed');
+  const stopScrollingByClickEl = document.getElementById(
+    'auto-scrolling-overlay-stop-scrolling-by-click');
+
+  scrollingSpeedEl.addEventListener('change',
+    setScrollingSpeed);
+  stopScrollingByClickEl.addEventListener('change',
+    setStopScrollingByClick);
+
+  browser.storage.sync.get({
+    scrollingSpeed: 50,
+    stopScrollingByClick: true
+  }).then((options) => {
+    scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
+    stopScrollingByClickEl.checked = options.stopScrollingByClick;
+  });
+};
+
+const setScrollingSpeed = (ev) => {
+  let scrollingSpeed = ev.target.value;
+  if (scrollingSpeed > 100) {
+    scrollingSpeed = 99;
+  }
+  else if (scrollingSpeed < 0) {
+    scrollingSpeed = 1;
+  }
+  browser.storage.sync.set({ scrollingSpeed: scrollingSpeed });
+};
+
+const setStopScrollingByClick = (ev) => {
+  let stopScrollingByClick = ev.target.checked;
+  browser.storage.sync.set({ stopScrollingByClick: stopScrollingByClick });
+};
+
+setupOverlayWindow();

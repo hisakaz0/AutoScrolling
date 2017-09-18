@@ -1,6 +1,7 @@
 
 PACKAGE_DIR = web-ext-artifacts
-IGNORE_FILES = test
+IGNORE_FILES = tests Makefile package-lock.json package.json doc node_modules \
+							 Session.vim screenshots src web-ext-artifacts webpack.config.js
 API_KEY = $(shell cat ~/.firefox/add-on/JWT_issuer)
 API_SECRET = $(shell cat ~/.firefox/add-on/JWT_secret)
 

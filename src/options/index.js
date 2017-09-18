@@ -1,41 +1,27 @@
 
 'use strict';
 
-import { setValueToStorage, onError } from '../utils';
+import { onError } from '../utils';
 
-/*
- *  It is consists of the following specification of this object, 'addon_options'.
- *  addon_options = {
- *    "name1": value1,
- *    "name2": value2,
- *    ...
- *  };
- */
-const addonOptions = {
-  scrollingSpeed: 50,
-  stopScrollingByClick: true,
-};
+const setupOptionPage = () => {
+  const scrollingSpeedEl =
+    document.getElementById('scrolling-speed');
+  const stopScrollingByClickEl =
+    document.getElementById('stop-scrolling-by-click');
 
-const setupOnDOMContentLoaded = () => {
-  document.addEventListener('DOMContentLoaded', () => {
-    const scrollingSpeedEl =
-      document.getElementById('scrolling-speed');
-    const stopScrollingByClickEl =
-      document.getElementById('stop-scrolling-by-click');
+  scrollingSpeedEl.addEventListener('change', setScrollingSpeed);
+  stopScrollingByClickEl.addEventListener('change', setStopScrollingByClick);
 
-    scrollingSpeedEl.addEventListener('change', setScrollingSpeed);
-    stopScrollingByClickEl.addEventListener('change', setStopScrollingByClick);
-
-    const options = getValueFromStorage(addonOptions);
+  browser.storage.sync.get({
+    scrollingSpeed: 50,
+    stopScrollingByClick: true
+  }).then((options) => {
     scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
-    stopScrollingByClickEl.checked = items.stopScrollingByClick;
+    stopScrollingByClickEl.checked = options.stopScrollingByClick;
   });
 };
 
 const setScrollingSpeed = (ev) => {
-  if (ev.target.name != 'scrolling-speed') {
-    return;
-  }
   let scrollingSpeed = ev.target.value;
   if (scrollingSpeed > 100) {
     scrollingSpeed = 99;
@@ -43,21 +29,12 @@ const setScrollingSpeed = (ev) => {
   else if (scrollingSpeed < 0) {
     scrollingSpeed = 1;
   }
-  setValueToStorage({ scrollingSpeed: scrollingSpeed });
+  browser.storage.sync.set({ scrollingSpeed: scrollingSpeed });
 };
 
 const setStopScrollingByClick = (ev) => {
-  if (ev.target.name != 'stop-scrolling-by-click') {
-    return;
-  }
   let stopScrollingByClick = ev.target.checked;
-  setValueToStorage({ stopScrollingByClick: stopScrollingByClick });
+  browser.storage.sync.set({ stopScrollingByClick: stopScrollingByClick });
 };
 
-setupOnDOMContentLoaded();
-
-export { addonOptions,
-  setupOnDOMContentLoaded,
-  setScrollingSpeed,
-  setStopScrollingByClick
-};
+setupOptionPage();

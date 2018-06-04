@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const src = path.resolve(__dirname, 'src');
-const dist = path.resolve(__dirname, 'dist');
+const dist = path.resolve(__dirname, 'public');
 
 module.exports = {
   entry: {
@@ -47,7 +47,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'options.html',
-      template: 'src/options/index.html',
+      template: path.join(src, '/options/index.html'),
       inject: false
     }),
     new ExtractTextPlugin('index.css')

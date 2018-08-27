@@ -105,6 +105,14 @@ function resetIsWaitingDoubleClick (windowId) {
 //////////////////////////////////////////////////////////////////////////////
 // Event listeners / event functions
 
+// Listens for all of the available and assignable keyboard shortcut commands.
+browser.commands.onCommand.addListener(function(command) {
+  const currentTab = browser.tabs.getCurrent();
+  if (command == 'toggle-scrolling-state') {
+    toggleAutoScrolling(currentTab);
+  }
+});
+
 browser.windows.onCreated.addListener((window) => {
   const windowId = window.id;
   createAutoScrollingState(windowId);

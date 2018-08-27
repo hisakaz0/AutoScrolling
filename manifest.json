@@ -14,7 +14,7 @@
 
   "description": "Auto-scrolling without mouse-wheel",
 
-  "permissions": [ "storage" ],
+  "permissions": ["storage"],
 
   "options_ui": {
     "page": "dist/options.html"
@@ -35,13 +35,22 @@
 
   "content_scripts": [
     {
-      "matches": [ "<all_urls>" ],
-      "js": [ "dist/content.js" ],
-      "css": [ "dist/index.css" ]
+      "matches": ["<all_urls>"],
+      "js": ["dist/content.js"],
+      "css": ["dist/index.css"]
     }
   ],
 
   "background": {
-    "scripts": [ "dist/background.js" ]
+    "scripts": ["dist/background.js"]
+  },
+
+  "commands": {
+    "toggle-scrolling-state": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+PageDown"
+      },
+      "description": "Sends a command to toggle the Autoscrolling ON or OFF"
+    }
   }
 }

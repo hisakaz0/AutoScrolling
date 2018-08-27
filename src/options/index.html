@@ -9,15 +9,23 @@
         <h2>Scrolling speed</h2>
         <p>The value is scrolling speed. Max is 99, and min is 1.</p>
         <p><strong>Scrolling speed:</strong>
-          <input type="text" id="scrolling-speed" name="scrolling-speed" value=50 />
+        <input type="text" id="scrolling-speed" name="scrolling-speed" value=50 />
         </p>
       </div>
       <div>
         <h2>To stop scrolling by click</h2>
         <p>The value decides the weather stoppling the scrolling when you click the scrolling window.</p>
         <p><strong>Scrolling stop by click:</strong>
-          <input type="checkbox" id='stop-scrolling-by-click'
-            name='stop-scrolling-by-click' value=true checked=true />
+        <input type="checkbox" id='stop-scrolling-by-click'
+               name='stop-scrolling-by-click' value=true checked=true />
+        </p>
+      </div>
+      <div>
+        <h2>Toggle the tab's scrolling by keyboard shortcut</h2>
+        <p>The value should be a combination of keycodes combined with the '+' sign. Ex: Ctrl+E.</p>
+        <p>Check out the link for the keycodes: <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/commands#Key_combinations" target="_blank">Key combinations</a></p>
+        <p><strong>Shortcut: Toggle Autoscrolling for the current tab</strong>
+        <input type="text" id="kb-shortcut-toggle-current-tab" value="Ctrl+Shift+PageDown" />
         </p>
       </div>
     </div>

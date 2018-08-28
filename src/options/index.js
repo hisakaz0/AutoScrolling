@@ -11,7 +11,7 @@ const updateKeyboardShortcut = (shortcutName, newShortcutCombination) => {
       shortcut: newShortcutCombination 
     }
   ).catch(onError);
-  browser.storage.sync.set({ shortcutToggleCurrentTab });
+  browser.storage.sync.set({ shortcutName: newShortcutCombination });
 };
 
 const setupOptionPage = () => {
@@ -29,7 +29,7 @@ const setupOptionPage = () => {
   browser.storage.sync.get({
     scrollingSpeed: 50,
     stopScrollingByClick: true,
-    shortcutToggleCurrentTab: 'Alt+Shift+PageDown'
+    'toggle-scrolling-state': 'Alt+Shift+PageDown'
   }).then((options) => {
     scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
     stopScrollingByClickEl.checked = options.stopScrollingByClick;

@@ -4,14 +4,15 @@
 import { onError } from '../utils';
 
 const updateKeyboardShortcut = (shortcutName, newShortcutCombination) => {
-  console.log('Updating', shortcutName, newShortcutCombination);
   browser.commands.update(
     {
       name: shortcutName,
       shortcut: newShortcutCombination 
     }
   ).catch(onError);
-  browser.storage.sync.set({ shortcutName: newShortcutCombination });
+  let updateObject = {};
+  updateObject[shortcutName] = newShortcutCombination;
+  browser.storage.sync.set(updateObject);
 };
 
 const setupOptionPage = () => {
@@ -29,11 +30,12 @@ const setupOptionPage = () => {
   browser.storage.sync.get({
     scrollingSpeed: 50,
     stopScrollingByClick: true,
-    'toggle-scrolling-state': 'Alt+Shift+PageDown'
+    'toggle-scrolling-state': 'Alt+Shift+PageDown' 
   }).then((options) => {
     scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
     stopScrollingByClickEl.checked = options.stopScrollingByClick;
-    updateKeyboardShortcut('toggle-scrolling-state', options.shortcutToggleCurrentTab);
+    shortcutToggleCurrentTabEl.value = options['toggle-scrolling-state'];
+    updateKeyboardShortcut('toggle-scrolling-state', options['toggle-scrolling-state']);
   });
 };
 

@@ -4,12 +4,14 @@
 import { onError } from '../utils';
 
 const updateKeyboardShortcut = (shortcutName, newShortcutCombination) => {
+  console.log('Updating', shortcutName, newShortcutCombination);
   browser.commands.update(
     {
       name: shortcutName,
       shortcut: newShortcutCombination 
     }
   ).catch(onError);
+  browser.storage.sync.set({ shortcutToggleCurrentTab });
 };
 
 const setupOptionPage = () => {
@@ -17,17 +19,17 @@ const setupOptionPage = () => {
     document.getElementById('scrolling-speed');
   const stopScrollingByClickEl =
     document.getElementById('stop-scrolling-by-click');
-  const shortcutToggleCurrentTab =
+  const shortcutToggleCurrentTabEl =
     document.getElementById('kb-shortcut-toggle-current-tab');
 
   scrollingSpeedEl.addEventListener('change', setScrollingSpeed);
   stopScrollingByClickEl.addEventListener('change', setStopScrollingByClick);
-  shortcutToggleCurrentTab.addEventListener('blur', setShortcutForTogglingCurrentTab);
+  shortcutToggleCurrentTabEl.addEventListener('blur', setShortcutForTogglingCurrentTab);
 
   browser.storage.sync.get({
     scrollingSpeed: 50,
     stopScrollingByClick: true,
-    shortcutToggleCurrentTab: 'Ctrl+Shift+PageDown'
+    shortcutToggleCurrentTab: 'Alt+Shift+PageDown'
   }).then((options) => {
     scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
     stopScrollingByClickEl.checked = options.stopScrollingByClick;
@@ -52,8 +54,8 @@ const setStopScrollingByClick = (ev) => {
 };
 
 const setShortcutForTogglingCurrentTab = (ev) => {
-  let shortcutToggleCurrentTab = ev.target.value;
-  browser.storage.sync.set({ shortcutToggleCurrentTab });
+  let kbShortcut = ev.target.value;
+  updateKeyboardShortcut('toggle-scrolling-state', kbShortcut);
 };
 
 setupOptionPage();

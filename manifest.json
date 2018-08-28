@@ -48,7 +48,7 @@
   "commands": {
     "toggle-scrolling-state": {
       "suggested_key": {
-        "default": "Ctrl+Shift+PageDown"
+        "default": "Alt+Shift+PageDown"
       },
       "description": "Sends a command to toggle the Autoscrolling ON or OFF"
     }

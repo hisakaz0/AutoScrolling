@@ -59,10 +59,10 @@ function toggleAutoScrolling (tab) {
   // function is not called.
   const tabId = tab.id;
   const windowId = tab.windowId;
-  const willIsScrolling = ! autoScrollingStates[ windowId ].isScrolling;
+  const willIsScrolling = !(autoScrollingStates[ windowId ] && autoScrollingStates[ windowId ].isScrolling);
   browser.tabs.sendMessage(tabId, {
     isScrolling: willIsScrolling
-  }).then((response) => {
+  }).then(() => {
     autoScrollingStates[ windowId ].tabId = tabId;
     autoScrollingStates[ windowId ].isScrolling = willIsScrolling;
   }).catch(onError);
@@ -107,10 +107,15 @@ function resetIsWaitingDoubleClick (windowId) {
 
 // Listens for all of the available and assignable keyboard shortcut commands.
 browser.commands.onCommand.addListener(function(command) {
-  const currentTab = browser.tabs.getCurrent();
-  if (command == 'toggle-scrolling-state') {
-    toggleAutoScrolling(currentTab);
-  }
+  // https://stackoverflow.com/questions/43695817/tabs-getcurrent-result-is-undefined
+  browser.tabs.query({active: true, windowId: browser.windows.WINDOW_ID_CURRENT})
+    .then(tabs => browser.tabs.get(tabs[0].id))
+    .then(currentTab => {
+      if (command == 'toggle-scrolling-state') {
+        toggleAutoScrolling(currentTab);
+      }
+    })
+    .catch(onError);
 });
 
 browser.windows.onCreated.addListener((window) => {

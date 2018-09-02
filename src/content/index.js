@@ -5,24 +5,49 @@ import { onError } from '../utils';
 import './index.css';
 
 const autoScrolling = {
-  tid: -1,
+  intervalID: -1, 
   x: 0,
   y: 0,
   scrollingStep: 1,
   scrollingSpeed: 50,
   scrollingElement: document.documentElement,
   stopScrollingByClick: true,
-  start: function () {
+  stopScrollingByTextHover: false,
+  currentlyHovering: false,
+  scrollingAction: function () {
+    if (this.stopScrollingOnHover && this.currentlyHovering) {
+      return;
+    }
     this.y = this.y + this.scrollingStep;
     this.scrollingElement.scroll(this.x, this.y);
-    this.tid = setTimeout(() => {
-      this.start();
-    }, 100 - this.scrollingSpeed);
+  },
+  start: function () {
+    if (this.stopScrollingByTextHover) {
+      unregisterBodyMouseEvents();
+      registerBodyMouseEvents();
+    }
+    this.intervalID = window.setInterval(this.scrollingAction, 100 - this.scrollingSpeed);
   },
   stop: function () {
-    clearTimeout(this.tid);
-    this.tid = -1;
+    unregisterBodyMouseEvents();
+    window.clearInterval(this.intervalID);
   },
+};
+
+const registerBodyMouseEvents = () => {
+  document.body.addEventListener(
+    'mouseover',
+    (e) => {
+      if (e.target == document.body) {
+        autoScrolling.currentlyHovering = false;
+      } else {
+        autoScrolling.currentlyHovering = true;
+      }
+    }
+  );
+};
+const unregisterBodyMouseEvents = () => {
+  document.body.removeEventListener('mouseover', registerBodyMouseEvents);
 };
 
 const getScrollingElement = () => {

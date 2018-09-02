@@ -23,7 +23,7 @@ const setupOptionPage = () => {
     document.getElementById('scrolling-speed');
   const stopScrollingByClickEl =
     document.getElementById('stop-scrolling-by-click');
-  const stopScrollingOnHover =
+  const stopScrollingOnHoverEl =
     document.getElementById('stop-scrolling-on-hover');
   const shortcutToggleCurrentTabEl =
     document.getElementById('kb-shortcut-toggle-current-tab');
@@ -36,7 +36,7 @@ const setupOptionPage = () => {
   }).then((options) => {
     scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
     stopScrollingByClickEl.checked = options.stopScrollingByClick;
-    stopScrollingOnHover.checked = options.stopScrollingOnHover;
+    stopScrollingOnHoverEl.checked = options.stopScrollingOnHover;
     shortcutToggleCurrentTabEl.value = options['toggle-scrolling-state'];
     // Do not update the sync this time since we just read from it, so pass false as the last argument.
     updateKeyboardShortcut('toggle-scrolling-state', options['toggle-scrolling-state'], false);

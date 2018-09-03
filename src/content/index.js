@@ -69,14 +69,29 @@ const updateFromSync = () => {
 updateFromSync();
 
 // DOM Events
-const mouseoverEvents = ev => {
+const mouseoverEvents = (ev) => {
+  const target = ev.target;
   if (autoScrolling.stopScrollingOnHover) {
-    if (ev.target == document.body) {
+    if (target == document.body) {
       autoScrolling.currentlyHovering = false;
     } else {
-      autoScrolling.currentlyHovering = true;
+      let targetRect = target.getBoundingClientRect();
+      // console.log(ev, targetRect, (targetRect.right > ev.pageX || targetRect.top > ev.pageY));
+      // Check if the mouse is overlapping with the resulting element's dimensions.
+      if (
+        targetRect.width != document.body.clientWidth 
+        && (targetRect.right > ev.pageX || targetRect.top > ev.pageY)
+      ) {
+        autoScrolling.currentlyHovering = true;
+      } else {
+        autoScrolling.currentlyHovering = false;
+      }
     }
   }
+};
+
+const mouseoutEvents = () => {
+  autoScrolling.currentlyHovering = false;
 };
 
 const clickEvents = () => {
@@ -94,11 +109,13 @@ const clickEvents = () => {
 
 const registerBodyMouseEvents = () => {
   document.body.addEventListener('mouseover', mouseoverEvents);
+  document.body.addEventListener('mouseout', mouseoutEvents);
   document.body.addEventListener('click', clickEvents);
 };
 
 const unregisterBodyMouseEvents = () => {
   document.body.removeEventListener('mouseover', mouseoverEvents);
+  document.body.removeEventListener('mouseout', mouseoutEvents);
   document.body.removeEventListener('click', clickEvents);
 };
 

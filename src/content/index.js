@@ -10,7 +10,7 @@ const getScrollingElement = () => {
 };
 
 const defaultValues = {
-  intervalID: -1,
+  intervalId: -1,
   x: 0,
   y: 0,
   scrollingElement: null,
@@ -31,16 +31,16 @@ let autoScrolling = Object.assign({}, defaultValues, {
   },
   start: function() {
     this.scrollingElement = getScrollingElement();
-    unregisterBodyMouseEvents();
-    registerBodyMouseEvents();
-    this.intervalID = window.setInterval(
+    unregisterMouseListeners();
+    registerMouseListeners();
+    this.intervalId = window.setInterval(
       this.scrollingAction.bind(this),
       100 - this.scrollingSpeed
     );
   },
   stop: function() {
-    unregisterBodyMouseEvents();
-    window.clearInterval(this.intervalID);
+    unregisterMouseListeners();
+    window.clearInterval(this.intervalId);
   }
 });
 
@@ -69,32 +69,32 @@ const updateFromSync = () => {
 updateFromSync();
 
 // DOM Events
-const mouseoverEvents = (ev) => {
+const mouseoverListeners = ev => {
   const target = ev.target;
-  if (autoScrolling.stopScrollingOnHover) {
-    if (target == document.body) {
-      autoScrolling.currentlyHovering = false;
+  if (!autoScrolling.stopScrollingOnHover) {
+    return;
+  }
+  if (target == document.body) {
+    autoScrolling.currentlyHovering = false;
+  } else {
+    let targetRect = target.getBoundingClientRect();
+    // Check if the mouse is overlapping with the element's dimensions.
+    if (
+      targetRect.width != document.body.clientWidth &&
+      (targetRect.right > ev.pageX || targetRect.top > ev.pageY)
+    ) {
+      autoScrolling.currentlyHovering = true;
     } else {
-      let targetRect = target.getBoundingClientRect();
-      // console.log(ev, targetRect, (targetRect.right > ev.pageX || targetRect.top > ev.pageY));
-      // Check if the mouse is overlapping with the resulting element's dimensions.
-      if (
-        targetRect.width != document.body.clientWidth 
-        && (targetRect.right > ev.pageX || targetRect.top > ev.pageY)
-      ) {
-        autoScrolling.currentlyHovering = true;
-      } else {
-        autoScrolling.currentlyHovering = false;
-      }
+      autoScrolling.currentlyHovering = false;
     }
   }
 };
 
-const mouseoutEvents = () => {
+const mouseoutListeners = () => {
   autoScrolling.currentlyHovering = false;
 };
 
-const clickEvents = () => {
+const clickListeners = () => {
   if (autoScrolling.stopScrollingByClick == true) {
     browser.runtime
       .sendMessage({
@@ -107,16 +107,16 @@ const clickEvents = () => {
   }
 };
 
-const registerBodyMouseEvents = () => {
-  document.body.addEventListener('mouseover', mouseoverEvents);
-  document.body.addEventListener('mouseout', mouseoutEvents);
-  document.body.addEventListener('click', clickEvents);
+const registerMouseListeners = () => {
+  document.body.addEventListener('mouseover', mouseoverListeners);
+  document.body.addEventListener('mouseout', mouseoutListeners);
+  document.body.addEventListener('click', clickListeners);
 };
 
-const unregisterBodyMouseEvents = () => {
-  document.body.removeEventListener('mouseover', mouseoverEvents);
-  document.body.removeEventListener('mouseout', mouseoutEvents);
-  document.body.removeEventListener('click', clickEvents);
+const unregisterMouseListeners = () => {
+  document.body.removeEventListener('mouseover', mouseoverListeners);
+  document.body.removeEventListener('mouseout', mouseoutListeners);
+  document.body.removeEventListener('click', clickListeners);
 };
 
 // WebExtensions Events

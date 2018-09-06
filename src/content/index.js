@@ -13,7 +13,7 @@ const defaultValues = {
   intervalId: -1,
   x: 0,
   y: 0,
-  scrollingElement: null,
+  scrollingElement: getScrollingElement(),
   currentlyHovering: false,
   scrollingStep: 1,
   scrollingSpeed: 50,
@@ -31,20 +31,19 @@ let autoScrolling = Object.assign({}, defaultValues, {
   },
   start: function() {
     this.scrollingElement = getScrollingElement();
-    unregisterMouseListeners();
-    registerMouseListeners();
+    removeMouseListeners();
+    addMouseListeners();
     this.intervalId = window.setInterval(
       this.scrollingAction.bind(this),
       100 - this.scrollingSpeed
     );
   },
   stop: function() {
-    unregisterMouseListeners();
+    removeMouseListeners();
     window.clearInterval(this.intervalId);
   }
 });
 
-// Deconstruct only the fields which are synchronized.
 const updateFromSync = () => {
   const {
     scrollingStep,
@@ -107,13 +106,13 @@ const clickListeners = () => {
   }
 };
 
-const registerMouseListeners = () => {
+const addMouseListeners = () => {
   document.body.addEventListener('mouseover', mouseoverListeners);
   document.body.addEventListener('mouseout', mouseoutListeners);
   document.body.addEventListener('click', clickListeners);
 };
 
-const unregisterMouseListeners = () => {
+const removeMouseListeners = () => {
   document.body.removeEventListener('mouseover', mouseoverListeners);
   document.body.removeEventListener('mouseout', mouseoutListeners);
   document.body.removeEventListener('click', clickListeners);

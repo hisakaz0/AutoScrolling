@@ -1,64 +1,132 @@
-
 'use strict';
 
 import { onError } from '../utils';
 import './index.css';
 
-const autoScrolling = {
-  tid: -1,
+const getScrollingElement = () => {
+  return document.scrollingElement
+    ? document.scrollingElement
+    : document.documentElement;
+};
+
+const defaultValues = {
+  intervalId: -1,
   x: 0,
   y: 0,
+  scrollingElement: getScrollingElement(),
+  currentlyHovering: false,
   scrollingStep: 1,
   scrollingSpeed: 50,
-  scrollingElement: document.documentElement,
   stopScrollingByClick: true,
-  start: function () {
+  stopScrollingOnHover: false
+};
+
+let autoScrolling = Object.assign({}, defaultValues, {
+  scrollingAction: function() {
+    if (this.stopScrollingOnHover && this.currentlyHovering) {
+      return;
+    }
     this.y = this.y + this.scrollingStep;
     this.scrollingElement.scroll(this.x, this.y);
-    this.tid = setTimeout(() => {
-      this.start();
-    }, 100 - this.scrollingSpeed);
   },
-  stop: function () {
-    clearTimeout(this.tid);
-    this.tid = -1;
+  start: function() {
+    this.scrollingElement = getScrollingElement();
+    removeMouseListeners();
+    addMouseListeners();
+    this.intervalId = window.setInterval(
+      this.scrollingAction.bind(this),
+      100 - this.scrollingSpeed
+    );
   },
+  stop: function() {
+    removeMouseListeners();
+    window.clearInterval(this.intervalId);
+  }
+});
+
+const updateFromSync = () => {
+  const {
+    scrollingStep,
+    scrollingSpeed,
+    stopScrollingByClick,
+    stopScrollingOnHover
+  } = defaultValues;
+
+  browser.storage.sync
+    .get({
+      scrollingStep,
+      scrollingSpeed,
+      stopScrollingByClick,
+      stopScrollingOnHover
+    })
+    .then(data => {
+      Object.assign(autoScrolling, data);
+    })
+    .catch(onError);
 };
 
-const getScrollingElement = () => {
-  return document.scrollingElement ?
-    document.scrollingElement : document.documentElement;
+updateFromSync();
+
+// DOM Events
+const mouseoverListeners = ev => {
+  const target = ev.target;
+  if (!autoScrolling.stopScrollingOnHover) {
+    return;
+  }
+  if (target == document.body) {
+    autoScrolling.currentlyHovering = false;
+  } else {
+    let targetRect = target.getBoundingClientRect();
+    // Check if the mouse is overlapping with the element's dimensions.
+    if (
+      targetRect.width != document.body.clientWidth &&
+      (targetRect.right > ev.pageX || targetRect.top > ev.pageY)
+    ) {
+      autoScrolling.currentlyHovering = true;
+    } else {
+      autoScrolling.currentlyHovering = false;
+    }
+  }
 };
 
-const defaultStopScrollingByClick = true;
-browser.storage.sync.get({
-  stopScrollingByClick: defaultStopScrollingByClick
-}).then((data) => {
-  const { stopScrollingByClick } = data;
-  autoScrolling.stopScrollingByClick = stopScrollingByClick;
-}).catch(onError);
+const mouseoutListeners = () => {
+  autoScrolling.currentlyHovering = false;
+};
 
-const defaultScrollingSpeed = 50;
-browser.storage.sync.get({
-  scrollingSpeed: defaultScrollingSpeed
-}).then((data) => {
-  const { scrollingSpeed } = data;
-  autoScrolling.scrollingSpeed= scrollingSpeed;
-}).catch(onError);
+const clickListeners = () => {
+  if (autoScrolling.stopScrollingByClick == true) {
+    browser.runtime
+      .sendMessage({
+        isScrolling: false
+      })
+      .then(() => {
+        autoScrolling.stop();
+      })
+      .catch(onError);
+  }
+};
 
+const addMouseListeners = () => {
+  document.body.addEventListener('mouseover', mouseoverListeners);
+  document.body.addEventListener('mouseout', mouseoutListeners);
+  document.body.addEventListener('click', clickListeners);
+};
 
-browser.runtime.onMessage.addListener((msg) => {
-  if (!msg.isScrolling && autoScrolling.tid !== -1) {
+const removeMouseListeners = () => {
+  document.body.removeEventListener('mouseover', mouseoverListeners);
+  document.body.removeEventListener('mouseout', mouseoutListeners);
+  document.body.removeEventListener('click', clickListeners);
+};
+
+// WebExtensions Events
+browser.runtime.onMessage.addListener(msg => {
+  if (msg.isScrolling) {
+    autoScrolling.x = window.scrollX;
+    autoScrolling.y = window.scrollY;
+    autoScrolling.scrollingElement = getScrollingElement();
+    autoScrolling.start();
+  } else {
     autoScrolling.stop();
-  } else if (msg.isScrolling) {
-    new Promise((resolve, reject) => {
-      autoScrolling.x = window.scrollX;
-      autoScrolling.y = window.scrollY;
-      autoScrolling.scrollingElement = getScrollingElement();
-      return resolve();
-    }).then(() => {
-      autoScrolling.start();
-    });
   }
 
   if (msg.isOpenOverlay) {
@@ -66,7 +134,7 @@ browser.runtime.onMessage.addListener((msg) => {
   }
 });
 
-browser.storage.onChanged.addListener((changes) => {
+browser.storage.onChanged.addListener(changes => {
   var changedItems = Object.keys(changes);
   for (var item of changedItems) {
     if (item == 'scrollingSpeed') {
@@ -78,84 +146,71 @@ browser.storage.onChanged.addListener((changes) => {
   }
 });
 
-document.body.addEventListener('click', () => {
-  if (autoScrolling.tid !== -1 &&
-      autoScrolling.stopScrollingByClick == true) {
-    browser.runtime.sendMessage({
-      isScrolling: false
-    }).then(() => {
-      autoScrolling.stop();
-    }).catch(onError);
-  }
-});
-
+// Autoscrolling Overlay
 const openOverlay = () => {
   let overlayEle = document.getElementById('auto-scrolling-overlay');
-  overlayEle.classList = [ 'auto-scrolling-overlay is-open' ];
+  overlayEle.classList = ['auto-scrolling-overlay is-open'];
 };
 
 const closeOverlay = () => {
   let overlayEle = document.getElementById('auto-scrolling-overlay');
-  overlayEle.classList = [ 'auto-scrolling-overlay' ];
+  overlayEle.classList = ['auto-scrolling-overlay'];
 };
 
-const insertOverlayEle = () => {
+const setScrollingSpeed = ev => {
+  let scrollingSpeed = ev.target.value;
+  if (scrollingSpeed > 100) {
+    scrollingSpeed = 99;
+  } else if (scrollingSpeed < 0) {
+    scrollingSpeed = 1;
+  }
+  autoScrolling.scrollingSpeed = scrollingSpeed;
+  browser.storage.sync.set({ scrollingSpeed: scrollingSpeed });
+};
+
+const setStopScrollingByClick = ev => {
+  let stopScrollingByClick = ev.target.checked;
+  autoScrolling.stopScrollingByClick = stopScrollingByClick;
+  browser.storage.sync.set({ stopScrollingByClick: stopScrollingByClick });
+};
+
+const insertOverlayElement = () => {
   let overlayEle = document.createElement('div');
   overlayEle.id = 'auto-scrolling-overlay';
-  overlayEle.classList = [ 'auto-scrolling-overlay' ];
+  overlayEle.classList = ['auto-scrolling-overlay'];
   overlayEle.innerHTML = require('html-loader!./index.html');
-  overlayEle.addEventListener('click', (ev) => {
-    browser.runtime.sendMessage({
-      isOpenOverlay: false
-    }).then((response) => {
-      closeOverlay();
-    });
+  overlayEle.addEventListener('click', () => {
+    browser.runtime
+      .sendMessage({
+        isOpenOverlay: false
+      })
+      .then(() => {
+        closeOverlay();
+      })
+      .catch(onError);
   });
   document.body.appendChild(overlayEle);
 
-  let overlayWrapperEle =
-    document.getElementById('auto-scrolling-overlay-wrapper');
-  overlayWrapperEle.addEventListener('click', (ev) => {
+  let overlayWrapperEle = document.getElementById(
+    'auto-scrolling-overlay-wrapper'
+  );
+  overlayWrapperEle.addEventListener('click', ev => {
     ev.stopPropagation();
   });
 };
 
-insertOverlayEle();
+const setupOverlayWindow = () => {
+  insertOverlayElement();
 
-const setupOverlayWindow= () => {
   const scrollingSpeedEl = document.getElementById(
-    'auto-scrolling-overlay-scrolling-speed');
+    'auto-scrolling-overlay-scrolling-speed'
+  );
   const stopScrollingByClickEl = document.getElementById(
-    'auto-scrolling-overlay-stop-scrolling-by-click');
+    'auto-scrolling-overlay-stop-scrolling-by-click'
+  );
 
-  scrollingSpeedEl.addEventListener('change',
-    setScrollingSpeed);
-  stopScrollingByClickEl.addEventListener('change',
-    setStopScrollingByClick);
-
-  browser.storage.sync.get({
-    scrollingSpeed: 50,
-    stopScrollingByClick: true
-  }).then((options) => {
-    scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
-    stopScrollingByClickEl.checked = options.stopScrollingByClick;
-  });
-};
-
-const setScrollingSpeed = (ev) => {
-  let scrollingSpeed = ev.target.value;
-  if (scrollingSpeed > 100) {
-    scrollingSpeed = 99;
-  }
-  else if (scrollingSpeed < 0) {
-    scrollingSpeed = 1;
-  }
-  browser.storage.sync.set({ scrollingSpeed: scrollingSpeed });
-};
-
-const setStopScrollingByClick = (ev) => {
-  let stopScrollingByClick = ev.target.checked;
-  browser.storage.sync.set({ stopScrollingByClick: stopScrollingByClick });
+  scrollingSpeedEl.addEventListener('change', setScrollingSpeed);
+  stopScrollingByClickEl.addEventListener('change', setStopScrollingByClick);
 };
 
 setupOverlayWindow();

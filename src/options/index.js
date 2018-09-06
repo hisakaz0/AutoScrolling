@@ -44,7 +44,7 @@ const setupOptionPage = () => {
 
   scrollingSpeedEl.addEventListener('change', setScrollingSpeed);
   stopScrollingByClickEl.addEventListener('change', setStopScrollingByClick);
-  stopScrollingOnHover.addEventListener('change', setStopScrollingOnHover);
+  stopScrollingOnHoverEl.addEventListener('change', setStopScrollingOnHover);
   shortcutToggleCurrentTabEl.addEventListener('blur', setShortcutForTogglingCurrentTab);
 };
 

@@ -1,7 +1,6 @@
 'use strict';
 
 import { onError } from '../utils';
-import './index.css';
 
 const getScrollingElement = () => {
   return document.scrollingElement
@@ -130,9 +129,44 @@ browser.runtime.onMessage.addListener(msg => {
   }
 
   if (msg.isOpenOverlay) {
-    openOverlay();
+    loadAllOptionsOnStorage()
+      .then(options => {
+        return setOnOptionWindowWith(options);
+      })
+      .then(() => {
+        openOverlay();
+      })
+      .catch(onError);
   }
 });
+
+const setOnOptionWindowWith = options => {
+  return setValueOnInput(
+    'auto-scrolling-overlay-scrolling-speed',
+    options.scrollingSpeed)
+    .then(() => {
+      return setValueOnInput(
+        'auto-scrolling-overlay-stop-scrolling-by-click',
+        options.stopScrollingByClick)
+    })
+    .then(() => {
+      return setValueOnInput(
+        'stop-scrolling-on-hover',
+        options.stopScrollingOnHover)
+    })
+    .then(() => {
+      return setValueOnInput(
+        'kb-shortcut-toggle-current-tab',
+        options["toggle-scrolling-state"])
+    });
+};
+
+const setValueOnInput = (id, value) => {
+  return new Promise(resolve => {
+    document.getElementById(id).value = value;
+    resolve();
+  });
+};
 
 browser.storage.onChanged.addListener(changes => {
   var changedItems = Object.keys(changes);
@@ -148,13 +182,13 @@ browser.storage.onChanged.addListener(changes => {
 
 // Autoscrolling Overlay
 const openOverlay = () => {
-  let overlayEle = document.getElementById('auto-scrolling-overlay');
-  overlayEle.classList = ['auto-scrolling-overlay is-open'];
+  document.getElementById('modal-auto-scrolling')
+    .classList.add('active');
 };
 
 const closeOverlay = () => {
-  let overlayEle = document.getElementById('auto-scrolling-overlay');
-  overlayEle.classList = ['auto-scrolling-overlay'];
+  document.getElementById('modal-auto-scrolling')
+    .classList.remove('active');
 };
 
 const setScrollingSpeed = ev => {
@@ -174,43 +208,66 @@ const setStopScrollingByClick = ev => {
   browser.storage.sync.set({ stopScrollingByClick: stopScrollingByClick });
 };
 
-const insertOverlayElement = () => {
-  let overlayEle = document.createElement('div');
-  overlayEle.id = 'auto-scrolling-overlay';
-  overlayEle.classList = ['auto-scrolling-overlay'];
-  overlayEle.innerHTML = require('html-loader!./index.html');
-  overlayEle.addEventListener('click', () => {
-    browser.runtime
-      .sendMessage({
-        isOpenOverlay: false
-      })
-      .then(() => {
-        closeOverlay();
-      })
-      .catch(onError);
-  });
-  document.body.appendChild(overlayEle);
+const sendMessageCloseModal = ev => {
+  browser.runtime
+    .sendMessage({ isOpenOverlay: false })
+    .then(() => { closeOverlay(); })
+    .catch(onError);
+};
 
-  let overlayWrapperEle = document.getElementById(
-    'auto-scrolling-overlay-wrapper'
-  );
-  overlayWrapperEle.addEventListener('click', ev => {
-    ev.stopPropagation();
+function insertOverlayElement () {
+  let overlayEle = document.createElement('div');
+  overlayEle.id = 'auto-scrolling';
+  overlayEle.innerHTML = require('html-loader!./index.html');
+  return new Promise(resolve => {
+    resolve(document.body.appendChild(overlayEle));
   });
 };
 
-const setupOverlayWindow = () => {
-  insertOverlayElement();
+function setupOverlayWindow () {
+  insertOverlayElement().then(setEvetListeners);
+};
 
-  const scrollingSpeedEl = document.getElementById(
-    'auto-scrolling-overlay-scrolling-speed'
-  );
-  const stopScrollingByClickEl = document.getElementById(
-    'auto-scrolling-overlay-stop-scrolling-by-click'
-  );
+function setEvetListeners (parent) {
+  document.querySelectorAll('[data-modal-auto-scrolling]')
+    .forEach(ele => {
+      ele.addEventListener('click', sendMessageCloseModal)
+    });
+  document.getElementById('auto-scrolling-overlay-scrolling-speed')
+    .addEventListener('change', setScrollingSpeed);
+  document.getElementById('auto-scrolling-overlay-stop-scrolling-by-click')
+    .addEventListener('change', setStopScrollingByClick);
+  document.getElementById("stop-scrolling-on-hover")
+    .addEventListener('change', listenerOnChangeStopScrollingOnHover);
+  document.getElementById("kb-shortcut-toggle-current-tab")
+    .addEventListener('change', listenerOnChangeKbShortcutToggleCurrentTab);
+}
 
-  scrollingSpeedEl.addEventListener('change', setScrollingSpeed);
-  stopScrollingByClickEl.addEventListener('change', setStopScrollingByClick);
+const listenerOnChangeStopScrollingOnHover = ev => {
+  const newValue = ev.target.checked;
+  autoScrolling.stopScrollingOnHover = newValue;
+  saveOptionOnStorageWith({ stopScrollingOnHover: newValue })
+    .catch(onError);
+};
+
+const listenerOnChangeKbShortcutToggleCurrentTab = ev => {
+  const option = { "toggle-scrolling-state": ev.target.value };
+  saveOptionOnStorageWith(option)
+    .catch(onError);
+  sendMessageToUpdateCommandWith(option)
+    .catch(onError);
+};
+
+const saveOptionOnStorageWith = option => {
+  return browser.storage.sync.set(option);
+}
+
+const sendMessageToUpdateCommandWith = option => {
+  return browser.runtime.sendMessage(option);
+};
+
+const loadAllOptionsOnStorage = () => {
+  return browser.storage.sync.get();
 };
 
 setupOverlayWindow();

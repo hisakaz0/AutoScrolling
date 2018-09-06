@@ -166,5 +166,13 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.isOpenOverlay == false) {
     autoScrollingStates[ sender.tab.windowId ].isOpenOverlay = false;
   }
+  if (msg["toggle-scrolling-state"] != undefined) {
+    browser.commands.update(
+      {
+        name: "toggle-scrolling-state",
+        shortcut: msg["toggle-scrolling-state"]
+      }
+    );
+  }
 });
 

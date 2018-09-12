@@ -1,0 +1,67 @@
+
+@import "node_modules/spectre.css/src/variables";
+@import "node_modules/spectre.css/src/mixins";
+
+// Wrapper of modal option window
+#auto-scrolling {
+
+  @import "node_modules/spectre.css/src/normalize";
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  // 'html' of "node_modules/spectre.css/src/base"
+  box-sizing: border-box;
+  font-size: $html-font-size;
+  line-height: $html-line-height;
+  -webkit-tap-highlight-color: transparent;
+
+  // 'body' of "node_modules/spectre.css/src/base"
+  > div {
+    background: $body-bg;
+    color: $body-font-color;
+    font-family: $body-font-family;
+    font-size: $font-size;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    color: $link-color;
+    outline: none;
+    text-decoration: none;
+
+    &:focus {
+      @include control-shadow();
+    }
+
+    &:focus,
+    &:hover,
+    &:active,
+    &.active {
+      color: $link-color-dark;
+      text-decoration: underline;
+    }
+
+    &:visited {
+      color: $link-color-light;
+    }
+  }
+
+  @import "node_modules/spectre.css/src/modals";
+  @import "node_modules/spectre.css/src/animations";
+  @import "node_modules/spectre.css/src/buttons";
+  @import "node_modules/spectre.css/src/utilities";
+  @import "node_modules/spectre.css/src/typography";
+}
+
+#auto-scrolling-overlay-scrolling-speed {
+  width: 5em;
+}
+
+#kb-shortcut-toggle-current-tab {
+  width: 15em;
+}

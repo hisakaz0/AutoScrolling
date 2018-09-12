@@ -1,7 +1,6 @@
+"use strict";
 
-'use strict';
-
-const onError = (err) => {
+const onError = err => {
   console.error(`Autoscrolling Error: ${err}`);
 };
 

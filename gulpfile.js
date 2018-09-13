@@ -1,21 +1,32 @@
+const gulp = require("gulp");
+const sass = require("gulp-sass");
+const concat = require("gulp-concat");
+const ejs = require("gulp-ejs");
 
-const gulp = require('gulp');
-const sass = require('gulp-sass');
-const concat = require('gulp-concat');
+const appConst = require("./src/appConst");
+const srcScssPath = "src/**/*.scss";
+const srcTemplatePath = ["src/options/options.ejs", "src/options/modal.ejs"];
+const distPath = "dist";
+const distFilename = "style.css";
 
-const srcScssPath = 'src/**/*.scss';
-const distPath = 'dist';
-const distFilename = 'index.css';
-
-gulp.task('css', () => {
-  return gulp.src(srcScssPath)
+gulp.task("css", () => {
+  return gulp
+    .src(srcScssPath)
     .pipe(sass())
     .pipe(concat(distFilename))
-    .pipe(gulp.dest(distPath))
+    .pipe(gulp.dest(distPath));
 });
 
-gulp.task('watch', () => {
-  gulp.watch(srcScssPath, [ 'css' ]);
+gulp.task("html", () => {
+  return gulp
+    .src(srcTemplatePath)
+    .pipe(ejs({ appConst: appConst }, {}, { ext: ".html" }))
+    .pipe(gulp.dest(distPath));
 });
 
-gulp.task('default', [ 'css' ]);
+gulp.task("watch", () => {
+  gulp.watch(srcScssPath, ["css"]);
+  gulp.watch(srcTemplatePath, ["html"]);
+});
+
+gulp.task("default", ["css", "html"]);

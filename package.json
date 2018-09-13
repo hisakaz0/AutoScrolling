@@ -10,14 +10,30 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src",
     "start": "webpack -w --debug",
-    "build": "webpack",
+    "build": "gulp && webpack",
     "debug": "web-ext run",
-    "css": "gulp watch",
-    "format": "prettier --write src/**/*.js"
+    "gulp": "gulp watch",
+    "precommit": "lint-staged"
   },
   "lint-staged": {
     "src/**/*.js": [
-      "npm run format --",
+      "prettier --write src/**/*.js",
+      "git add"
+    ],
+    "gulpfile.js": [
+      "prettier --write gulpfile.js",
+      "git add"
+    ],
+    "webpack.config.js": [
+      "prettier --write webpack.config.js",
+      "git add"
+    ],
+    "manifest.json": [
+      "prettier --write manifest.json",
+      "git add"
+    ],
+    "package.json": [
+      "prettier --write package.json",
       "git add"
     ]
   },
@@ -48,10 +64,12 @@
     "extract-text-webpack-plugin": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
+    "gulp-ejs": "^3.2.0",
     "gulp-sass": "^4.0.1",
     "html-loader": "^0.5.1",
     "html-webpack-plugin": "^2.30.1",
     "husky": "^1.0.0-rc.13",
+    "json-loader": "^0.5.7",
     "lint-staged": "^7.2.2",
     "mocha": "^3.5.3",
     "prettier": "1.14.2",

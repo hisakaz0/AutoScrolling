@@ -3,7 +3,7 @@
 @import "node_modules/spectre.css/src/mixins";
 
 // Wrapper of modal option window
-#auto-scrolling {
+#wrapper-auto-scrolling {
 
   @import "node_modules/spectre.css/src/normalize";
 
@@ -58,10 +58,10 @@
   @import "node_modules/spectre.css/src/typography";
 }
 
-#auto-scrolling-overlay-scrolling-speed {
+#scrolling-speed {
   width: 5em;
 }
 
-#kb-shortcut-toggle-current-tab {
+#keybind-switch-scrolling {
   width: 15em;
 }

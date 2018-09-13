@@ -1,0 +1,32 @@
+<div>
+  <strong>Scrolling speed:</strong>
+  <input type="text"
+         id="<%= appConst.options.scrollingSpeed.elementId %>"
+         value=<%= appConst.options.scrollingSpeed.defaultValue %> />
+  <p>The value is scrolling speed. Max is 99, and min is 1.</p>
+</div>
+<div>
+  <strong>Scrolling stop by click:</strong>
+  <input type="checkbox"
+         id="<%= appConst.options.stopScrollingByClick.elementId %>"
+         checked=<%= appConst.options.stopScrollingByClick.defaultValue %> />
+  <p>The value decides the weather stoppling the scrolling when you click the scrolling window.</p>
+</div>
+<div>
+  <strong>Stop scrolling when hovering over something:</strong>
+  <input type="checkbox"
+         id="<%= appConst.options.stopScrollingOnMouseHover.elementId %>"
+         checked=<%= appConst.options.stopScrollingOnMouseHover.defaultValue %> />
+  <p>Stop scrolling on hover</p>
+</div>
+<div>
+  <strong>Shortcut - Toggle Autoscrolling: </strong>
+  <input type="text"
+         id="<%= appConst.options.keybindSwitchScrolling.elementId %>"
+         value="<%= appConst.options.keybindSwitchScrolling.defaultValue %>" />
+  <p>Toggle the tab's scrolling by keyboard shortcut<br>
+  The value should be a combination of keycodes combined with the '+' sign. <br>
+  <i>Ex: Ctrl+Shift+Insert.</i><br>
+  Check out the link for the keycodes: <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/commands#Key_combinations" target="_blank">Key combinations</a><br>
+  <span class="text-gray">PS: Some key combinations are reserved by the browser and can't be reassigned to this.<span></p>
+</div>

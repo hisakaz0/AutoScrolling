@@ -1,47 +1,42 @@
+const path = require("path");
 
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-const src = path.resolve(__dirname, 'src');
-const dist = path.resolve(__dirname, 'dist');
+const src = path.resolve(__dirname, "src");
+const dist = path.resolve(__dirname, "dist");
 
 module.exports = {
   entry: {
-    content: path.join(src, 'content'),
-    background: path.join(src, 'background'),
-    options: path.join(src, 'options')
+    content: path.join(src, "content"),
+    background: path.join(src, "background"),
+    options: path.join(src, "options")
   },
 
   output: {
     path: dist,
-    filename: '[name].js'
+    filename: "[name].js"
   },
 
   module: {
     loaders: [
       {
-        test: /\.js/,
+        test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
+        loader: "babel-loader",
         query: {
-          presets: [ 'es2015' ]
+          presets: ["es2015"]
         }
+      },
+      {
+        test: /\.html$/,
+        loader: "html-loader"
+      },
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
       }
-    ],
+    ]
   },
 
   resolve: {
-    extensions: [ '.js' ]
-  },
-
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: 'options.html',
-      template: path.join(src, '/options/index.html'),
-      inject: false
-    })
-  ]
-
+    extensions: [".js"]
+  }
 };
-
-

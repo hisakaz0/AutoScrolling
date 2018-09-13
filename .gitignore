@@ -3,6 +3,8 @@
 test/kill-server.sh
 .web-extension-id
 /dist
+*~
+tags
 
 Session.vim
 

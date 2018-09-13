@@ -37,7 +37,7 @@
     {
       "matches": ["<all_urls>"],
       "js": ["dist/content.js"],
-      "css": ["dist/index.css"]
+      "css": ["dist/style.css"]
     }
   ],
 

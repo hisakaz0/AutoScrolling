@@ -1,29 +1,29 @@
 <div>
   <strong>Scrolling speed:</strong>
   <input type="text"
-         id="<%= appConst.options.scrollingSpeed.elementId %>"
-         value=<%= appConst.options.scrollingSpeed.defaultValue %> />
+         id="<%= appConst.options.scrollingSpeed.id %>"
+         value=<%= appConst.options.scrollingSpeed.value %> />
   <p>The value is scrolling speed. Max is 99, and min is 1.</p>
 </div>
 <div>
   <strong>Scrolling stop by click:</strong>
   <input type="checkbox"
-         id="<%= appConst.options.stopScrollingByClick.elementId %>"
-         checked=<%= appConst.options.stopScrollingByClick.defaultValue %> />
+         id="<%= appConst.options.stopScrollingByClick.id %>"
+         checked=<%= appConst.options.stopScrollingByClick.value %> />
   <p>The value decides the weather stoppling the scrolling when you click the scrolling window.</p>
 </div>
 <div>
   <strong>Stop scrolling when hovering over something:</strong>
   <input type="checkbox"
-         id="<%= appConst.options.stopScrollingOnMouseHover.elementId %>"
-         checked=<%= appConst.options.stopScrollingOnMouseHover.defaultValue %> />
+         id="<%= appConst.options.stopScrollingOnHover.id %>"
+         checked=<%= appConst.options.stopScrollingOnHover.value %> />
   <p>Stop scrolling on hover</p>
 </div>
 <div>
   <strong>Shortcut - Toggle Autoscrolling: </strong>
   <input type="text"
-         id="<%= appConst.options.keybindSwitchScrolling.elementId %>"
-         value="<%= appConst.options.keybindSwitchScrolling.defaultValue %>" />
+         id="<%= appConst.options.keybindSwitchScrolling.id %>"
+         value="<%= appConst.options.keybindSwitchScrolling.value %>" />
   <p>Toggle the tab's scrolling by keyboard shortcut<br>
   The value should be a combination of keycodes combined with the '+' sign. <br>
   <i>Ex: Ctrl+Shift+Insert.</i><br>

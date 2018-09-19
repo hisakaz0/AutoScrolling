@@ -16,9 +16,9 @@ const defaultValues = {
   scrollingElement: getScrollingElement(),
   currentlyHovering: false,
   scrollingStep: 1,
-  scrollingSpeed: appConst.options.scrollingSpeed.defaultValue,
-  stopScrollingByClick: appConst.options.stopScrollingByClick.defaultValue,
-  stopScrollingOnHover: appConst.options.stopScrollingOnMouseHover.defaultValue
+  scrollingSpeed: appConst.options.scrollingSpeed.value,
+  stopScrollingByClick: appConst.options.stopScrollingByClick.value,
+  stopScrollingOnHover: appConst.options.stopScrollingOnHover.value
 };
 
 let autoScrolling = Object.assign({}, defaultValues, {
@@ -132,7 +132,7 @@ browser.runtime.onMessage.addListener(msg => {
   if (msg.isOpenOverlay) {
     loadAllOptionsOnStorage()
       .then(options => {
-        return setOnOptionWindowWith(options);
+        return Promise.all(setOnOptionWindowWith(options));
       })
       .then(() => {
         openOverlay();
@@ -142,35 +142,15 @@ browser.runtime.onMessage.addListener(msg => {
 });
 
 const setOnOptionWindowWith = options => {
-  return setValueOnInput(
-    appConst.options.scrollingSpeed.elementId,
-    options.scrollingSpeed
-  )
-    .then(() => {
-      return setValueOnInput(
-        appConst.options.stopScrollingByClick.elementId,
-        options.stopScrollingByClick
-      );
-    })
-    .then(() => {
-      return setValueOnInput(
-        appConst.options.stopScrollingOnMouseHover.elementId,
-        options.stopScrollingOnHover
-      );
-    })
-    .then(() => {
-      return setValueOnInput(
-        appConst.options.keybindSwitchScrolling.elementId,
-        options["toggle-scrolling-state"]
-      );
+  return Object.keys(appConst.options).map(optName => {
+    return new Promise(resolve => {
+      resolve(setValueOnInput(appConst.options[optName].id, options[optName]));
     });
+  });
 };
 
 const setValueOnInput = (id, value) => {
-  return new Promise(resolve => {
-    document.getElementById(id).value = value;
-    resolve();
-  });
+  document.getElementById(id).value = value;
 };
 
 browser.storage.onChanged.addListener(changes => {
@@ -200,11 +180,6 @@ const closeOverlay = () => {
 
 const setScrollingSpeed = ev => {
   let scrollingSpeed = ev.target.value;
-  if (scrollingSpeed > 100) {
-    scrollingSpeed = 99;
-  } else if (scrollingSpeed < 0) {
-    scrollingSpeed = 1;
-  }
   autoScrolling.scrollingSpeed = scrollingSpeed;
   browser.storage.sync.set({ scrollingSpeed: scrollingSpeed });
 };
@@ -246,17 +221,17 @@ function setEvetListeners(parent) {
       ele.addEventListener("click", sendMessageCloseModal);
     });
   document
-    .getElementById(appConst.options.scrollingSpeed.elementId)
+    .getElementById(appConst.options.scrollingSpeed.id)
     .addEventListener("change", setScrollingSpeed);
   document
-    .getElementById(appConst.options.stopScrollingByClick.elementId)
+    .getElementById(appConst.options.stopScrollingByClick.id)
     .addEventListener("change", setStopScrollingByClick);
   document
-    .getElementById(appConst.options.stopScrollingOnMouseHover.elementId)
+    .getElementById(appConst.options.stopScrollingOnHover.id)
     .addEventListener("change", listenerOnChangeStopScrollingOnHover);
   document
-    .getElementById(appConst.options.keybindSwitchScrolling.elementId)
-    .addEventListener("blur", listenerOnBlurKbShortcutToggleCurrentTab);
+    .getElementById(appConst.options.keybindSwitchScrolling.id)
+    .addEventListener("blur", listenerOnBlurKeybindSwitchScrolling);
 }
 
 const listenerOnChangeStopScrollingOnHover = ev => {
@@ -265,8 +240,8 @@ const listenerOnChangeStopScrollingOnHover = ev => {
   saveOptionOnStorageWith({ stopScrollingOnHover: newValue }).catch(onError);
 };
 
-const listenerOnBlurKbShortcutToggleCurrentTab = ev => {
-  const option = { "toggle-scrolling-state": ev.target.value };
+const listenerOnBlurKeybindSwitchScrolling = ev => {
+  const option = { keybindSwitchScrolling: ev.target.value };
   saveOptionOnStorageWith(option).catch(onError);
   sendMessageToUpdateCommandWith(option).catch(onError);
 };

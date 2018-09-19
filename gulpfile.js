@@ -5,15 +5,15 @@ const ejs = require("gulp-ejs");
 
 const appConst = require("./src/appConst");
 const srcScssPath = "src/**/*.scss";
-const srcTemplatePath = ["src/options/options.ejs", "src/options/modal.ejs"];
+const srcTemplatePath = ["src/views/options.ejs", "src/views/modal.ejs"];
 const distPath = "dist";
-const distFilename = "style.css";
+const dirCssPath = "style.css";
 
 gulp.task("css", () => {
   return gulp
     .src(srcScssPath)
     .pipe(sass())
-    .pipe(concat(distFilename))
+    .pipe(concat(dirCssPath))
     .pipe(gulp.dest(distPath));
 });
 

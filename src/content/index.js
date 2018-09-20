@@ -1,6 +1,7 @@
-'use strict';
+"use strict";
 
-import { onError } from '../utils';
+import { onError } from "../utils";
+import appConst from "../appConst.json";
 
 const getScrollingElement = () => {
   return document.scrollingElement
@@ -15,9 +16,9 @@ const defaultValues = {
   scrollingElement: getScrollingElement(),
   currentlyHovering: false,
   scrollingStep: 1,
-  scrollingSpeed: 50,
-  stopScrollingByClick: true,
-  stopScrollingOnHover: false
+  scrollingSpeed: appConst.options.scrollingSpeed.value,
+  stopScrollingByClick: appConst.options.stopScrollingByClick.value,
+  stopScrollingOnHover: appConst.options.stopScrollingOnHover.value
 };
 
 let autoScrolling = Object.assign({}, defaultValues, {
@@ -106,15 +107,15 @@ const clickListeners = () => {
 };
 
 const addMouseListeners = () => {
-  document.body.addEventListener('mouseover', mouseoverListeners);
-  document.body.addEventListener('mouseout', mouseoutListeners);
-  document.body.addEventListener('click', clickListeners);
+  document.body.addEventListener("mouseover", mouseoverListeners);
+  document.body.addEventListener("mouseout", mouseoutListeners);
+  document.body.addEventListener("click", clickListeners);
 };
 
 const removeMouseListeners = () => {
-  document.body.removeEventListener('mouseover', mouseoverListeners);
-  document.body.removeEventListener('mouseout', mouseoutListeners);
-  document.body.removeEventListener('click', clickListeners);
+  document.body.removeEventListener("mouseover", mouseoverListeners);
+  document.body.removeEventListener("mouseout", mouseoutListeners);
+  document.body.removeEventListener("click", clickListeners);
 };
 
 // WebExtensions Events
@@ -131,7 +132,7 @@ browser.runtime.onMessage.addListener(msg => {
   if (msg.isOpenOverlay) {
     loadAllOptionsOnStorage()
       .then(options => {
-        return setOnOptionWindowWith(options);
+        return Promise.all(setOnOptionWindowWith(options));
       })
       .then(() => {
         openOverlay();
@@ -141,63 +142,44 @@ browser.runtime.onMessage.addListener(msg => {
 });
 
 const setOnOptionWindowWith = options => {
-  return setValueOnInput(
-    'auto-scrolling-overlay-scrolling-speed',
-    options.scrollingSpeed)
-    .then(() => {
-      return setValueOnInput(
-        'auto-scrolling-overlay-stop-scrolling-by-click',
-        options.stopScrollingByClick)
-    })
-    .then(() => {
-      return setValueOnInput(
-        'stop-scrolling-on-hover',
-        options.stopScrollingOnHover)
-    })
-    .then(() => {
-      return setValueOnInput(
-        'kb-shortcut-toggle-current-tab',
-        options["toggle-scrolling-state"])
+  return Object.keys(appConst.options).map(optName => {
+    return new Promise(resolve => {
+      resolve(setValueOnInput(appConst.options[optName].id, options[optName]));
     });
+  });
 };
 
 const setValueOnInput = (id, value) => {
-  return new Promise(resolve => {
-    document.getElementById(id).value = value;
-    resolve();
-  });
+  document.getElementById(id).value = value;
 };
 
 browser.storage.onChanged.addListener(changes => {
   var changedItems = Object.keys(changes);
   for (var item of changedItems) {
-    if (item == 'scrollingSpeed') {
-      autoScrolling.scrollingSpeed = parseInt(changes[item]['newValue']);
+    if (item == "scrollingSpeed") {
+      autoScrolling.scrollingSpeed = parseInt(changes[item]["newValue"]);
     }
-    if (item == 'stopScrollingByClick') {
-      autoScrolling.stopScrollingByClick = changes[item]['newValue'];
+    if (item == "stopScrollingByClick") {
+      autoScrolling.stopScrollingByClick = changes[item]["newValue"];
     }
   }
 });
 
 // Autoscrolling Overlay
 const openOverlay = () => {
-  document.getElementById('modal-auto-scrolling')
-    .classList.add('active');
+  return document
+    .getElementById(appConst.html.modal.id)
+    .classList.add("active");
 };
 
 const closeOverlay = () => {
-  document.getElementById('modal-auto-scrolling')
-    .classList.remove('active');
+  return document
+    .getElementById(appConst.html.modal.id)
+    .classList.remove("active");
 };
 
 const setScrollingSpeed = ev => {
   let scrollingSpeed = ev.target.value;
-  if (scrollingSpeed > 100) {
-    scrollingSpeed = 99;
-  } else if (scrollingSpeed < 0) {
-    scrollingSpeed = 1;
-  }
   autoScrolling.scrollingSpeed = scrollingSpeed;
   browser.storage.sync.set({ scrollingSpeed: scrollingSpeed });
 };
@@ -211,56 +193,62 @@ const setStopScrollingByClick = ev => {
 const sendMessageCloseModal = ev => {
   browser.runtime
     .sendMessage({ isOpenOverlay: false })
-    .then(() => { closeOverlay(); })
+    .then(() => {
+      closeOverlay();
+    })
     .catch(onError);
 };
 
-function insertOverlayElement () {
-  let overlayEle = document.createElement('div');
-  overlayEle.id = 'auto-scrolling';
-  overlayEle.innerHTML = require('html-loader!./index.html');
+function insertOverlayElement() {
+  let overlayEle = document.createElement("div");
+  overlayEle.id = appConst.html.wrapper.id;
+  overlayEle.innerHTML = require("../../dist/modal.html");
   return new Promise(resolve => {
     resolve(document.body.appendChild(overlayEle));
   });
-};
+}
 
-function setupOverlayWindow () {
-  insertOverlayElement().then(setEvetListeners);
-};
+function setupOverlayWindow() {
+  insertOverlayElement()
+    .then(setEvetListeners)
+    .catch(onError);
+}
 
-function setEvetListeners (parent) {
-  document.querySelectorAll('[data-modal-auto-scrolling]')
+function setEvetListeners(parent) {
+  document
+    .querySelectorAll(`[${appConst.html.modal.closeAttribute}]`)
     .forEach(ele => {
-      ele.addEventListener('click', sendMessageCloseModal)
+      ele.addEventListener("click", sendMessageCloseModal);
     });
-  document.getElementById('auto-scrolling-overlay-scrolling-speed')
-    .addEventListener('change', setScrollingSpeed);
-  document.getElementById('auto-scrolling-overlay-stop-scrolling-by-click')
-    .addEventListener('change', setStopScrollingByClick);
-  document.getElementById("stop-scrolling-on-hover")
-    .addEventListener('change', listenerOnChangeStopScrollingOnHover);
-  document.getElementById("kb-shortcut-toggle-current-tab")
-    .addEventListener('change', listenerOnChangeKbShortcutToggleCurrentTab);
+  document
+    .getElementById(appConst.options.scrollingSpeed.id)
+    .addEventListener("change", setScrollingSpeed);
+  document
+    .getElementById(appConst.options.stopScrollingByClick.id)
+    .addEventListener("change", setStopScrollingByClick);
+  document
+    .getElementById(appConst.options.stopScrollingOnHover.id)
+    .addEventListener("change", listenerOnChangeStopScrollingOnHover);
+  document
+    .getElementById(appConst.options.keybindSwitchScrolling.id)
+    .addEventListener("blur", listenerOnBlurKeybindSwitchScrolling);
 }
 
 const listenerOnChangeStopScrollingOnHover = ev => {
   const newValue = ev.target.checked;
   autoScrolling.stopScrollingOnHover = newValue;
-  saveOptionOnStorageWith({ stopScrollingOnHover: newValue })
-    .catch(onError);
+  saveOptionOnStorageWith({ stopScrollingOnHover: newValue }).catch(onError);
 };
 
-const listenerOnChangeKbShortcutToggleCurrentTab = ev => {
-  const option = { "toggle-scrolling-state": ev.target.value };
-  saveOptionOnStorageWith(option)
-    .catch(onError);
-  sendMessageToUpdateCommandWith(option)
-    .catch(onError);
+const listenerOnBlurKeybindSwitchScrolling = ev => {
+  const option = { keybindSwitchScrolling: ev.target.value };
+  saveOptionOnStorageWith(option).catch(onError);
+  sendMessageToUpdateCommandWith(option).catch(onError);
 };
 
 const saveOptionOnStorageWith = option => {
   return browser.storage.sync.set(option);
-}
+};
 
 const sendMessageToUpdateCommandWith = option => {
   return browser.runtime.sendMessage(option);

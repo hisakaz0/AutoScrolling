@@ -1,0 +1,18 @@
+<div id="<%= appConst.html.modal.id %>" class="modal">
+  <a href="#close"
+     class="modal-overlay"
+     <%= appConst.html.modal.closeAttribute %>
+     aria-label="Close"></a>
+  <div class="modal-container">
+    <div class="modal-header">
+      <a href="#close"
+         class="btn btn-clear float-right"
+         <%= appConst.html.modal.closeAttribute %>
+         aria-label="Close"></a>
+      <div class="modal-title h3">Options | AutoScrolling</div>
+    </div>
+    <div class="modal-body">
+      <%- include('partial/body') -%>
+    </div>
+  </div>
+</div>

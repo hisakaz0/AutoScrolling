@@ -1,0 +1,31 @@
+{
+  "html": {
+    "wrapper": {
+      "id": "wrapper-auto-scrolling"
+    },
+    "modal": {
+      "id": "modal-auto-scrolling",
+      "closeAttribute": "data-close-modal-auto-scrolling"
+    }
+  },
+
+  "options": {
+    "stopScrollingByClick": {
+      "id": "stop-scrolling-by-click",
+      "value": false
+    },
+    "stopScrollingOnHover": {
+      "id": "stop-scrolling-by-click-on-hover",
+      "vaule": false
+    },
+    "scrollingSpeed": {
+      "id": "scrolling-speed",
+      "value": 50
+    },
+    "keybindSwitchScrolling": {
+      "id": "keybind-switch-scrolling",
+      "value": "Alt+Shift+PageDown",
+      "commandName": "toggle-scrolling-state"
+    }
+  }
+}

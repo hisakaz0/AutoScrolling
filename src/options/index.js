@@ -1,77 +1,72 @@
+"use strict";
 
-'use strict';
+import { onError } from "../utils";
+import appConst from "../appConst.json";
 
-import { onError } from '../utils';
-
-const updateKeyboardShortcut = (shortcutName, newShortcutCombination, updateSync = true) => {
-  browser.commands.update(
-    {
-      name: shortcutName,
-      shortcut: newShortcutCombination 
-    }
-  ).catch(onError);
-
-  if (updateSync) {
-    let updateObject = {};
-    updateObject[shortcutName] = newShortcutCombination;
-    browser.storage.sync.set(updateObject);
-  }
+const updateCommandKeybind = (name, shortcut) => {
+  return browser.commands.update({ name, shortcut });
 };
 
 const setupOptionPage = () => {
-  const scrollingSpeedEl =
-    document.getElementById('scrolling-speed');
-  const stopScrollingByClickEl =
-    document.getElementById('stop-scrolling-by-click');
-  const stopScrollingOnHoverEl =
-    document.getElementById('stop-scrolling-on-hover');
-  const shortcutToggleCurrentTabEl =
-    document.getElementById('kb-shortcut-toggle-current-tab');
+  const scrollingSpeedEl = document.getElementById(
+    appConst.options.scrollingSpeed.id
+  );
+  const stopScrollingByClickEl = document.getElementById(
+    appConst.options.stopScrollingByClick.id
+  );
+  const stopScrollingOnHoverEl = document.getElementById(
+    appConst.options.stopScrollingOnHover.id
+  );
+  const keybindSwitchScrollingEl = document.getElementById(
+    appConst.options.keybindSwitchScrolling.id
+  );
+  browser.storage.sync
+    .get({
+      scrollingSpeed: appConst.options.scrollingSpeed.value,
+      stopScrollingByClick: appConst.options.stopScrollingByClick.value,
+      stopScrollingOnHover: appConst.options.stopScrollingOnHover.value,
+      keybindSwitchScrolling: appConst.options.keybindSwitchScrolling.value
+    })
+    .then(options => {
+      scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
+      stopScrollingByClickEl.checked = options.stopScrollingByClick;
+      stopScrollingOnHoverEl.checked = options.stopScrollingOnHover;
+      keybindSwitchScrollingEl.value = options.keybindSwitchScrolling;
+      updateCommandKeybind(
+        appConst.options.keybindSwitchScrolling.commandName,
+        options.keybindSwitchScrolling
+      );
+    })
+    .catch(onError);
 
-  browser.storage.sync.get({
-    scrollingSpeed: 50,
-    stopScrollingByClick: true,
-    stopScrollingOnHover: false,
-    'toggle-scrolling-state': 'Alt+Shift+PageDown' 
-  }).then((options) => {
-    scrollingSpeedEl.value = parseInt(options.scrollingSpeed);
-    stopScrollingByClickEl.checked = options.stopScrollingByClick;
-    stopScrollingOnHoverEl.checked = options.stopScrollingOnHover;
-    shortcutToggleCurrentTabEl.value = options['toggle-scrolling-state'];
-    // Do not update the sync this time since we just read from it, so pass false as the last argument.
-    updateKeyboardShortcut('toggle-scrolling-state', options['toggle-scrolling-state'], false);
-  });
-
-  scrollingSpeedEl.addEventListener('change', setScrollingSpeed);
-  stopScrollingByClickEl.addEventListener('change', setStopScrollingByClick);
-  stopScrollingOnHoverEl.addEventListener('change', setStopScrollingOnHover);
-  shortcutToggleCurrentTabEl.addEventListener('blur', setShortcutForTogglingCurrentTab);
+  scrollingSpeedEl.addEventListener("change", setScrollingSpeed);
+  stopScrollingByClickEl.addEventListener("change", setStopScrollingByClick);
+  stopScrollingOnHoverEl.addEventListener("change", setStopScrollingOnHover);
+  keybindSwitchScrollingEl.addEventListener("blur", setKeybindSwitchScrolling);
 };
 
-const setScrollingSpeed = (ev) => {
+const setScrollingSpeed = ev => {
   let scrollingSpeed = ev.target.value;
-  if (scrollingSpeed > 100) {
-    scrollingSpeed = 99;
-  }
-  else if (scrollingSpeed < 0) {
-    scrollingSpeed = 1;
-  }
   browser.storage.sync.set({ scrollingSpeed });
 };
 
-const setStopScrollingByClick = (ev) => {
+const setStopScrollingByClick = ev => {
   let stopScrollingByClick = ev.target.checked;
   browser.storage.sync.set({ stopScrollingByClick });
 };
 
-const setStopScrollingOnHover = (ev) => {
+const setStopScrollingOnHover = ev => {
   let stopScrollingOnHover = ev.target.checked;
   browser.storage.sync.set({ stopScrollingOnHover });
 };
 
-const setShortcutForTogglingCurrentTab = (ev) => {
-  let kbShortcut = ev.target.value;
-  updateKeyboardShortcut('toggle-scrolling-state', kbShortcut);
+const setKeybindSwitchScrolling = ev => {
+  const keybindSwitchScrolling = ev.target.value;
+  updateCommandKeybind(
+    appConst.options.keybindSwitchScrolling.commandName,
+    keybindSwitchScrolling
+  );
+  browser.storage.sync.set({ keybindSwitchScrolling });
 };
 
 setupOptionPage();

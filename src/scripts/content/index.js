@@ -1,7 +1,9 @@
 "use strict";
 
-import { onError } from "../utils";
-import appConst from "../appConst.json";
+import { onError } from "../../modules/utils";
+import appConst from "../../appConst.json";
+
+const distModalHtmlPath = "../../../dist/modal.html";
 
 const getScrollingElement = () => {
   return document.scrollingElement
@@ -202,7 +204,7 @@ const sendMessageCloseModal = ev => {
 function insertOverlayElement() {
   let overlayEle = document.createElement("div");
   overlayEle.id = appConst.html.wrapper.id;
-  overlayEle.innerHTML = require("../../dist/modal.html");
+  overlayEle.innerHTML = require(distModalHtmlPath);
   return new Promise(resolve => {
     resolve(document.body.appendChild(overlayEle));
   });

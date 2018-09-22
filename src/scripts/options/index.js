@@ -1,7 +1,7 @@
 "use strict";
 
-import { onError } from "../utils";
-import appConst from "../appConst.json";
+import { onError } from "../../modules/utils";
+import appConst from "../../appConst.json";
 
 const updateCommandKeybind = (name, shortcut) => {
   return browser.commands.update({ name, shortcut });

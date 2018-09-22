@@ -4,8 +4,11 @@ const concat = require("gulp-concat");
 const ejs = require("gulp-ejs");
 
 const appConst = require("./src/appConst");
-const srcScssPath = "src/**/*.scss";
-const srcTemplatePath = ["src/views/options.ejs", "src/views/modal.ejs"];
+const srcScssPath = "src/assets/styles/**/*.scss";
+const srcTemplatePath = [
+  "src/assets/views/options.ejs",
+  "src/assets/views/modal.ejs"
+];
 const distPath = "dist";
 const dirCssPath = "style.css";
 

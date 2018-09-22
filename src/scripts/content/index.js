@@ -1,9 +1,8 @@
 "use strict";
 
 import { onError } from "../../modules/utils";
+import { parseSpeed } from "../../modules/scrolling";
 import appConst from "../../appConst.json";
-
-const distModalHtmlPath = "../../../dist/modal.html";
 
 const getScrollingElement = () => {
   return document.scrollingElement
@@ -18,6 +17,7 @@ const defaultValues = {
   scrollingElement: getScrollingElement(),
   currentlyHovering: false,
   scrollingStep: 1,
+  scrollingInterval: 1000,
   scrollingSpeed: appConst.options.scrollingSpeed.value,
   stopScrollingByClick: appConst.options.stopScrollingByClick.value,
   stopScrollingOnHover: appConst.options.stopScrollingOnHover.value
@@ -31,13 +31,19 @@ let autoScrolling = Object.assign({}, defaultValues, {
     this.y = this.y + this.scrollingStep;
     this.scrollingElement.scroll(this.x, this.y);
   },
+  setScrollingSpeed: function() {
+    const speed = parseSpeed(this.scrollingSpeed);
+    this.scrollingStep = speed.step;
+    this.scrollingInterval = speed.interval;
+  },
   start: function() {
+    this.setScrollingSpeed();
     this.scrollingElement = getScrollingElement();
     removeMouseListeners();
     addMouseListeners();
     this.intervalId = window.setInterval(
       this.scrollingAction.bind(this),
-      100 - this.scrollingSpeed
+      this.scrollingInterval
     );
   },
   stop: function() {
@@ -48,7 +54,6 @@ let autoScrolling = Object.assign({}, defaultValues, {
 
 const updateFromSync = () => {
   const {
-    scrollingStep,
     scrollingSpeed,
     stopScrollingByClick,
     stopScrollingOnHover
@@ -56,7 +61,6 @@ const updateFromSync = () => {
 
   browser.storage.sync
     .get({
-      scrollingStep,
       scrollingSpeed,
       stopScrollingByClick,
       stopScrollingOnHover
@@ -144,15 +148,17 @@ browser.runtime.onMessage.addListener(msg => {
 });
 
 const setOnOptionWindowWith = options => {
-  return Object.keys(appConst.options).map(optName => {
+  return Object.keys(appConst.options).map(key => {
     return new Promise(resolve => {
-      resolve(setValueOnInput(appConst.options[optName].id, options[optName]));
+      resolve(setValueOnInput(appConst.options[key].id, options[key]));
     });
   });
 };
 
 const setValueOnInput = (id, value) => {
-  document.getElementById(id).value = value;
+  const ele = document.getElementById(id);
+  if (typeof value === "Boolean") ele.checked = value;
+  ele.value = value;
 };
 
 browser.storage.onChanged.addListener(changes => {
@@ -181,7 +187,7 @@ const closeOverlay = () => {
 };
 
 const setScrollingSpeed = ev => {
-  let scrollingSpeed = ev.target.value;
+  let scrollingSpeed = parseInt(ev.target.value);
   autoScrolling.scrollingSpeed = scrollingSpeed;
   browser.storage.sync.set({ scrollingSpeed: scrollingSpeed });
 };
@@ -204,7 +210,7 @@ const sendMessageCloseModal = ev => {
 function insertOverlayElement() {
   let overlayEle = document.createElement("div");
   overlayEle.id = appConst.html.wrapper.id;
-  overlayEle.innerHTML = require(distModalHtmlPath);
+  overlayEle.innerHTML = require("../../../dist/modal.html");
   return new Promise(resolve => {
     resolve(document.body.appendChild(overlayEle));
   });
@@ -257,7 +263,12 @@ const sendMessageToUpdateCommandWith = option => {
 };
 
 const loadAllOptionsOnStorage = () => {
-  return browser.storage.sync.get();
+  const opts = appConst.options;
+  const defaultOpts = {};
+  Object.keys(opts).forEach(key => {
+    defaultOpts[key] = opts[key].value;
+  });
+  return browser.storage.sync.get(defaultOpts);
 };
 
 setupOverlayWindow();

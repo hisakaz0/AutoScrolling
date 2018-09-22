@@ -1,7 +1,5 @@
 "use strict";
 
-const onError = err => {
-  console.error(`Autoscrolling Error: ${err}`);
-};
+import onError from "./logging.js";
 
 export { onError };

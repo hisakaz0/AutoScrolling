@@ -5,9 +5,9 @@ const dist = path.resolve(__dirname, "dist");
 
 module.exports = {
   entry: {
-    content: path.join(src, "content"),
-    background: path.join(src, "background"),
-    options: path.join(src, "options")
+    content: path.join(src, "scripts/content"),
+    background: path.join(src, "scripts/background"),
+    options: path.join(src, "scripts/options")
   },
 
   output: {
@@ -31,7 +31,7 @@ module.exports = {
       },
       {
         test: /\.json$/,
-        loader: 'json-loader'
+        loader: "json-loader"
       }
     ]
   },

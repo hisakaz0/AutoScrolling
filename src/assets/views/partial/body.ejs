@@ -1,22 +1,20 @@
 <div>
-  <strong>Scrolling speed:</strong>
+  <strong>Scrolling speed(scroll/sec):</strong>
   <input type="text"
          id="<%= appConst.options.scrollingSpeed.id %>"
          value=<%= appConst.options.scrollingSpeed.value %> />
-  <p>The value is scrolling speed. Max is 99, and min is 1.</p>
+  <p>The value is scrolling speed. A unit is scroll / sec. Max is <%= appConst.scrolling.maxSpeed %>, and min is <%= appConst.scrolling.minSpeed %> .</p>
 </div>
 <div>
   <strong>Scrolling stop by click:</strong>
   <input type="checkbox"
-         id="<%= appConst.options.stopScrollingByClick.id %>"
-         checked=<%= appConst.options.stopScrollingByClick.value %> />
+         id="<%= appConst.options.stopScrollingByClick.id %>" />
   <p>The value decides the weather stoppling the scrolling when you click the scrolling window.</p>
 </div>
 <div>
   <strong>Stop scrolling when hovering over something:</strong>
   <input type="checkbox"
-         id="<%= appConst.options.stopScrollingOnHover.id %>"
-         checked=<%= appConst.options.stopScrollingOnHover.value %> />
+         id="<%= appConst.options.stopScrollingOnHover.id %>" />
   <p>Stop scrolling on hover</p>
 </div>
 <div>

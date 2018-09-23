@@ -16,16 +16,22 @@
     },
     "stopScrollingOnHover": {
       "id": "stop-scrolling-by-click-on-hover",
-      "vaule": false
+      "value": false
     },
     "scrollingSpeed": {
       "id": "scrolling-speed",
-      "value": 50
+      "value": 20
     },
     "keybindSwitchScrolling": {
       "id": "keybind-switch-scrolling",
       "value": "Alt+Shift+PageDown",
       "commandName": "toggle-scrolling-state"
     }
+  },
+
+  "scrolling": {
+    "maxSpeed": 3000,
+    "minSpeed": 1,
+    "thresholdStep": 5
   }
 }

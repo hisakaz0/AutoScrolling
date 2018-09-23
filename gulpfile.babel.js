@@ -24,7 +24,7 @@ gulp.task("css", () => {
 gulp.task("html", () => {
   return gulp
     .src(srcTemplatePath)
-    .pipe(ejs({ appConst: appConst }, {}, { ext: ".html" }))
+    .pipe(ejs({ appConst }, {}, { ext: ".html" }))
     .pipe(gulp.dest(distPath));
 });
 

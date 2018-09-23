@@ -1,9 +1,10 @@
-const gulp = require("gulp");
-const sass = require("gulp-sass");
-const concat = require("gulp-concat");
-const ejs = require("gulp-ejs");
+import gulp from "gulp";
+import sass from "gulp-sass";
+import concat from "gulp-concat";
+import ejs from "gulp-ejs";
 
-const appConst = require("./src/appConst");
+import appConst from "./src/appConst";
+
 const srcScssPath = "src/assets/styles/**/*.scss";
 const srcTemplatePath = [
   "src/assets/views/options.ejs",

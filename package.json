@@ -35,6 +35,10 @@
     "package.json": [
       "prettier --write package.json",
       "git add"
+    ],
+    ".eslintrc.json": [
+      "prettier --write .eslintrc.json",
+      "git add"
     ]
   },
   "repository": {

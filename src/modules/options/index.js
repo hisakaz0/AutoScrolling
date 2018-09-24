@@ -1,4 +1,3 @@
-
-import OptionItem from './option-item';
+import OptionItem from "./option-item";
 
 export { OptionItem };

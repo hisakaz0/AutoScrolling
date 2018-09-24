@@ -1,10 +1,9 @@
 "use strict";
 
 import appConst from "../../appConst.json";
-import { OptionItem } from '../../modules/options';
+import { OptionItem } from "../../modules/options";
 
 class OptionScript {
-
   constructor() {}
 
   setup() {
@@ -17,6 +16,7 @@ class OptionScript {
         appOpts[key].value,
         appOpts[key].commandName
       );
+      opt.init();
       this.optionList.push(opt);
     });
   }

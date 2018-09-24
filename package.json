@@ -13,6 +13,7 @@
     "compile:gulp": "gulp watch",
     "debug": "web-ext run",
     "test": "karma start",
+    "test:debug": "karma start --no-single-run --auto-watch",
     "lint": "eslint src",
     "precommit": "lint-staged"
   },

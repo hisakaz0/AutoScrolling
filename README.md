@@ -1,7 +1,7 @@
 ![icon][icon] AutoScrolling  
 ============================
 
-
+![badge dev dependencies][badge dev dependencies]
 
 [AutoScrolling] for Firefox browser enables you auto-scrolling without using
 mouse wheel and works in even a non-active window. This plugin
@@ -85,3 +85,4 @@ If you have some questions, please tell me or issue, or send PRs. Thx.
 [WebExtensions]: https://developer.mozilla.org/en-US/Add-ons/WebExtensions
 [icon]: https://addons.cdn.mozilla.net/user-media/addon_icons/840/840622-64.png
 [web-ext]: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext
+[badge dev dependencies]: https://david-dm.org/pinkienort/AutoScrolling.svg

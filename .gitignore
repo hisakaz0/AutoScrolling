@@ -1,10 +1,10 @@
 
 /web-ext-artifacts
-test/kill-server.sh
 .web-extension-id
 /dist
 *~
 tags
+tests/fixture/**/*.html
 
 Session.vim
 

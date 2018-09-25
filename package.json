@@ -22,6 +22,10 @@
       "prettier --write src/**/*.js",
       "git add"
     ],
+    "tests/**/*.js": [
+      "prettier --write tests/**/*.js",
+      "git add"
+    ],
     "gulpfile.js": [
       "prettier --write gulpfile.js",
       "git add"

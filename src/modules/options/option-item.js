@@ -1,10 +1,10 @@
 import { onError } from "../utils";
 
 class OptionItem {
-  constructor(name, id, defalutValue, commandName = undefined) {
+  constructor(name, id, defaultValue, commandName = undefined) {
     this.name = name;
     this.id = id;
-    this.defalutValue = defalutValue;
+    this.defaultValue = defaultValue;
     this.commandName = commandName;
   }
 
@@ -14,7 +14,7 @@ class OptionItem {
 
   loadOption() {
     const defaultData = {};
-    defaultData[this.name] = this.defalutValue;
+    defaultData[this.name] = this.defaultValue;
     return browser.storage.sync.get(defaultData).then(this._setOptionValue);
   }
 
@@ -33,7 +33,7 @@ class OptionItem {
   }
 
   assertValue(value) {
-    const correctType = typeof this.defalutValue;
+    const correctType = typeof this.defaultValue;
     if (correctType !== typeof value) {
       throw new Error(`Typeof value should be ${correctType}`);
     }
@@ -65,14 +65,21 @@ class OptionItem {
   }
 
   _getListenerType() {
-    return typeof this.defalutValue === "string" ? "blur" : "change";
+    return typeof this.defaultValue === "string" ? "blur" : "change";
   }
 
   _getTargetValue(target) {
-    return typeof this.defalutValue === "boolean"
+    const parseValueAsInt = intValue => {
+      const parsedInt = parseInt(intValue);
+      if (isNaN(parsedInt)) {
+        throw new Error(`Cannot parse as int, ${intValue}`);
+      }
+      return parsedInt;
+    };
+    return typeof this.defaultValue === "boolean"
       ? target.checked
-      : typeof this.defalutValue === "number"
-        ? parseInt(target.value)
+      : typeof this.defaultValue === "number"
+        ? parseValueAsInt(target.value)
         : target.value;
   }
 

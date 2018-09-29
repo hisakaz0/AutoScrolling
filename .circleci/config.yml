@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:10.10-browsers
+      - image: circleci/node:8-browsers
 
     working_directory: ~/repo
 
@@ -25,5 +25,3 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       - run: npm run build
-
-      - run: npm run test

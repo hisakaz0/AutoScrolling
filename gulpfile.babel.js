@@ -3,21 +3,17 @@ import gulp from "gulp";
 import sass from "gulp-sass";
 import concat from "gulp-concat";
 import ejs from "gulp-ejs";
+import glob from "glob";
 
 import appConst from "./src/appConst";
 
-const srcScssPath = "src/assets/styles/**/*.scss";
-const srcTemplatePath = [
-  "src/assets/views/options.ejs",
-  "src/assets/views/modal.ejs"
-];
+const srcScssPath = glob.sync("src/assets/styles/**/*.scss");
+const srcTemplatePath = glob.sync("src/assets/views/*.ejs");
 const distPath = "dist";
 const dirCssPath = "style.css";
 const templateRoot = path.resolve(__dirname, 'src/assets/views');
 
-const srcTestTemplatePath = [
-  'tests/fixture/options.ejs'
-];
+const srcTestTemplatePath = 'tests/fixture/*.ejs';
 
 gulp.task("css", () => {
   return gulp

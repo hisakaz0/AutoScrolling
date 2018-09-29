@@ -1,34 +1,54 @@
 import { onError } from "../utils";
+import {
+  addOnChangeListenerInStorage,
+  loadItemOnSyncStorage,
+  saveItemOnSyncStorage,
+  updateCommand,
+  createCommandObject
+} from "../browser";
 
 class OptionItem {
-  constructor(name, id, defaultValue, commandName = undefined) {
+  constructor(name, defaultValue, commandName = undefined) {
     this.name = name;
-    this.id = id;
+    this.value = defaultValue;
     this.defaultValue = defaultValue;
     this.commandName = commandName;
+
+    this.onHtmlInputChangedListener = this.onHtmlInputChangedListener.bind(
+      this
+    );
   }
 
   init() {
-    this.loadOption().then(this.addEventListenerOnElement);
+    this.onLoadListener = this.onLoadListener.bind(this);
+    this.onChangeListenerFromHtml = this.onChangeListenerFromHtml.bind(this);
+    this.onChangeListener = this.onChangeListener.bind(this);
+    addOnChangeListenerInStorage(this.onChangeListener);
+
+    this.loadOption();
   }
 
   loadOption() {
-    const defaultData = {};
-    defaultData[this.name] = this.defaultValue;
-    return browser.storage.sync.get(defaultData).then(this._setOptionValue);
+    return loadItemOnSyncStorage({
+      [this.name]: this.defaultValue
+    }).then(data => {
+      this.value = data[this.name];
+      this.onLoadListener(this.value);
+      return new Promise(resolve => {
+        resolve(data[this.name]);
+      });
+    });
   }
 
   saveOption(newValue) {
     this.assertValue(newValue);
-    const saveData = {};
-    saveData[this.name] = newValue;
-    return browser.storage.sync.set(saveData).then(this._setOptionValue);
-  }
-
-  _setOptionValue(data) {
-    this.value = data[this.name];
-    return new Promise(resolve => {
-      resolve(data[this.name]);
+    return saveItemOnSyncStorage({
+      [this.name]: newValue
+    }).then(() => {
+      this.value = newValue;
+      return new Promise(resolve => {
+        resolve(newValue);
+      });
     });
   }
 
@@ -39,59 +59,46 @@ class OptionItem {
     }
   }
 
+  addOnLoadListener(listener) {
+    this.onLoadListener = listener;
+  }
+
+  addOnChangeListenerFromHtml(listener) {
+    this.onChangeListenerFromHtml = listener;
+  }
+
+  onChangeListener(changes) {
+    // from storage
+    if (Object.keys(changes).includes(this.name)) {
+      const newValue = changes[this.name].newValue;
+      this.value = newValue;
+      if (this.hasCommand()) {
+        this.updateCommandKeyBind(newValue);
+      }
+      this.onChangeListenerFromHtml(newValue);
+    }
+  }
+
+  onHtmlInputChangedListener(value) {
+    return this.saveOption(value);
+  }
+
   hasCommand() {
     if (typeof this.commandName !== "undefined") return true;
     return false;
   }
 
-  updateCommandKeyBind() {
-    const keybind = { name: this.name, shortcut: this.value };
-    return browser.commands.update(keybind);
-  }
-
-  getElement() {
-    return document.getElementById(this.id);
-  }
-
-  setValueOnElement() {
-    const ele = this.getElement();
-    if (typeof this.value === "number") {
-      ele.value = parseInt(this.value);
-    } else if (typeof this.value === "boolean") {
-      ele.checked = this.value;
-    } else if (typeof this.value === "string") {
-      ele.value = this.value;
+  updateCommandKeyBind(value) {
+    const cmd = createCommandObject(this.name, value);
+    try {
+      return updateCommand(cmd);
+    } catch (e) {
+      this.onUpdateCommandListener(cmd);
     }
   }
 
-  _getListenerType() {
-    return typeof this.defaultValue === "string" ? "blur" : "change";
-  }
-
-  _getTargetValue(target) {
-    const parseValueAsInt = intValue => {
-      const parsedInt = parseInt(intValue);
-      if (isNaN(parsedInt)) {
-        throw new Error(`Cannot parse as int, ${intValue}`);
-      }
-      return parsedInt;
-    };
-    return typeof this.defaultValue === "boolean"
-      ? target.checked
-      : typeof this.defaultValue === "number"
-        ? parseValueAsInt(target.value)
-        : target.value;
-  }
-
-  addEventListenerOnElement() {
-    const listener = ev => {
-      this.saveOption(this._getTargetValue(ev.target))
-        .then(savedValue => {
-          if (this.hasCommand()) this.updateCommandKeyBind();
-        })
-        .catch(onError);
-    };
-    this.getElement().addEventListener(_getListenerType(), listener);
+  setOnUpdateCommandListener(l) {
+    this.onUpdateCommandListener = l;
   }
 }
 

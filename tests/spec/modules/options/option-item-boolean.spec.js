@@ -1,18 +1,15 @@
+import { getOptionItemWith } from "./index";
 
-import { getOptionItemWith } from './index';
-
-describe("spec OptionItem:", () => {
-
-  describe("which has boolean value: ", () => {
-
+describe("OptionItem:", () => {
+  describe("which has a boolean typed value: ", () => {
     beforeEach(() => {
-      this.optionItem = getOptionItemWith('boolean');
-      document.body.innerHTML = __html__['options.html'];
-    })
+      this.optionItem = getOptionItemWith("boolean");
+      document.body.innerHTML = __html__["options.html"];
+    });
 
     it("throw a error when string is fed into assertValue", done => {
       try {
-        this.optionItem.assertValue('stststring');
+        this.optionItem.assertValue("stststring");
       } catch (e) {
         done();
       }
@@ -27,19 +24,19 @@ describe("spec OptionItem:", () => {
       }
     });
 
-    it("ele.checked expected the value when setValueOnElement is called with a value", () =>{
-      this.optionItem.value = ! this.optionItem.value;
-      this.optionItem.setValueOnElement()
-      expect(this.optionItem.value)
-        .toBe(this.optionItem.getElement().checked);
+    it("return a reversed value when setValueOnElement is called with the value", () => {
+      this.optionItem.value = !this.optionItem.value;
+      this.optionItem.setValueOnElement();
+      expect(this.optionItem.value).toBe(this.optionItem.getElement().checked);
     });
 
     it("return string 'change' when _getListenerType is called", () => {
-      expect(this.optionItem._getListenerType()).toBe('change');
+      expect(this.optionItem._getListenerType()).toBe("change");
     });
 
-    it("return boolean value when _getTargetValue is called", () => {
-      const target = { checked: true, value: 'yes party party' };
+    it("return 'true' when _getTargetValue is called with a object \
+      which include checked property has true", () => {
+      const target = { checked: true, value: "yes party party" };
       expect(this.optionItem._getTargetValue(target)).toBe(target.checked);
     });
   });

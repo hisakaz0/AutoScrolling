@@ -1,20 +1,16 @@
+import { getOptionItemWith } from "./index";
 
-import { getOptionItemWith } from './index';
-import { doesNotReject } from 'assert';
-
-describe("spec OptionItem:", () => {
-
+describe("OptionItem:", () => {
   describe("has string value:", () => {
-
     beforeEach(() => {
-      this.optionItem = getOptionItemWith('string');
-      document.body.innerHTML = __html__['options.html'];
+      this.optionItem = getOptionItemWith("string");
+      document.body.innerHTML = __html__["options.html"];
     });
 
     it("throw a error when boolean is fed into assertValue", done => {
       try {
-        this.optionItem.assertValue(true)
-      } catch(e) {
+        this.optionItem.assertValue(true);
+      } catch (e) {
         done();
       }
     });
@@ -23,20 +19,19 @@ describe("spec OptionItem:", () => {
       try {
         this.optionItem.assertValue("nothing to do");
         done();
-      } catch(e) {
+      } catch (e) {
         fail(e);
       }
     });
 
     it("ele.vlaue is expected value when setValueOnElement is called with a value", () => {
       this.optionItem.value = "expected string";
-      this.optionItem.setValueOnElement()
-      expect(this.optionItem.getElement().value)
-        .toBe(this.optionItem.value);
+      this.optionItem.setValueOnElement();
+      expect(this.optionItem.getElement().value).toBe(this.optionItem.value);
     });
 
     it("return 'blur' when _getListenerType is called", () => {
-      expect(this.optionItem._getListenerType()).toBe('blur');
+      expect(this.optionItem._getListenerType()).toBe("blur");
     });
 
     it("return string value when _getTargetValue is called", () => {

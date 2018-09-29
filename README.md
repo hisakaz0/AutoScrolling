@@ -1,7 +1,7 @@
 ![icon][icon] AutoScrolling  
 ============================
 [![build status](https://circleci.com/gh/pinkienort/AutoScrolling.svg?style=svg)](https://circleci.com/gh/pinkienort/AutoScrolling)
-[![dev dependencies](https://david-dm.org/pinkienort/AutoScrolling.svg)](https://david-dm.org/pinkienort/AutoScrolling?type=dev)
+[![dev dependencies](https://david-dm.org/pinkienort/AutoScrolling.svg)](https://david-dm.org/pinkienort/AutoScrolling?type=dev) [![Greenkeeper badge](https://badges.greenkeeper.io/pinkienort/AutoScrolling.svg)](https://greenkeeper.io/)
 
 [AutoScrolling] for Firefox browser enables you auto-scrolling without using
 mouse wheel and works in even a non-active window. This plugin

@@ -1,18 +1,20 @@
-import { OptionItem } from "../../../../src/modules/options";
+import { OptionItem, OptionHtml } from "../../../../src/modules/options";
 import appConst from "../../../../src/appConst.json";
 
-const opts = appConst.options;
+const appOpts = appConst.options;
 
 const getOptionItemWith = typeName => {
-  for (const key of Object.keys(opts)) {
-    if (typeof opts[key].value !== typeName) continue;
-    return new OptionItem(
-      key,
-      opts[key].id,
-      opts[key].value,
-      opts[key].commandName
-    );
+  for (const key of Object.keys(appOpts)) {
+    if (typeof appOpts[key].value !== typeName) continue;
+    return new OptionItem(key, appOpts[key].value, appOpts[key].commandName);
   }
 };
 
-export { getOptionItemWith };
+const getOptionHtmlWith = typeName => {
+  for (const key of Object.keys(appOpts)) {
+    if (typeof appOpts[key].value !== typeName) continue;
+    return new OptionHtml(appOpts[key].id, appOpts[key].value);
+  }
+};
+
+export { getOptionItemWith, getOptionHtmlWith };

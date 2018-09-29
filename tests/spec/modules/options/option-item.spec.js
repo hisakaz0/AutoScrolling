@@ -6,9 +6,8 @@ describe("OptionItem:", () => {
     document.body.innerHTML = __html__["options.html"];
   });
 
-  it("return object has name and id when getOptionItemWith is called", () => {
+  it("return object has name when getOptionItemWith is called", () => {
     expect(typeof this.optionItem.name).toBe("string");
-    expect(typeof this.optionItem.id).toBe("string");
     expect(typeof this.optionItem.defaultValue).toBe("boolean");
   });
 
@@ -20,11 +19,6 @@ describe("OptionItem:", () => {
       expect(this.optionItem.value).toBe(false);
       done();
     });
-  });
-
-  it("return a element when getElement is called", () => {
-    const ele = this.optionItem.getElement();
-    expect(ele.attributes.toString()).toBe("[object NamedNodeMap]");
   });
 
   it("return false when hasCommand is called", () => {

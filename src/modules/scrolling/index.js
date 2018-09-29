@@ -1,3 +1,4 @@
-import parseSpeed from "./speed-parser.js";
+import SpeedParser from "./speed-parser";
+import AutoScroller from "./auto-scroller";
 
-export { parseSpeed };
+export { SpeedParser, AutoScroller };

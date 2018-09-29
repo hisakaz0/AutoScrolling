@@ -1,3 +1,4 @@
+import path from 'path';
 import gulp from "gulp";
 import sass from "gulp-sass";
 import concat from "gulp-concat";
@@ -12,6 +13,11 @@ const srcTemplatePath = [
 ];
 const distPath = "dist";
 const dirCssPath = "style.css";
+const templateRoot = path.resolve(__dirname, 'src/assets/views');
+
+const srcTestTemplatePath = [
+  'tests/fixture/options.ejs'
+];
 
 gulp.task("css", () => {
   return gulp
@@ -28,9 +34,19 @@ gulp.task("html", () => {
     .pipe(gulp.dest(distPath));
 });
 
+gulp.task('test:html', () => {
+  return gulp
+    .src(srcTestTemplatePath, {
+       base: './' // output same dir with src dir
+    })
+    .pipe(ejs({ appConst, templateRoot }, {}, { ext: '.html'}))
+    .pipe(gulp.dest('./'));
+});
+
 gulp.task("watch", () => {
   gulp.watch(srcScssPath, ["css"]);
   gulp.watch(srcTemplatePath, ["html"]);
+  gulp.watch(srcTestTemplatePath, ["test:html"]);
 });
 
-gulp.task("default", ["css", "html"]);
+gulp.task("default", ["css", "html", 'test:html']);

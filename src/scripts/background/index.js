@@ -131,12 +131,12 @@ class BackgroundScript {
         this.state = State.SCROLLING;
         break;
       case State.MODAL_OPENED:
-        if (!isEqualTargetToFocus()) break;
+        if (!this.isEqualTargetToFocus()) break;
         this.closeModalAction();
         this.state = State.STOP_OR_CLOSE;
         break;
       case State.SCROLLING:
-        if (!isEqualTargetToFocus()) break;
+        if (!this.isEqualTargetToFocus()) break;
         this.stopScrollingAction();
         this.state = State.STOP_OR_CLOSE;
         break;
@@ -150,12 +150,12 @@ class BackgroundScript {
         this.state = State.MODAL_OPENED;
         break;
       case State.MODAL_OPENED:
-        if (!isEqualTargetToFocus()) break;
+        if (!this.isEqualTargetToFocus()) break;
         this.closeModalAction();
         this.state = State.STOP_OR_CLOSE;
         break;
       case State.SCROLLING:
-        if (!isEqualTargetToFocus()) break;
+        if (!this.isEqualTargetToFocus()) break;
         this.stopScrollingAction();
         this.state = State.STOP_OR_CLOSE;
         break;
@@ -170,7 +170,7 @@ class BackgroundScript {
         this.state = State.STOP_OR_CLOSE;
         break;
       case State.STOP_OR_CLOSE:
-        if (!isEqualTargetToFocus()) break;
+        if (!this.isEqualTargetToFocus()) break;
         this.startScrollingAction();
       default:
         break;

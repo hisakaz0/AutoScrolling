@@ -1,6 +1,6 @@
 import { getOptionItemWith } from "./index";
 
-describe("OptionItem:", () => {
+xdescribe("OptionItem:", () => {
   describe("has string value:", () => {
     beforeEach(() => {
       this.optionItem = getOptionItemWith("string");

@@ -10,8 +10,10 @@ import {
 class OptionItem {
   constructor(name, defaultValue, commandName = undefined) {
     this.name = name;
+    this.value = defaultValue;
     this.defaultValue = defaultValue;
     this.commandName = commandName;
+    this._setOptionValue = this._setOptionValue.bind(this);
   }
 
   init() {

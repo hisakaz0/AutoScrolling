@@ -12,7 +12,7 @@ const saveItemOnSyncStorage = item => {
 
 const loadItemOnSyncStorage = item => {
   if (typeof item === typeofObject) {
-    return browser.storage.sycn.get(item);
+    return browser.storage.sync.get(item);
   }
   if (typeof item === typeofString) {
     const key = item; // item is key
@@ -41,7 +41,7 @@ const removeAllItemsOnSyncStorage = () => {
 };
 
 const addOnChangeListenerInStorage = l => {
-  return browser.storage.onChange.addListener(l);
+  return browser.storage.onChanged.addListener(l);
 };
 
 export {

@@ -1,6 +1,6 @@
 import { getOptionItemWith } from ".";
 
-describe("OptionItem:", () => {
+xdescribe("OptionItem:", () => {
   describe("has command:", () => {
     beforeEach(() => {
       this.optionItem = getOptionItemWith("string");

@@ -1,6 +1,7 @@
 class OptionHtml {
   constructor(id, defaultValue) {
     this.id = id;
+    this.value = defaultValue;
     this.defaultValue = defaultValue;
   }
 
@@ -44,7 +45,7 @@ class OptionHtml {
     const wrapper = ev => {
       listener(this._getTargetValue(ev.target));
     };
-    this.getElement().addEventListener(_getListenerType(), wrapper);
+    this.getElement().addEventListener(this._getListenerType(), wrapper);
   }
 
   handleOnChangeStorage(value) {

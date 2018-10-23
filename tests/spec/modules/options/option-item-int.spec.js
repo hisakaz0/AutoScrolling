@@ -1,6 +1,6 @@
 import { getOptionItemWith } from ".";
 
-describe("OptionItem:", () => {
+xdescribe("OptionItem:", () => {
   describe("which has boolean value: ", () => {
     beforeEach(() => {
       this.optionItem = getOptionItemWith("number");

@@ -3,7 +3,7 @@ const sendMessageToBackground = msg => {
 };
 
 const addOnMessageListener = listener => {
-  return browser.runtime.onMessage(listener);
+  return browser.runtime.onMessage.addListener(listener);
 };
 
 export { sendMessageToBackground, addOnMessageListener };

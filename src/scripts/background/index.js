@@ -103,7 +103,7 @@ class BackgroundScript {
   }
 
   _setFocusTab(tab) {
-    this.focusTab = { tabId: tab.Id, windowId: tab.windowId };
+    this.focusTab = { tabId: tab.tabId, windowId: tab.windowId };
   }
 
   isWaitingDoubleClick() {

@@ -16,10 +16,15 @@ class ContentScript {
   }
 
   init() {
+    this.onStopListener = this.onStopListener.bind(this);
+    this.onUpdateCommandListener = this.onUpdateCommandListener.bind(this);
+    this.onMessageListener = this.onMessageListener.bind(this);
+
     this.autoScoller.init();
     this.autoScoller.setOnStopListener(this.onStopListener);
     this.optionModal.init();
     this.optionModal.setOnUpdateCommandListener(this.onUpdateCommandListener);
+
     addOnMessageListener(this.onMessageListener);
   }
 

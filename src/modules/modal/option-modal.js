@@ -29,7 +29,7 @@ class OptionModal {
   loadHtml() {
     const wrapperEle = document.createElement("div");
     wrapperEle.id = appConst.html.wrapper.id;
-    // wrapperEle.innerHTML = require("../../../dist/modal.html");
+    wrapperEle.innerHTML = require("../../../dist/modal.html");
     this.html = wrapperEle;
   }
 

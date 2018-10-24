@@ -9,6 +9,8 @@ class AutoScroller {
     this.scrollingElement = null;
     this.scrollingStep = -1;
     this.scrollingInterval = -1;
+    this.isCursorOnText = false;
+    this.onStopListener = undefined;
   }
 
   init() {
@@ -17,6 +19,10 @@ class AutoScroller {
     for (const key of Object.keys(this.options)) {
       this.options[key].init();
     }
+
+    this.onMouseoverListener = this.onMouseoverListener.bind(this);
+    this.onMouseoutListener = this.onMouseoutListener.bind(this);
+    this.onClickListener = this.onClickListener.bind(this);
   }
 
   start() {
@@ -43,6 +49,10 @@ class AutoScroller {
     this.scrollingElement.scroll(this.x, this.y);
   }
 
+  needToStopScrolling() {
+    //if (this.options.stop this.isCursorOnText
+  }
+
   stop() {
     this.removeUserActionListeners();
     this._clearScrolling();
@@ -53,7 +63,9 @@ class AutoScroller {
   }
 
   setScrollingSpeed() {
-    const { step, interval } = this.parser.parse(this.options.scrollingSpeed);
+    const { step, interval } = this.parser.parse(
+      this.options.scrollingSpeed.value
+    );
     this.scrollingStep = step;
     this.scrollingInterval = interval;
   }
@@ -65,15 +77,15 @@ class AutoScroller {
   }
 
   addUserActionListeners() {
-    document.body.addEventListener("mouseover", onMouseoverListener);
-    document.body.addEventListener("mouseout", onMouseoutListener);
-    document.body.addEventListener("click", onClickListener);
+    document.body.addEventListener("mouseover", this.onMouseoverListener);
+    document.body.addEventListener("mouseout", this.onMouseoutListener);
+    document.body.addEventListener("click", this.onClickListener);
   }
 
   removeUserActionListeners() {
-    document.body.removeEventListener("mouseover", onMouseoverListener);
-    document.body.removeEventListener("mouseout", onMouseoutListener);
-    document.body.removeEventListener("click", onClickListener);
+    document.body.removeEventListener("mouseover", this.onMouseoverListener);
+    document.body.removeEventListener("mouseout", this.onMouseoutListener);
+    document.body.removeEventListener("click", this.onClickListener);
   }
 
   onMouseoverListener(ev) {

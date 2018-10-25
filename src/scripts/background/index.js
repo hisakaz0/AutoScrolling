@@ -3,6 +3,8 @@ import {
   updateCommand,
   sendMessageToTab,
   addOnTabActivatedListener,
+  addOnTabUpdatedListener,
+  getActivatedTabs,
   addOnClickListener as addOnBrowserActionClickListener,
   addOnCreatedListener as addOnWindowCreatedListener
 } from "../../modules/browser";
@@ -32,7 +34,6 @@ const DEFAULT_TARGET_TAB = {
   tabId: UNINIT_TAB_ID,
   windowId: UNINIT_WINDOW_ID,
   isScrolling: false,
-  stopOnTabChange: false,
   isModalOpened: false
 };
 const DEFAULT_FOCUS_TAB = {
@@ -65,11 +66,29 @@ class BackgroundScript {
       this
     );
     this.onTabActivatedListener = this.onTabActivatedListener.bind(this);
+    this.onTabUpdatedListener = this.onTabUpdatedListener.bind(this);
   }
 
   init() {
     addOnBrowserActionClickListener(this.onBrowserActionClickListener);
     addOnTabActivatedListener(this.onTabActivatedListener);
+    addOnTabUpdatedListener(this.onTabUpdatedListener);
+    this.initFocusTab();
+  }
+
+  initFocusTab() {
+    getActivatedTabs().then(
+      tabs => {
+        const tab = tabs[0];
+        this.focusTab = Object.assign(this.focusTab, {
+          tabId: tab.id,
+          windowId: tab.windowId
+        });
+      },
+      error => {
+        console.error(error);
+      }
+    );
   }
 
   onMessageListener(message, tab, sendResponse) {
@@ -97,9 +116,29 @@ class BackgroundScript {
     this.onDoubleClickEvent();
   }
 
-  onTabActivatedListener(tab) {
-    this._setFocusTab(tab);
+  onTabActivatedListener(activeInfo) {
+    this._setFocusTab(activeInfo);
     this.onTabChangedEvent();
+  }
+
+  onTabUpdatedListener(tab) {
+    if (
+      this.targetTab.tabId === tab.id &&
+      this.targetTab.windowId === tab.windowId
+    ) {
+      this.resetTargetTab();
+    }
+  }
+
+  resetTargetTab() {
+    this.targetTab = Object.assign(
+      {},
+      {
+        isScrolling: false,
+        isModalOpened: false
+      }
+    );
+    this.state = State.STOP_OR_CLOSE;
   }
 
   _setFocusTab(tab) {

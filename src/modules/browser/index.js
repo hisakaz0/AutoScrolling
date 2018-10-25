@@ -1,6 +1,9 @@
 import {
   sendMessage as sendMessageToTab,
-  addOnActivatedListener as addOnTabActivatedListener
+  addOnActivatedListener as addOnTabActivatedListener,
+  addOnUpdatedListener as addOnTabUpdatedListener,
+  getCurrent as getCurrentTab,
+  getActivated as getActivatedTabs
 } from "./tabs";
 import {
   saveItemOnSyncStorage,
@@ -21,6 +24,9 @@ import { addOnClickListener } from "./browser-action";
 export {
   sendMessageToTab,
   addOnTabActivatedListener,
+  addOnTabUpdatedListener,
+  getCurrentTab,
+  getActivatedTabs,
   saveItemOnSyncStorage,
   loadItemOnSyncStorage,
   loadAllItemsOnSyncStorage,

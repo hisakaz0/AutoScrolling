@@ -230,7 +230,7 @@ class BackgroundScript {
 
   openModalAction() {
     this.targetTab = Object.assign(this.targetTab, {
-      tarId: this.focusTab.tabId,
+      tabId: this.focusTab.tabId,
       windowId: this.focusTab.windowId,
       isModalOpened: true
     });

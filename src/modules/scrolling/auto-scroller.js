@@ -4,8 +4,6 @@ import { loadOptionItems } from "../options";
 class AutoScroller {
   constructor() {
     this.intervalId = -1;
-    this.x = 0;
-    this.y = 0;
     this.scrollingElement = null;
     this.scrollingStep = -1;
     this.scrollingInterval = -1;
@@ -45,8 +43,7 @@ class AutoScroller {
   }
 
   _oneScroll() {
-    this.y = this.y + this.scrollingStep;
-    this.scrollingElement.scroll(this.x, this.y);
+    this.scrollingElement.scrollBy(0, this.scrollingStep);
   }
 
   needToStopScrolling() {

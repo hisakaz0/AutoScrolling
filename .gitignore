@@ -6,6 +6,7 @@
 *~
 tags
 tests/fixture/**/*.html
+.envrc
 
 Session.vim
 

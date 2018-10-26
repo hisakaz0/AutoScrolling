@@ -211,6 +211,13 @@ class BackgroundScript {
       case State.STOP_OR_CLOSE:
         if (!this.isEqualTargetToFocus()) break;
         this.startScrollingAction();
+        this.state = State.SCROLLING;
+        break;
+      case State.MODAL_OPENED:
+        if (!needToCloseModalOnTabChanged()) break;
+        this.closeModalAction();
+        this.state = State.STOP_OR_CLOSE;
+        break;
       default:
         break;
     }
@@ -231,6 +238,16 @@ class BackgroundScript {
   needToStopScrollingOnTabChanged() {
     if (
       this.targetTab.isScrolling &&
+      this.targetTab.tabId !== this.focusTab.tabId &&
+      this.targetTab.windowId === this.focusTab.windowId
+    )
+      return true;
+    return false;
+  }
+  
+  needToCloseModalOnTabChanged() {
+    if (
+      this.targetTab.isModalOpened &&
       this.targetTab.tabId !== this.focusTab.tabId &&
       this.targetTab.windowId === this.focusTab.windowId
     )

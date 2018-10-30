@@ -5,7 +5,8 @@ import {
   addOnUpdatedListener as addOnTabUpdatedListener,
   getCurrent as getCurrentTab,
   getActivated as getActivatedTabs,
-  get as getTab
+  get as getTab,
+  isValidTabId
 } from "./tabs";
 import {
   saveItemOnSyncStorage,
@@ -22,7 +23,13 @@ import {
 } from "./commands";
 import { sendMessageToBackground, addOnMessageListener } from "./runtime";
 import { addOnClickListener } from "./browser-action";
-import { addOnFocusChangedListener as addOnWindowFocusChangedListener } from "./windows";
+import {
+  getAllWindow,
+  addOnCreatedListener as addOnWindowCreatedListener,
+  addOnRemovedListener as addOnWindowRemovedListener,
+  addOnFocusChangedListener as addOnWindowFocusChangedListener,
+  isValidWindowId
+} from "./windows";
 
 export {
   sendMessageToTab,
@@ -32,6 +39,7 @@ export {
   getCurrentTab,
   getActivatedTabs,
   getTab,
+  isValidTabId,
   saveItemOnSyncStorage,
   loadItemOnSyncStorage,
   loadAllItemsOnSyncStorage,
@@ -44,5 +52,8 @@ export {
   sendMessageToBackground,
   addOnMessageListener,
   addOnClickListener,
-  addOnWindowFocusChangedListener
+  addOnWindowCreatedListener,
+  addOnWindowFocusChangedListener,
+  addOnWindowRemovedListener,
+  isValidWindowId
 };

@@ -17,9 +17,9 @@ const loadOptions = () => {
 const initOptions = opts => {
   for (const key of Object.keys(opts)) {
     const opt = opts[key];
-    opt.item.addOnChangeListenerFromHtml(opt.html.onChangeStorageListener);
+    opt.item.addOnChangeListener(opt.html.onChangeStorageListener);
     opt.item.addOnLoadListener(opt.html.onLoadStorageListener);
-    opt.html.addEventListener(opt.item.onHtmlInputChangedListener);
+    opt.html.addOnChangeListener(opt.item.onInputChangeListener);
     opt.item.init();
     opt.html.init();
   }

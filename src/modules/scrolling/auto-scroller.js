@@ -8,13 +8,15 @@ class AutoScroller {
     this.scrollingStep = -1;
     this.scrollingInterval = -1;
     this.isCursorOnText = false;
-    this.onStopListener = undefined;
+    this.onStopListener = null;
+    this.parser = null;
+    this.options = null;
 
     this.onMouseoverListener = this.onMouseoverListener.bind(this);
     this.onMouseoutListener = this.onMouseoutListener.bind(this);
     this.onClickListener = this.onClickListener.bind(this);
-    this.onLoadListener = this.onLoadListener.bind(this);
-    this.onChangeListener = this.onChangeListener.bind(this);
+    this.onOptionLoadListener = this.onOptionLoadListener.bind(this);
+    this.onOptionChangeListener = this.onOptionChangeListener.bind(this);
   }
 
   init() {
@@ -26,17 +28,17 @@ class AutoScroller {
     const map = {};
     for (const key of Object.keys(options)) {
       const opt = options[key];
-      opt.addOnLoadListener(this.onLoadListener);
-      opt.addOnChangeListenerFromHtml(this.onChangeListener);
+      opt.addOnLoadListener(this.onOptionLoadListener);
+      opt.addOnChangeListener(this.onOptionChangeListener);
       opt.init();
       map[key] = opt;
     }
     return map;
   }
 
-  onLoadListener() {}
+  onOptionLoadListener() {} // nothing to do
 
-  onChangeListener() {}
+  onOptionChangeListener() {} // nothing to do
 
   start() {
     this.scrollingElement = this.getScrollingElement();
@@ -128,8 +130,8 @@ class AutoScroller {
     }
   }
 
-  setOnStopListener(l) {
-    this.onStopListener = l;
+  setOnStopListener(listener) {
+    this.onStopListener = listener;
   }
 }
 

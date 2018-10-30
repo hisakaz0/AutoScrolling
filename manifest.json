@@ -46,11 +46,11 @@
   },
 
   "commands": {
-    "toggle-scrolling-state": {
+    "single-click-action": {
       "suggested_key": {
         "default": "Alt+Shift+PageDown"
       },
-      "description": "Sends a command to toggle the Autoscrolling ON or OFF"
+      "description": "Fire a single click on browser icon"
     }
   }
 }

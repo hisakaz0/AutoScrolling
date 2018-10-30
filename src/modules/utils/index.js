@@ -1,5 +1,6 @@
 "use strict";
 
-import onError from "./logging.js";
+import onError from "./logging";
+import { isSystemProtocol } from "./util";
 
-export { onError };
+export { onError, isSystemProtocol };

@@ -44,7 +44,7 @@ class OptionHtml {
         : target.value;
   }
 
-  addEventListener(listener) {
+  addOnChangeListener(listener) {
     const wrapper = ev => {
       listener(this._getTargetValue(ev.target));
     };

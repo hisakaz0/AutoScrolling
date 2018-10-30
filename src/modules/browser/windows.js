@@ -14,4 +14,15 @@ const addOnFocusChangedListener = listener => {
   return browser.windows.onFocusChanged.addListener(listener);
 };
 
-export { addOnFocusChangedListener };
+const isValidWindowId = id => {
+  return (
+    id !== undefined && id !== null && id !== browser.windows.WINDOW_ID_NONE
+  );
+};
+export {
+  getAllWindow,
+  addOnCreatedListener,
+  addOnRemovedListener,
+  addOnFocusChangedListener,
+  isValidWindowId
+};

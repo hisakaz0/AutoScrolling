@@ -15,8 +15,8 @@ const updateCommand = cmd => {
  *
  * @returns {Promise}
  */
-const addOnCommandListener = l => {
-  return browser.commands.onCommand.addListener(l);
+const addOnCommandListener = listener => {
+  return browser.commands.onCommand.addListener(listener);
 };
 
 const KEY_COMMAND_NAME = "name";

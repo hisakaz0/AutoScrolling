@@ -22,10 +22,10 @@
       "id": "scrolling-speed",
       "value": 20
     },
-    "keybindSwitchScrolling": {
-      "id": "keybind-switch-scrolling",
+    "keybindSingleClick": {
+      "id": "keybind-single-click",
       "value": "Alt+Shift+PageDown",
-      "commandName": "toggle-scrolling-state"
+      "commandName": "single-click-action"
     }
   },
 

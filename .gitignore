@@ -1,10 +1,12 @@
 
+.vscode
 /web-ext-artifacts
 .web-extension-id
 /dist
 *~
 tags
 tests/fixture/**/*.html
+.envrc
 
 Session.vim
 

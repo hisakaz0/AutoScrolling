@@ -14,7 +14,7 @@
 
   "description": "Auto-scrolling without mouse-wheel",
 
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs"],
 
   "options_ui": {
     "page": "dist/options.html"

@@ -1,192 +1,425 @@
-"use strict";
+import {
+  addOnMessageListener,
+  updateCommand,
+  sendMessageToTab,
+  addOnTabActivatedListener,
+  addOnTabAttachedListener,
+  addOnTabUpdatedListener,
+  getActivatedTabs,
+  getTab,
+  addOnClickListener as addOnBrowserActionClickListener,
+  addOnWindowFocusChangedListener
+} from "../../modules/browser";
+import {
+  KEY_ACTION,
+  KEY_COMMAND,
+  ACTION_OPEN_MODAL,
+  ACTION_CLOSE_MODAL,
+  ACTION_START_SCROLLING,
+  ACTION_STOP_SCROLLING,
+  ACTION_INIT_CONTENT_SCRIPT,
+  MESSAGE_OPEN_MODAL,
+  MESSAGE_CLOSE_MODAL,
+  MESSAGE_START_SCROLLING,
+  MESSAGE_STOP_SCROLLING,
+  MESSAGE_UPDATE_COMMAND
+} from "../../modules/messaging";
 
-import { onError } from "../../modules/utils";
-
-//////////////////////////////////////////////////////////////////////////////
-// Constant / Variables
-
-let autoScrollingStates = [];
-const initAutoScrollingState = {
-  tabId: -1,
-  windowId: -1,
+const DEFAULT_INTERVAL_DOUBLE_CLICK = 500; // mili second
+const UNINIT_TAB_ID = -1;
+const UNINIT_WINDOW_ID = -1;
+const DEFAULT_DOUBLE_CLICK_TIMER = {
+  interval: DEFAULT_INTERVAL_DOUBLE_CLICK,
+  timerId: -1,
+  isWaiting: false
+};
+const DEFAULT_TARGET_TAB = {
+  tabId: UNINIT_TAB_ID,
+  windowId: UNINIT_WINDOW_ID,
   isScrolling: false,
-  isWaitingDoubleClick: false,
-  isOpenOverlay: false
+  isModalOpened: false
+};
+const DEFAULT_FOCUS_TAB = {
+  tabId: UNINIT_TAB_ID,
+  windowId: UNINIT_WINDOW_ID
 };
 
-browser.windows
-  .getAll()
-  .then(windowArray => {
-    windowArray.map(window => {
-      const windowId = window.id;
-      createAutoScrollingState(windowId);
-    });
-  })
-  .catch(onError);
-
-// Unit of both of 'intervalDoubleClick' and 'defaultIntervalDoubleClick' is
-// second. defaultIntervalDoubleClick is 1.00 second.
-const defaultIntervalDoubleClick = Number(0.5);
-const backgroundOptions = {
-  intervalDoubleClick: defaultIntervalDoubleClick
+const State = {
+  STOP_OR_CLOSE: 0,
+  SCROLLING: 1,
+  MODAL_OPENED: 2
 };
-browser.storage.sync
-  .get({
-    intervalDoubleClick: defaultIntervalDoubleClick
-  })
-  .then(data => {
-    const { intervalDoubleClick } = data;
-    backgroundOptions.intervalDoubleClick = intervalDoubleClick;
-  })
-  .catch(onError);
 
-//////////////////////////////////////////////////////////////////////////////
-// AutoScrolling functions
-function createAutoScrollingState(windowId) {
-  // Constructor. This function is called when new window is opened.
-  if (autoScrollingStates[windowId] != undefined) {
-    return;
+const Event = {
+  SINGLE_CLICK: 0,
+  DOUBLE_CLICK: 1,
+  TAB_CHANGED: 2,
+  STOP_MESSAGE_FROM_CONTENT: 3
+};
+
+// 複数windowでのscrollingは今後実装
+class BackgroundScript {
+  constructor() {
+    this.doubleClickTimer = Object.assign({}, DEFAULT_DOUBLE_CLICK_TIMER);
+    this.targetTab = Object.assign({}, DEFAULT_TARGET_TAB);
+    this.focusTab = Object.assign({}, DEFAULT_FOCUS_TAB);
+    this.state = State.STOP_OR_CLOSE;
+
+    this.onBrowserActionClickListener = this.onBrowserActionClickListener.bind(
+      this
+    );
+    this.onTabActivatedListener = this.onTabActivatedListener.bind(this);
+    this.onWindowFocusChangedListener = this.onWindowFocusChangedListener.bind(
+      this
+    );
+    this.onTabUpdatedListener = this.onTabUpdatedListener.bind(this);
+    this.onMessageListener = this.onMessageListener.bind(this);
   }
-  autoScrollingStates[windowId] = Object.assign({}, initAutoScrollingState, {
-    windowId: windowId
-  });
-}
 
-function removeAutoScrollingState(window) {
-  // Deconstructor. This function is called when a window is exited.
-  const windowId = window.id;
-  autoScrollingStates[windowId] = undefined;
-}
+  init() {
+    addOnBrowserActionClickListener(this.onBrowserActionClickListener);
+    addOnTabActivatedListener(this.onTabActivatedListener);
+    addOnWindowFocusChangedListener(this.onWindowFocusChangedListener);
+    addOnTabUpdatedListener(this.onTabUpdatedListener);
+    addOnMessageListener(this.onMessageListener);
+    this.initFocusTab();
+  }
 
-function toggleAutoScrolling(tab) {
-  // Toggling the auto scrolling state. This function is called when browser
-  // icon is clicked with single click. If double click is detected, this
-  // function is not called.
-  const tabId = tab.id;
-  const windowId = tab.windowId;
-  const willIsScrolling = !(
-    autoScrollingStates[windowId] && autoScrollingStates[windowId].isScrolling
-  );
-  browser.tabs
-    .sendMessage(tabId, {
-      isScrolling: willIsScrolling
-    })
-    .then(() => {
-      autoScrollingStates[windowId].tabId = tabId;
-      autoScrollingStates[windowId].isScrolling = willIsScrolling;
-    })
-    .catch(onError);
-}
+  initFocusTab() {
+    this.setFocusTabFromActivatedTab();
+  }
 
-function receiveAutoScrollingStatus(msg, sender, sendResponse) {
-  const windowId = sender.tab.windowId;
-  autoScrollingStates[windowId].isScrolling = msg.isScrolling;
-}
-
-function stopAutoScrolling(activeInfo) {
-  const tabId = activeInfo.tabId;
-  const windowId = activeInfo.windowId;
-  browser.tabs
-    .sendMessage(tabId, {
-      isScrolling: false
-    })
-    .then(response => {
-      autoScrollingStates[windowId].isScrolling = false;
-    })
-    .catch(onError);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Overlay functions
-
-// function disableBrowserActionPopup (msg, sender, sendResponse) {
-//   const tabId = sender.tab.id;
-//   const windowId = sender.tab.windowId;
-//   browser.browserAction.setPopup({
-//     tabId: tabId,
-//     popup: ''
-//   }).then((results) => {
-//     autoScrollingStates[ windowId ].isOpenPopup = false;
-//   }) .catch(onError);
-// }
-
-function resetIsWaitingDoubleClick(windowId) {
-  autoScrollingStates[windowId].isWaitingDoubleClick = false;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Event listeners / event functions
-
-// Listens for all of the available and assignable keyboard shortcut commands.
-browser.commands.onCommand.addListener(function(command) {
-  // https://stackoverflow.com/questions/43695817/tabs-getcurrent-result-is-undefined
-  browser.tabs
-    .query({ active: true, windowId: browser.windows.WINDOW_ID_CURRENT })
-    .then(tabs => browser.tabs.get(tabs[0].id))
-    .then(currentTab => {
-      if (command == "toggle-scrolling-state") {
-        toggleAutoScrolling(currentTab);
+  setFocusTabFromActivatedTab(windowId = null) {
+    getActivatedTabs().then(tabs => {
+      let tab = tabs[0];
+      if (this.isValidWindow(windowId)) {
+        tab = tabs.filter(tab => {
+          return tab.windowId === windowId;
+        })[0];
       }
-    })
-    .catch(onError);
-});
-
-browser.windows.onCreated.addListener(window => {
-  const windowId = window.id;
-  createAutoScrollingState(windowId);
-});
-
-browser.windows.onRemoved.addListener(window => {
-  removeAutoScrollingState(window);
-});
-
-browser.browserAction.onClicked.addListener(tab => {
-  // This function is fired when browser icon is clicked.
-  const windowId = tab.windowId;
-  if (autoScrollingStates[windowId].isWaitingDoubleClick) {
-    browser.tabs
-      .sendMessage(tab.id, {
-        isOpenOverlay: true
-      })
-      .then(response => {
-        autoScrollingStates[windowId].isOpenOverlay = true;
+      this._setFocusTab({
+        tabId: tab.id,
+        windowId: tab.windowId
       });
-  }
-  setTimeout(() => {
-    resetIsWaitingDoubleClick(tab.windowId);
-    if (!autoScrollingStates[windowId].isOpenOverlay) {
-      toggleAutoScrolling(tab);
-    }
-  }, backgroundOptions.intervalDoubleClick * 1000);
-  autoScrollingStates[windowId].isWaitingDoubleClick = true;
-});
-
-browser.tabs.onActivated.addListener(activeInfo => {
-  const windowId = activeInfo.windowId;
-  const tabId = activeInfo.tabId;
-  if (autoScrollingStates[windowId] == undefined) {
-    createAutoScrollingState(windowId);
-  }
-  if (
-    autoScrollingStates[windowId].isScrolling &&
-    autoScrollingStates[windowId].tabId != tabId
-  ) {
-    stopAutoScrolling(activeInfo);
-  }
-});
-
-browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  // This event is fired when content scripts sent message.
-  if (msg.isScrolling != undefined) {
-    receiveAutoScrollingStatus(msg, sender, sendResponse);
-  }
-  if (msg.isOpenOverlay == false) {
-    autoScrollingStates[sender.tab.windowId].isOpenOverlay = false;
-  }
-  if (msg["toggle-scrolling-state"] != undefined) {
-    browser.commands.update({
-      name: "toggle-scrolling-state",
-      shortcut: msg["toggle-scrolling-state"]
     });
   }
-});
+
+  onMessageListener(message, tab, sendResponse) {
+    switch (message[KEY_ACTION]) {
+      case ACTION_STOP_SCROLLING:
+        this.onReceiveStopMessage();
+        break;
+      case ACTION_CLOSE_MODAL:
+        this.onReceiveCloseMessage();
+        break;
+      case ACTION_UPDATE_COMMAND:
+        updateCommand(message[KEY_COMMAND]);
+        break;
+      case ACTION_INIT_CONTENT_SCRIPT:
+        this.onRecieveInitContentScript();
+        break;
+    }
+  }
+
+  resetTargetTab() {
+    this.targetTab = Object.assign(this.targetTab, {
+      tabId: UNINIT_TAB_ID,
+      windowId: UNINIT_WINDOW_ID,
+      isScrolling: false
+    });
+  }
+
+  onBrowserActionClickListener(tab) {
+    if (!this.isWaitingDoubleClick()) return this.setDoubleClickTimer();
+    this.clearDoubleClickTimer();
+    this.onDoubleClickEvent();
+  }
+
+  onTabActivatedListener(activeInfo) {
+    this._setFocusTab(activeInfo);
+    this.onTabChangedEvent();
+  }
+
+  onWindowFocusChangedListener(windowId) {
+    this.setFocusTabFromActivatedTab(windowId);
+    this.onTabChangedEvent();
+  }
+
+  onTabUpdatedListener(tab) {
+    if (
+      this.targetTab.tabId === tab.id &&
+      this.targetTab.windowId === tab.windowId
+    ) {
+      this.resetTargetTab();
+    }
+  }
+
+  resetTargetTab() {
+    this.targetTab = Object.assign(
+      {},
+      {
+        isScrolling: false,
+        isModalOpened: false
+      }
+    );
+    this.state = State.STOP_OR_CLOSE;
+  }
+
+  _setFocusTab(tab) {
+    this.focusTab = { tabId: tab.tabId, windowId: tab.windowId };
+  }
+
+  isWaitingDoubleClick() {
+    return this.doubleClickTimer.isWaiting;
+  }
+
+  setDoubleClickTimer(tab) {
+    this.doubleClickTimer.timerId = setTimeout(() => {
+      this.clearDoubleClickTimer();
+      this.onSingleClickEvent();
+    }, this.doubleClickTimer.interval);
+    this.doubleClickTimer.isWaiting = true;
+  }
+
+  clearDoubleClickTimer() {
+    clearTimeout(this.doubleClickTimer.timerId);
+    this.doubleClickTimer.isWaiting = false;
+  }
+
+  // begin: event area
+  onSingleClickEvent() {
+    switch (this.state) {
+      case State.STOP_OR_CLOSE:
+        this.startScrollingAction().then(isSuccess => {
+          if (!isSuccess) return;
+          this.state = State.SCROLLING;
+        });
+        break;
+      case State.MODAL_OPENED:
+        if (!this.isEqualTargetToFocus()) break;
+        this.closeModalAction().then(isSuccess => {
+          if (!isSuccess) return;
+          this.state = State.STOP_OR_CLOSE;
+        });
+        break;
+      case State.SCROLLING:
+        if (!this.isEqualTargetToFocus()) break;
+        this.stopScrollingAction().then(isSuccess => {
+          if (!isSuccess) return;
+          this.state = State.STOP_OR_CLOSE;
+        });
+        break;
+    }
+  }
+
+  onDoubleClickEvent() {
+    switch (this.state) {
+      case State.STOP_OR_CLOSE:
+        this.openModalAction().then(isSuccess => {
+          if (!isSuccess) return;
+          this.state = State.MODAL_OPENED;
+        });
+        break;
+      case State.MODAL_OPENED:
+        if (!this.isEqualTargetToFocus()) break;
+        this.closeModalAction().then(isSuccess => {
+          if (!isSuccess) return;
+          this.state = State.STOP_OR_CLOSE;
+        });
+        break;
+      case State.SCROLLING:
+        if (!this.isEqualTargetToFocus()) break;
+        this.stopScrollingAction().then(isSuccess => {
+          if (!isSuccess) return;
+          this.state = State.STOP_OR_CLOSE;
+        });
+        break;
+    }
+  }
+
+  onTabChangedEvent() {
+    switch (this.state) {
+      case State.SCROLLING:
+        if (!this.needToStopScrollingOnTabChanged()) break;
+        this.stopScrollingAction(false).then(isSuccess => {
+          if (!isSuccess) return;
+          this.state = State.STOP_OR_CLOSE;
+        });
+        break;
+      case State.MODAL_OPENED:
+        if (!this.needToCloseModalOnTabChanged()) break;
+        this.closeModalAction().then(isSuccess => {
+          if (!isSuccess) return;
+          this.state = State.STOP_OR_CLOSE;
+        });
+        break;
+      case State.STOP_OR_CLOSE:
+      default:
+        break;
+    }
+  }
+  // end: event area
+
+  onRecieveInitContentScript() {
+    if (!this.isEqualTargetToFocus()) return;
+    this.targetTab = Object.assign(this.targetTab, {
+      isScrolling: false,
+      isModalOpened: false
+    });
+    this.state = State.STOP_OR_CLOSE;
+  }
+
+  onReceiveStopMessage() {
+    this.targetTab = Object.assign(this.targetTab, {
+      tabId: UNINIT_TAB_ID,
+      windowId: UNINIT_WINDOW_ID,
+      isScrolling: false
+    });
+    this.state = State.STOP_OR_CLOSE;
+  }
+
+  onReceiveCloseMessage() {
+    this.targetTab = Object.assign(this.targetTab, {
+      tabId: UNINIT_TAB_ID,
+      windowId: UNINIT_WINDOW_ID,
+      isModalOpened: false
+    });
+    this.state = State.STOP_OR_CLOSE;
+  }
+
+  needToStopScrollingOnTabChanged() {
+    if (
+      this.targetTab.isScrolling &&
+      this.targetTab.tabId !== this.focusTab.tabId &&
+      this.targetTab.windowId === this.focusTab.windowId
+    )
+      return true;
+    return false;
+  }
+
+  needToCloseModalOnTabChanged() {
+    if (
+      this.targetTab.isModalOpened &&
+      this.targetTab.tabId !== this.focusTab.tabId &&
+      this.targetTab.windowId === this.focusTab.windowId
+    )
+      return true;
+    return false;
+  }
+
+  isEqualTargetToFocus() {
+    if (
+      this.targetTab.tabId === this.focusTab.tabId &&
+      this.targetTab.windowId === this.focusTab.windowId
+    )
+      return true;
+    return false;
+  }
+
+  beforeAction(tabId, callback) {
+    const falsePromise = new Promise(resolve => {
+      resolve(false);
+    });
+    if (!this.isValidTab(this.focusTab.tabId)) return falsePromise;
+    return getTab(tabId).then(tab => {
+      if (this.isSystemProtocol(tab.url)) return falsePromise;
+      return callback();
+    });
+  }
+
+  // begin: action area
+  startScrollingAction() {
+    const action = () => {
+      this.targetTab = Object.assign(this.targetTab, {
+        tabId: this.focusTab.tabId,
+        windowId: this.focusTab.windowId,
+        isScrolling: true
+      });
+      sendMessageToTab(this.targetTab.tabId, MESSAGE_START_SCROLLING);
+      return new Promise(resolve => {
+        resolve(true);
+      });
+    };
+    action.bind(this);
+
+    return this.beforeAction(this.focusTab.tabId, action);
+  }
+
+  stopScrollingAction(isResetTarget = true) {
+    const action = () => {
+      sendMessageToTab(this.targetTab.tabId, MESSAGE_STOP_SCROLLING);
+      if (!isResetTarget) return;
+      this.targetTab = Object.assign(this.targetTab, {
+        tabId: UNINIT_TAB_ID,
+        windowId: UNINIT_WINDOW_ID,
+        isScrolling: false
+      });
+      return new Promise(resolve => {
+        resolve(true);
+      });
+    };
+    action.bind(this);
+
+    return this.beforeAction(this.targetTab.tabId, action);
+  }
+
+  openModalAction() {
+    const action = () => {
+      this.targetTab = Object.assign(this.targetTab, {
+        tabId: this.focusTab.tabId,
+        windowId: this.focusTab.windowId,
+        isModalOpened: true
+      });
+      sendMessageToTab(this.targetTab.tabId, MESSAGE_OPEN_MODAL);
+      return new Promise(resolve => {
+        resolve(true);
+      });
+    };
+    action.bind(this);
+
+    return this.beforeAction(this.focusTab.tabId, action);
+  }
+
+  closeModalAction() {
+    const action = () => {
+      sendMessageToTab(this.targetTab.tabId, MESSAGE_CLOSE_MODAL);
+      this.targetTab = Object.assign(this.targetTab, {
+        tabId: UNINIT_TAB_ID,
+        windowId: UNINIT_WINDOW_ID,
+        isModalOpened: false
+      });
+      return new Promise(resolve => {
+        resolve(true);
+      });
+    };
+    action.bind(this);
+
+    return this.beforeAction(this.targetTab.tabId, action);
+  }
+  // end: action area
+
+  _getScrollingMessage(state) {
+    if (state) return MESSAGE_START_SCROLLING;
+    return MESSAGE_STOP_SCROLLING;
+  }
+
+  isValidTab(tabId) {
+    // TypeError is throwed when `TAB_ID_NONE` is loaded in content script
+    return tabId !== browser.tabs.TAB_ID_NONE;
+  }
+
+  isValidWindow(windowId) {
+    return (
+      windowId !== null &&
+      windowId !== undefined &&
+      windowId !== browser.windows.WINDOW_ID_NONE
+    );
+  }
+
+  isSystemProtocol(url) {
+    return url.match(/^about:/) !== null;
+  }
+}
+
+const script = new BackgroundScript();
+script.init();

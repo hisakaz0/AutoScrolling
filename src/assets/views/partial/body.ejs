@@ -3,28 +3,29 @@
   <input type="text"
          id="<%= appConst.options.scrollingSpeed.id %>"
          value=<%= appConst.options.scrollingSpeed.value %> />
-  <p>The value is scrolling speed. A unit is scroll / sec. Max is <%= appConst.scrolling.maxSpeed %>, and min is <%= appConst.scrolling.minSpeed %> .</p>
+  <p>The value is scrolling speed. A unit is scroll / sec.</br>
+     Max is <%= appConst.scrolling.maxSpeed %>, and min is <%= appConst.scrolling.minSpeed %> .</p>
 </div>
 <div>
   <strong>Scrolling stop by click:</strong>
   <input type="checkbox"
          id="<%= appConst.options.stopScrollingByClick.id %>" />
-  <p>The value decides the weather stoppling the scrolling when you click the scrolling window.</p>
+  <p>If enabled the option, scrolling is stopped when you click the scrolling window.</p>
 </div>
 <div>
-  <strong>Stop scrolling when hovering over something:</strong>
+  <strong>Stop scrolling by cursor hovering over something:</strong>
   <input type="checkbox"
          id="<%= appConst.options.stopScrollingOnHover.id %>" />
-  <p>Stop scrolling on hover</p>
+  <p>If enabled the option, scrolling is stopped temporally when mouse cursor is hovering over something.</p>
 </div>
 <div>
-  <strong>Shortcut - Toggle Autoscrolling: </strong>
+  <strong>Keyboard shortcut for toggle scrolling</strong>
   <input type="text"
          id="<%= appConst.options.keybindSwitchScrolling.id %>"
          value="<%= appConst.options.keybindSwitchScrolling.value %>" />
-  <p>Toggle the tab's scrolling by keyboard shortcut<br>
-  The value should be a combination of keycodes combined with the '+' sign. <br>
+  <p>Toggle scrolling by keyboard shortcut</br>
+  The keybind should be a combination of keycodes concatenated with the '+' sign. <br>
   <i>Ex: Ctrl+Shift+Insert.</i><br>
   Check out the link for the keycodes: <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/commands#Key_combinations" target="_blank">Key combinations</a><br>
-  <span class="text-gray">PS: Some key combinations are reserved by the browser and can't be reassigned to this.<span></p>
+  <span class="text-gray">Notice: Some key combinations are reserved by the browser and can't be reassigned to this.<span></p>
 </div>

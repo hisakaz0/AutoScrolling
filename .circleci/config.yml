@@ -15,15 +15,15 @@ jobs:
 
       - run: rm -rf node_modules
 
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
+        #      - restore_cache:
+        #          keys:
+        #          - v1-dependencies-{{ checksum "package.json" }}
 
       - run: npm install
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+        #      - save_cache:
+        #          paths:
+        #            - node_modules
+        #          key: v1-dependencies-{{ checksum "package.json" }}
 
       - run: npm run build

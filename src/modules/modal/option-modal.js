@@ -5,8 +5,10 @@ const appOpts = appConst.options;
 
 class OptionModal {
   constructor() {
-    this.onCloseListener = null;
     this.CLASS_NAME_OPEN = "active";
+    this.options = null;
+    this.onCloseListener = null;
+    this.html = null;
 
     this.onCloseButtonClickListener = this.onCloseButtonClickListener.bind(
       this
@@ -21,7 +23,7 @@ class OptionModal {
   }
 
   setOptions() {
-    this.optionMap = initOptions(loadOptions());
+    this.options = initOptions(loadOptions());
   }
 
   setOnCloseButtonClickListener() {
@@ -64,10 +66,10 @@ class OptionModal {
       .classList.remove(this.CLASS_NAME_OPEN);
   }
 
-  setOnUpdateCommandListener(l) {
-    for (const key of Object.keys(this.optionMap)) {
-      const opt = this.optionMap[key].item;
-      if (opt.hasCommand()) opt.setOnUpdateCommandListener(l);
+  setOnUpdateCommandListener(listener) {
+    for (const key of Object.keys(this.options)) {
+      const opt = this.options[key].item;
+      if (opt.hasCommand()) opt.setOnUpdateCommandListener(listener);
     }
   }
 }

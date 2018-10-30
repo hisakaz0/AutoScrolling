@@ -1,14 +1,17 @@
 import {
   addOnMessageListener,
   updateCommand,
+  addOnCommandListener,
   sendMessageToTab,
   addOnTabActivatedListener,
   addOnTabAttachedListener,
   addOnTabUpdatedListener,
   getActivatedTabs,
   getTab,
+  isValidTabId,
   addOnClickListener as addOnBrowserActionClickListener,
-  addOnWindowFocusChangedListener
+  addOnWindowFocusChangedListener,
+  isValidWindowId
 } from "../../modules/browser";
 import {
   KEY_ACTION,
@@ -18,12 +21,17 @@ import {
   ACTION_START_SCROLLING,
   ACTION_STOP_SCROLLING,
   ACTION_INIT_CONTENT_SCRIPT,
+  ACTION_UPDATE_COMMAND,
   MESSAGE_OPEN_MODAL,
   MESSAGE_CLOSE_MODAL,
   MESSAGE_START_SCROLLING,
   MESSAGE_STOP_SCROLLING,
   MESSAGE_UPDATE_COMMAND
 } from "../../modules/messaging";
+import { isSystemProtocol } from "../../modules/utils";
+
+import appConst from "../../appConst.json";
+const appOpts = appConst.options;
 
 const DEFAULT_INTERVAL_DOUBLE_CLICK = 500; // mili second
 const UNINIT_TAB_ID = -1;
@@ -74,6 +82,7 @@ class BackgroundScript {
     );
     this.onTabUpdatedListener = this.onTabUpdatedListener.bind(this);
     this.onMessageListener = this.onMessageListener.bind(this);
+    this.onCommandListener = this.onCommandListener.bind(this);
   }
 
   init() {
@@ -82,6 +91,7 @@ class BackgroundScript {
     addOnWindowFocusChangedListener(this.onWindowFocusChangedListener);
     addOnTabUpdatedListener(this.onTabUpdatedListener);
     addOnMessageListener(this.onMessageListener);
+    addOnCommandListener(this.onCommandListener);
     this.initFocusTab();
   }
 
@@ -92,7 +102,7 @@ class BackgroundScript {
   setFocusTabFromActivatedTab(windowId = null) {
     getActivatedTabs().then(tabs => {
       let tab = tabs[0];
-      if (this.isValidWindow(windowId)) {
+      if (isValidWindowId(windowId)) {
         tab = tabs.filter(tab => {
           return tab.windowId === windowId;
         })[0];
@@ -121,14 +131,6 @@ class BackgroundScript {
     }
   }
 
-  resetTargetTab() {
-    this.targetTab = Object.assign(this.targetTab, {
-      tabId: UNINIT_TAB_ID,
-      windowId: UNINIT_WINDOW_ID,
-      isScrolling: false
-    });
-  }
-
   onBrowserActionClickListener(tab) {
     if (!this.isWaitingDoubleClick()) return this.setDoubleClickTimer();
     this.clearDoubleClickTimer();
@@ -155,13 +157,10 @@ class BackgroundScript {
   }
 
   resetTargetTab() {
-    this.targetTab = Object.assign(
-      {},
-      {
-        isScrolling: false,
-        isModalOpened: false
-      }
-    );
+    this.targetTab = Object.assign(this.targetTab, {
+      isScrolling: false,
+      isModalOpened: false
+    });
     this.state = State.STOP_OR_CLOSE;
   }
 
@@ -258,6 +257,16 @@ class BackgroundScript {
         break;
     }
   }
+
+  onCommandListener(name) {
+    switch (name) {
+      case appOpts.keybindSingleClick.commandName:
+        this.onSingleClickEvent();
+        break;
+      default:
+        break;
+    }
+  }
   // end: event area
 
   onRecieveInitContentScript() {
@@ -320,9 +329,9 @@ class BackgroundScript {
     const falsePromise = new Promise(resolve => {
       resolve(false);
     });
-    if (!this.isValidTab(this.focusTab.tabId)) return falsePromise;
+    if (!isValidTabId(this.focusTab.tabId)) return falsePromise;
     return getTab(tabId).then(tab => {
-      if (this.isSystemProtocol(tab.url)) return falsePromise;
+      if (isSystemProtocol(tab.url)) return falsePromise;
       return callback();
     });
   }
@@ -401,23 +410,6 @@ class BackgroundScript {
   _getScrollingMessage(state) {
     if (state) return MESSAGE_START_SCROLLING;
     return MESSAGE_STOP_SCROLLING;
-  }
-
-  isValidTab(tabId) {
-    // TypeError is throwed when `TAB_ID_NONE` is loaded in content script
-    return tabId !== browser.tabs.TAB_ID_NONE;
-  }
-
-  isValidWindow(windowId) {
-    return (
-      windowId !== null &&
-      windowId !== undefined &&
-      windowId !== browser.windows.WINDOW_ID_NONE
-    );
-  }
-
-  isSystemProtocol(url) {
-    return url.match(/^about:/) !== null;
   }
 }
 

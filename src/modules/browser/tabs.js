@@ -26,6 +26,10 @@ const get = tabId => {
   return browser.tabs.get(tabId);
 };
 
+const isValidTabId = id => {
+  // TypeError is throwed when `TAB_ID_NONE` is loaded in content script
+  return id !== undefined && id !== null && id !== browser.tabs.TAB_ID_NONE;
+};
 export {
   sendMessage,
   addOnActivatedListener,
@@ -33,5 +37,6 @@ export {
   addOnUpdatedListener,
   getCurrent,
   getActivated,
-  get
+  get,
+  isValidTabId
 };

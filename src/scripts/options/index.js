@@ -1,14 +1,14 @@
-"use strict";
-
 import { loadOptions, initOptions } from "../../modules/options";
 
 class OptionScript {
-  constructor() {}
+  constructor() {
+    this.options = null;
+  }
 
   init() {
-    this.optionMap = initOptions(loadOptions());
+    this.options = initOptions(loadOptions());
   }
 }
 
-const optionScript = new OptionScript();
-optionScript.init();
+const script = new OptionScript();
+script.init();

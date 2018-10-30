@@ -13,22 +13,23 @@ class OptionItem {
     this.value = defaultValue;
     this.defaultValue = defaultValue;
     this.commandName = commandName;
+    this.onUpdateCommandListener = null;
+    this.onLoadListener = null;
+    this.onChangeListener = null;
 
-    this.onHtmlInputChangedListener = this.onHtmlInputChangedListener.bind(
-      this
-    );
+    this.onInputChangeListener = this.onInputChangeListener.bind(this);
   }
 
   init() {
     this.onLoadListener = this.onLoadListener.bind(this);
-    this.onChangeListenerFromHtml = this.onChangeListenerFromHtml.bind(this);
     this.onChangeListener = this.onChangeListener.bind(this);
-    addOnChangeListenerInStorage(this.onChangeListener);
+    this.onStorageChangeListener = this.onStorageChangeListener.bind(this);
+    addOnChangeListenerInStorage(this.onStorageChangeListener);
 
-    this.loadOption();
+    this.load();
   }
 
-  loadOption() {
+  load() {
     return loadItemOnSyncStorage({
       [this.name]: this.defaultValue
     }).then(data => {
@@ -40,7 +41,7 @@ class OptionItem {
     });
   }
 
-  saveOption(newValue) {
+  save(newValue) {
     this.assertValue(newValue);
     return saveItemOnSyncStorage({
       [this.name]: newValue
@@ -63,24 +64,23 @@ class OptionItem {
     this.onLoadListener = listener;
   }
 
-  addOnChangeListenerFromHtml(listener) {
-    this.onChangeListenerFromHtml = listener;
+  addOnChangeListener(listener) {
+    this.onChangeListener = listener;
   }
 
-  onChangeListener(changes) {
+  onStorageChangeListener(changes) {
     // from storage
-    if (Object.keys(changes).includes(this.name)) {
-      const newValue = changes[this.name].newValue;
-      this.value = newValue;
-      if (this.hasCommand()) {
-        this.updateCommandKeyBind(newValue);
-      }
-      this.onChangeListenerFromHtml(newValue);
+    if (!Object.keys(changes).includes(this.name)) return;
+    const newValue = changes[this.name].newValue;
+    this.value = newValue;
+    if (this.hasCommand()) {
+      this.updateCommandKeyBind(newValue);
     }
+    this.onChangeListener(newValue);
   }
 
-  onHtmlInputChangedListener(value) {
-    return this.saveOption(value);
+  onInputChangeListener(value) {
+    return this.save(value);
   }
 
   hasCommand() {
@@ -89,16 +89,17 @@ class OptionItem {
   }
 
   updateCommandKeyBind(value) {
-    const cmd = createCommandObject(this.name, value);
+    const cmd = createCommandObject(this.commandName, value);
     try {
       return updateCommand(cmd);
     } catch (e) {
+      if (!this.onUpdateCommandListener) return;
       this.onUpdateCommandListener(cmd);
     }
   }
 
-  setOnUpdateCommandListener(l) {
-    this.onUpdateCommandListener = l;
+  setOnUpdateCommandListener(listener) {
+    this.onUpdateCommandListener = listener;
   }
 }
 

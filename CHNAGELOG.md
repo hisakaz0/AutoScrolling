@@ -63,4 +63,19 @@
 
     Overlay window to access addon options quickly.
 
+2018-11-02: Version 1.4.9
 
+    Fix bugs
+      - Cannot stop scrolling when change tab
+      - Cannot start scrolling after tab/window manipulation
+      - Cannot open modal window after tab/window manipulation
+      - Cannot close the modal window
+    Add new option
+      - stopScrollingOnHover
+        - Stop scrolling when cursor is hovering on html element
+        - Thanks for @jpsouzasilva
+      - keybindSingleClick
+        - Fire single-click action when shortcut is typed
+        - Thanks for @jpsouzasilva
+    Other improvement
+      - scrolling speed is change more slower / faster

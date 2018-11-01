@@ -1,4 +1,4 @@
-![icon][icon] AutoScrolling  
+[![icon][icon] AutoScrolling](https://addons.mozilla.org/ja/firefox/addon/autoscrolling/)
 ============================
 [![build status](https://circleci.com/gh/pinkienort/AutoScrolling.svg?style=svg)](https://circleci.com/gh/pinkienort/AutoScrolling)
 [![dev dependencies](https://david-dm.org/pinkienort/AutoScrolling.svg)](https://david-dm.org/pinkienort/AutoScrolling?type=dev) [![Greenkeeper badge](https://badges.greenkeeper.io/pinkienort/AutoScrolling.svg)](https://greenkeeper.io/)

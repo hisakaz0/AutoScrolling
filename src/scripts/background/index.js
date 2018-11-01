@@ -189,22 +189,19 @@ class BackgroundScript {
   onSingleClickEvent() {
     switch (this.state) {
       case State.STOP_OR_CLOSE:
-        this.startScrollingAction().then(isSuccess => {
-          if (!isSuccess) return;
+        this.startScrollingAction().then(() => {
           this.state = State.SCROLLING;
         });
         break;
       case State.MODAL_OPENED:
         if (!this.isEqualTargetToFocus()) break;
-        this.closeModalAction().then(isSuccess => {
-          if (!isSuccess) return;
+        this.closeModalAction().then(() => {
           this.state = State.STOP_OR_CLOSE;
         });
         break;
       case State.SCROLLING:
         if (!this.isEqualTargetToFocus()) break;
-        this.stopScrollingAction().then(isSuccess => {
-          if (!isSuccess) return;
+        this.stopScrollingAction().then(() => {
           this.state = State.STOP_OR_CLOSE;
         });
         break;
@@ -214,22 +211,19 @@ class BackgroundScript {
   onDoubleClickEvent() {
     switch (this.state) {
       case State.STOP_OR_CLOSE:
-        this.openModalAction().then(isSuccess => {
-          if (!isSuccess) return;
+        this.openModalAction().then(() => {
           this.state = State.MODAL_OPENED;
         });
         break;
       case State.MODAL_OPENED:
         if (!this.isEqualTargetToFocus()) break;
-        this.closeModalAction().then(isSuccess => {
-          if (!isSuccess) return;
+        this.closeModalAction().then(() => {
           this.state = State.STOP_OR_CLOSE;
         });
         break;
       case State.SCROLLING:
         if (!this.isEqualTargetToFocus()) break;
-        this.stopScrollingAction().then(isSuccess => {
-          if (!isSuccess) return;
+        this.stopScrollingAction().then(() => {
           this.state = State.STOP_OR_CLOSE;
         });
         break;
@@ -240,15 +234,13 @@ class BackgroundScript {
     switch (this.state) {
       case State.SCROLLING:
         if (!this.needToStopScrollingOnTabChanged()) break;
-        this.stopScrollingAction(false).then(isSuccess => {
-          if (!isSuccess) return;
+        this.stopScrollingAction().then(() => {
           this.state = State.STOP_OR_CLOSE;
         });
         break;
       case State.MODAL_OPENED:
         if (!this.needToCloseModalOnTabChanged()) break;
-        this.closeModalAction().then(isSuccess => {
-          if (!isSuccess) return;
+        this.closeModalAction().then(() => {
           this.state = State.STOP_OR_CLOSE;
         });
         break;
@@ -325,85 +317,74 @@ class BackgroundScript {
     return false;
   }
 
-  beforeAction(tabId, callback) {
-    const falsePromise = new Promise(resolve => {
-      resolve(false);
-    });
-    if (!isValidTabId(this.focusTab.tabId)) return falsePromise;
+  beforeAction(tabId) {
+    if (!isValidTabId(this.focusTab.tabId)) return Promise.reject();
     return getTab(tabId).then(tab => {
-      if (isSystemProtocol(tab.url)) return falsePromise;
-      return callback();
+      if (isSystemProtocol(tab.url)) return Promise.reject();
+      return Promise.resolve();
     });
   }
 
   // begin: action area
   startScrollingAction() {
-    const action = () => {
-      this.targetTab = Object.assign(this.targetTab, {
-        tabId: this.focusTab.tabId,
-        windowId: this.focusTab.windowId,
-        isScrolling: true
+    return this.beforeAction(this.focusTab.tabId)
+      .then(() => {
+        return sendMessageToTab(this.focusTab.tabId, MESSAGE_START_SCROLLING);
+      })
+      .then(() => {
+        this.targetTab = Object.assign(this.targetTab, {
+          tabId: this.focusTab.tabId,
+          windowId: this.focusTab.windowId,
+          isScrolling: true
+        });
+        return Promise.resolve();
       });
-      sendMessageToTab(this.targetTab.tabId, MESSAGE_START_SCROLLING);
-      return new Promise(resolve => {
-        resolve(true);
-      });
-    };
-    action.bind(this);
-
-    return this.beforeAction(this.focusTab.tabId, action);
   }
 
   stopScrollingAction(isResetTarget = true) {
-    const action = () => {
-      sendMessageToTab(this.targetTab.tabId, MESSAGE_STOP_SCROLLING);
-      if (!isResetTarget) return;
-      this.targetTab = Object.assign(this.targetTab, {
-        tabId: UNINIT_TAB_ID,
-        windowId: UNINIT_WINDOW_ID,
-        isScrolling: false
+    return this.beforeAction(this.targetTab.tabId)
+      .then(() => {
+        return sendMessageToTab(this.targetTab.tabId, MESSAGE_STOP_SCROLLING);
+      })
+      .then(() => {
+        if (!isResetTarget) return;
+        this.targetTab = Object.assign(this.targetTab, {
+          tabId: UNINIT_TAB_ID,
+          windowId: UNINIT_WINDOW_ID,
+          isScrolling: false
+        });
+        return Promise.resolve();
       });
-      return new Promise(resolve => {
-        resolve(true);
-      });
-    };
-    action.bind(this);
-
-    return this.beforeAction(this.targetTab.tabId, action);
   }
 
   openModalAction() {
-    const action = () => {
-      this.targetTab = Object.assign(this.targetTab, {
-        tabId: this.focusTab.tabId,
-        windowId: this.focusTab.windowId,
-        isModalOpened: true
+    return this.beforeAction(this.focusTab.tabId)
+      .then(() => {
+        return sendMessageToTab(this.focusTab.tabId, MESSAGE_OPEN_MODAL);
+      })
+      .then(() => {
+        this.targetTab = Object.assign(this.targetTab, {
+          tabId: this.focusTab.tabId,
+          windowId: this.focusTab.windowId,
+          isModalOpened: true
+        });
+        return Promise.resolve();
       });
-      sendMessageToTab(this.targetTab.tabId, MESSAGE_OPEN_MODAL);
-      return new Promise(resolve => {
-        resolve(true);
-      });
-    };
-    action.bind(this);
-
-    return this.beforeAction(this.focusTab.tabId, action);
   }
 
   closeModalAction() {
-    const action = () => {
-      sendMessageToTab(this.targetTab.tabId, MESSAGE_CLOSE_MODAL);
-      this.targetTab = Object.assign(this.targetTab, {
-        tabId: UNINIT_TAB_ID,
-        windowId: UNINIT_WINDOW_ID,
-        isModalOpened: false
+    return this.beforeAction(this.targetTab.tabId)
+      .then(() => {
+        return sendMessageToTab(this.targetTab.tabId, MESSAGE_CLOSE_MODAL);
+      })
+      .then(() => {
+        this.targetTab = Object.assign(this.targetTab, {
+          tabId: UNINIT_TAB_ID,
+          windowId: UNINIT_WINDOW_ID,
+          isModalOpened: false
+        });
+        return Promise.resolve();
       });
-      return new Promise(resolve => {
-        resolve(true);
-      });
-    };
-    action.bind(this);
-
-    return this.beforeAction(this.targetTab.tabId, action);
   }
   // end: action area
 

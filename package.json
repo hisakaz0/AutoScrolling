@@ -17,6 +17,7 @@
     "test": "npm run build:gulp && karma start",
     "test:debug": "npm run build:gulp && karma start --no-single-run --auto-watch",
     "lint": "eslint src",
+    "lint:ext": "web-ext lint",
     "precommit": "lint-staged"
   },
   "lint-staged": {

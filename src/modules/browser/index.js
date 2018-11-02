@@ -21,6 +21,11 @@ import {
   addOnCommandListener,
   createCommandObject
 } from "./commands";
+import {
+  createContextMenu,
+  updateContextMenu,
+  addOnClickListener as addOnMenuClickListener
+} from "./menus";
 import { sendMessageToBackground, addOnMessageListener } from "./runtime";
 import { addOnClickListener } from "./browser-action";
 import {
@@ -49,6 +54,9 @@ export {
   updateCommand,
   addOnCommandListener,
   createCommandObject,
+  createContextMenu,
+  updateContextMenu,
+  addOnMenuClickListener,
   sendMessageToBackground,
   addOnMessageListener,
   addOnClickListener,

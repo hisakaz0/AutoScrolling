@@ -2,4 +2,11 @@ const addOnClickListener = listener => {
   return browser.browserAction.onClicked.addListener(listener);
 };
 
-export { addOnClickListener };
+const setTitle = text => {
+  return browser.browserAction.setTitle(text);
+};
+
+export { 
+  addOnClickListener,
+  setTitle
+};

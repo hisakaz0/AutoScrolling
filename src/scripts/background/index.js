@@ -4,8 +4,8 @@ import {
   addOnCommandListener,
   sendMessageToTab,
   addOnTabActivatedListener,
-  addOnTabAttachedListener,
   addOnTabUpdatedListener,
+  addOnTabRemovedListener,
   getActivatedTabs,
   getTab,
   isValidTabId,
@@ -81,6 +81,7 @@ class BackgroundScript {
       this
     );
     this.onTabUpdatedListener = this.onTabUpdatedListener.bind(this);
+    this.onTabRemovedListener = this.onTabRemovedListener.bind(this);
     this.onMessageListener = this.onMessageListener.bind(this);
     this.onCommandListener = this.onCommandListener.bind(this);
   }
@@ -90,6 +91,7 @@ class BackgroundScript {
     addOnTabActivatedListener(this.onTabActivatedListener);
     addOnWindowFocusChangedListener(this.onWindowFocusChangedListener);
     addOnTabUpdatedListener(this.onTabUpdatedListener);
+    addOnTabRemovedListener(this.onTabRemovedListener);
     addOnMessageListener(this.onMessageListener);
     addOnCommandListener(this.onCommandListener);
     this.initFocusTab();
@@ -148,10 +150,13 @@ class BackgroundScript {
   }
 
   onTabUpdatedListener(tab) {
-    if (
-      this.targetTab.tabId === tab.id &&
-      this.targetTab.windowId === tab.windowId
-    ) {
+    if (this.targetTab.tabId === tab.id) {
+      this.resetTargetTab();
+    }
+  }
+
+  onTabRemovedListener(tabId) {
+    if (this.targetTab.tabId === tabId) {
       this.resetTargetTab();
     }
   }

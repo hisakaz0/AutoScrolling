@@ -1,5 +1,6 @@
 import appConst from "../../appConst.json";
 import { OptionItem, OptionHtml, loadOptions, initOptions } from "../options";
+import { appendHtmlText } from "../utils";
 
 const appOpts = appConst.options;
 
@@ -50,10 +51,7 @@ class OptionModal {
   loadHtml() {
     const wrapperEle = document.createElement("div");
     wrapperEle.id = appConst.html.wrapper.id;
-    wrapperEle.insertAdjacentHTML(
-      "afterbegin",
-      require("../../../dist/modal.html")
-    );
+    appendHtmlText(wrapperEle, require("../../../dist/modal.html"));
     this.html = wrapperEle;
   }
 

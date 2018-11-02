@@ -2,11 +2,27 @@ const addOnClickListener = listener => {
   return browser.browserAction.onClicked.addListener(listener);
 };
 
-const setTitle = text => {
-  return browser.browserAction.setTitle(text);
+const setTitle = (title, tabId, windowId) => {
+  return browser.browserAction.setTitle({
+    title,
+    tabId,
+    windowId
+  });
 };
 
-export { 
-  addOnClickListener,
-  setTitle
+const setBadgeText = (text, tabId, windowId) => {
+  return browser.browserAction.setBadgeText({
+    text,
+    tabId,
+    windowId
+  });
 };
+
+const setIcon = (path, tabId, windowId) => {
+  return browser.browserAction.setIcon({
+    path,
+    tabId,
+    windowId
+  });
+};
+export { addOnClickListener, setTitle, setBadgeText, setIcon };

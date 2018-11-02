@@ -28,7 +28,12 @@ import {
   addOnClickListener as addOnMenuClickListener
 } from "./menus";
 import { sendMessageToBackground, addOnMessageListener } from "./runtime";
-import { addOnClickListener } from "./browser-action";
+import {
+  addOnClickListener as addOnBrowserActionClickListener,
+  setTitle as setBrowserActionTitle,
+  setBadgeText as setBrowserActionBadgeText,
+  setIcon as setBrowserActionIcon
+} from "./browser-action";
 import {
   getAllWindow,
   addOnCreatedListener as addOnWindowCreatedListener,
@@ -61,7 +66,10 @@ export {
   addOnMenuClickListener,
   sendMessageToBackground,
   addOnMessageListener,
-  addOnClickListener,
+  addOnBrowserActionClickListener,
+  setBrowserActionTitle,
+  setBrowserActionBadgeText,
+  setBrowserActionIcon,
   addOnWindowCreatedListener,
   addOnWindowFocusChangedListener,
   addOnWindowRemovedListener,

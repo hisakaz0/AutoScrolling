@@ -14,6 +14,10 @@ const addOnUpdatedListener = listener => {
   return browser.tabs.onUpdated.addListener(listener);
 };
 
+const addOnRemovedListener = listener => {
+  return browser.tabs.onRemoved.addListener(listener);
+};
+
 const getCurrent = () => {
   return browser.tabs.getCurrent();
 };
@@ -27,14 +31,15 @@ const get = tabId => {
 };
 
 const isValidTabId = id => {
-  // TypeError is throwed when `TAB_ID_NONE` is loaded in content script
   return id !== undefined && id !== null && id !== browser.tabs.TAB_ID_NONE;
 };
+
 export {
   sendMessage,
   addOnActivatedListener,
   addOnAttachedListener,
   addOnUpdatedListener,
+  addOnRemovedListener,
   getCurrent,
   getActivated,
   get,

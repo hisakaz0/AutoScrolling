@@ -33,5 +33,35 @@
     "maxSpeed": 3000,
     "minSpeed": 1,
     "thresholdStep": 5
+  },
+
+  "browserAction": {
+    "stopOrClose": {
+      "title": "Start scrolling / Open modal window",
+      "badgeText": "",
+      "path": {
+        "16": "../icons/mouse-16.png",
+        "32": "../icons/mouse-32.png",
+        "32": "../icons/mouse-48.png"
+      }
+    },
+    "scrolling": {
+      "title": "Stop scrolling",
+      "badgeText": "Scroll",
+      "path": {
+        "16": "../icons/scrolling-mouse-16.png",
+        "32": "../icons/scrolling-mouse-32.png",
+        "32": "../icons/scrolling-mouse-48.png"
+      }
+    },
+    "modalOpened": {
+      "title": "Close modal window",
+      "badgeText": "Modal",
+      "path": {
+        "16": "../icons/mouse-16.png",
+        "32": "../icons/mouse-32.png",
+        "32": "../icons/mouse-48.png"
+      }
+    }
   }
 }

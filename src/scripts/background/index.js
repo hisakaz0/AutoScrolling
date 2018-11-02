@@ -9,7 +9,9 @@ import {
   getActivatedTabs,
   getTab,
   isValidTabId,
-  addOnClickListener as addOnBrowserActionClickListener,
+  addOnBrowserActionClickListener,
+  setBrowserActionTitle,
+  setBrowserActionIcon,
   addOnWindowFocusChangedListener,
   isValidWindowId
 } from "../../modules/browser";
@@ -32,6 +34,7 @@ import { isSystemProtocol } from "../../modules/utils";
 
 import appConst from "../../appConst.json";
 const appOpts = appConst.options;
+const appBrowseActs = appConst.browserAction;
 
 const DEFAULT_INTERVAL_DOUBLE_CLICK = 500; // mili second
 const UNINIT_TAB_ID = -1;
@@ -95,6 +98,7 @@ class BackgroundScript {
     addOnMessageListener(this.onMessageListener);
     addOnCommandListener(this.onCommandListener);
     this.initFocusTab();
+    this.updateBrowerAction(this.state);
   }
 
   initFocusTab() {
@@ -166,7 +170,7 @@ class BackgroundScript {
       isScrolling: false,
       isModalOpened: false
     });
-    this.state = State.STOP_OR_CLOSE;
+    this.setState(State.STOP_OR_CLOSE);
   }
 
   _setFocusTab(tab) {
@@ -190,24 +194,50 @@ class BackgroundScript {
     this.doubleClickTimer.isWaiting = false;
   }
 
+  setState(newState) {
+    const prevState = this.state;
+    this.state = newState;
+    this.onUpdateState(prevState, newState);
+  }
+
+  onUpdateState(prevState, newState) {
+    this.updateBrowerAction(newState);
+  }
+
+  updateBrowerAction(state) {
+    const getInfo = state => {
+      switch (state) {
+        case State.STOP_OR_CLOSE:
+          return appBrowseActs.stopOrClose;
+        case State.SCROLLING:
+          return appBrowseActs.scrolling;
+        case State.MODAL_OPENED:
+          return appBrowseActs.modalOpened;
+      }
+    };
+    const { title, path } = getInfo(state);
+    setBrowserActionTitle(title);
+    setBrowserActionIcon(path);
+  }
+
   // begin: event area
   onSingleClickEvent() {
     switch (this.state) {
       case State.STOP_OR_CLOSE:
         this.startScrollingAction().then(() => {
-          this.state = State.SCROLLING;
+          this.setState(State.SCROLLING);
         });
         break;
       case State.MODAL_OPENED:
         if (!this.isEqualTargetToFocus()) break;
         this.closeModalAction().then(() => {
-          this.state = State.STOP_OR_CLOSE;
+          this.setState(State.STOP_OR_CLOSE);
         });
         break;
       case State.SCROLLING:
         if (!this.isEqualTargetToFocus()) break;
         this.stopScrollingAction().then(() => {
-          this.state = State.STOP_OR_CLOSE;
+          this.setState(State.STOP_OR_CLOSE);
         });
         break;
     }
@@ -217,19 +247,19 @@ class BackgroundScript {
     switch (this.state) {
       case State.STOP_OR_CLOSE:
         this.openModalAction().then(() => {
-          this.state = State.MODAL_OPENED;
+          this.setState(State.MODAL_OPENED);
         });
         break;
       case State.MODAL_OPENED:
         if (!this.isEqualTargetToFocus()) break;
         this.closeModalAction().then(() => {
-          this.state = State.STOP_OR_CLOSE;
+          this.setState(State.STOP_OR_CLOSE);
         });
         break;
       case State.SCROLLING:
         if (!this.isEqualTargetToFocus()) break;
         this.stopScrollingAction().then(() => {
-          this.state = State.STOP_OR_CLOSE;
+          this.setState(State.STOP_OR_CLOSE);
         });
         break;
     }
@@ -240,13 +270,13 @@ class BackgroundScript {
       case State.SCROLLING:
         if (!this.needToStopScrollingOnTabChanged()) break;
         this.stopScrollingAction().then(() => {
-          this.state = State.STOP_OR_CLOSE;
+          this.setState(State.STOP_OR_CLOSE);
         });
         break;
       case State.MODAL_OPENED:
         if (!this.needToCloseModalOnTabChanged()) break;
         this.closeModalAction().then(() => {
-          this.state = State.STOP_OR_CLOSE;
+          this.setState(State.STOP_OR_CLOSE);
         });
         break;
       case State.STOP_OR_CLOSE:
@@ -272,7 +302,7 @@ class BackgroundScript {
       isScrolling: false,
       isModalOpened: false
     });
-    this.state = State.STOP_OR_CLOSE;
+    this.setState(State.STOP_OR_CLOSE);
   }
 
   onReceiveStopMessage() {
@@ -281,7 +311,7 @@ class BackgroundScript {
       windowId: UNINIT_WINDOW_ID,
       isScrolling: false
     });
-    this.state = State.STOP_OR_CLOSE;
+    this.setState(State.STOP_OR_CLOSE);
   }
 
   onReceiveCloseMessage() {
@@ -290,7 +320,7 @@ class BackgroundScript {
       windowId: UNINIT_WINDOW_ID,
       isModalOpened: false
     });
-    this.state = State.STOP_OR_CLOSE;
+    this.setState(State.STOP_OR_CLOSE);
   }
 
   needToStopScrollingOnTabChanged() {

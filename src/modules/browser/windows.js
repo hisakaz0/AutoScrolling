@@ -19,6 +19,7 @@ const isValidWindowId = id => {
     id !== undefined && id !== null && id !== browser.windows.WINDOW_ID_NONE
   );
 };
+
 export {
   getAllWindow,
   addOnCreatedListener,

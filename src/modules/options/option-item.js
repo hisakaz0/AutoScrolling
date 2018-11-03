@@ -17,14 +17,11 @@ class OptionItem {
     this.onChangeListener = null;
 
     this.onInputChangeListener = this.onInputChangeListener.bind(this);
+    this.onStorageChangeListener = this.onStorageChangeListener.bind(this);
   }
 
   init() {
-    this.onLoadListener = this.onLoadListener.bind(this);
-    this.onChangeListener = this.onChangeListener.bind(this);
-    this.onStorageChangeListener = this.onStorageChangeListener.bind(this);
     addOnChangeListenerInStorage(this.onStorageChangeListener);
-
     this.load();
   }
 
@@ -33,7 +30,7 @@ class OptionItem {
       [this.name]: this.defaultValue
     }).then(data => {
       this.value = data[this.name];
-      this.onLoadListener(this.value);
+      if (this.onLoadListener !== null) this.onLoadListener(this.value);
       return new Promise(resolve => {
         resolve(data[this.name]);
       });
@@ -61,10 +58,12 @@ class OptionItem {
 
   addOnLoadListener(listener) {
     this.onLoadListener = listener;
+    this.onLoadListener = this.onLoadListener.bind(this);
   }
 
   addOnChangeListener(listener) {
     this.onChangeListener = listener;
+    this.onChangeListener = this.onChangeListener.bind(this);
   }
 
   onStorageChangeListener(changes) {
@@ -72,10 +71,8 @@ class OptionItem {
     if (!Object.keys(changes).includes(this.name)) return;
     const newValue = changes[this.name].newValue;
     this.value = newValue;
-    if (this.hasCommand()) {
-      this.updateCommandKeyBind(newValue);
-    }
-    this.onChangeListener(newValue);
+    if (this.hasCommand()) this.updateCommandKeyBind(newValue);
+    if (this.onChangeListener !== null) this.onChangeListener(newValue);
   }
 
   onInputChangeListener(value) {

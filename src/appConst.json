@@ -26,6 +26,10 @@
       "id": "keybind-single-click",
       "value": "Alt+Shift+PageDown",
       "commandName": "single-click-action"
+    },
+    "stopScrollingOnFocusOut": {
+      "id": "stop-scrolling-on-focus-out",
+      "value": false
     }
   },
 

@@ -106,9 +106,15 @@ class BackgroundScript {
   }
 
   initLoadOptions() {
-    const { id, value } = appOpts.stopScrollingOnFocusOut;
     this.options = {
-      stopScrollingOnFocusOut: new OptionItem("stopScrollingOnFocusOut", value)
+      stopScrollingOnFocusOut: new OptionItem(
+        "stopScrollingOnFocusOut",
+        appOpts.stopScrollingOnFocusOut.value
+      ),
+      disableDoubleClick: new OptionItem(
+        "disableDoubleClick",
+        appOpts.disableDoubleClick.value
+      )
     };
     Object.entries(this.options).map(entry => {
       const [key, value] = entry;
@@ -118,6 +124,10 @@ class BackgroundScript {
 
   isStopScrollingOnFocusOut() {
     return this.options.stopScrollingOnFocusOut.value;
+  }
+
+  isDisableDoubleClick() {
+    return this.options.disableDoubleClick.value;
   }
 
   setFocusTabFromActivateWindow(windowId = WINDOW_ID_NONE) {
@@ -159,6 +169,7 @@ class BackgroundScript {
   }
 
   onBrowserActionClickListener(tab) {
+    if (this.isDisableDoubleClick()) return this.onSingleClickEvent();
     if (!this.isWaitingDoubleClick()) return this.setDoubleClickTimer();
     this.clearDoubleClickTimer();
     this.onDoubleClickEvent();

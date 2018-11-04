@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 const src = path.resolve(__dirname, "src");
 const dist = path.resolve(__dirname, "dist");
@@ -36,5 +37,11 @@ module.exports = {
 
   resolve: {
     extensions: [".js"]
-  }
+  },
+
+  plugins: [
+    new webpack.EnvironmentPlugin({
+      DEBUG: false
+    })
+  ]
 };

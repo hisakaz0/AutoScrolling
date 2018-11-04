@@ -1,6 +1,6 @@
 "use strict";
 
-import onError from "./logging";
+import { logger } from "./logging";
 import { isSystemProtocol, isFunction, appendHtmlText } from "./util";
 
-export { onError, isSystemProtocol, isFunction, appendHtmlText };
+export { logger, isSystemProtocol, isFunction, appendHtmlText };

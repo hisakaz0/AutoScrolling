@@ -1,4 +1,3 @@
-import { onError } from "../utils";
 import {
   addOnChangeListenerInStorage,
   loadItemOnSyncStorage,

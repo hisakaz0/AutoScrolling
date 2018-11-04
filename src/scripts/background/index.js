@@ -32,6 +32,8 @@ import {
 } from "../../modules/messaging";
 import { OptionItem } from "../../modules/options";
 import { logger, isSystemProtocol } from "../../modules/utils";
+import { ContextMenuScript } from "../context-menu";
+import { State } from "./state";
 
 import appConst from "../../appConst.json";
 const appOpts = appConst.options;
@@ -58,12 +60,6 @@ const DEFAULT_FOCUS_TAB = {
   windowId: WINDOW_ID_NONE
 };
 
-const State = {
-  STOP_OR_CLOSE: 0,
-  SCROLLING: 1,
-  MODAL_OPENED: 2
-};
-
 const Event = {
   SINGLE_CLICK: 0,
   DOUBLE_CLICK: 1,
@@ -77,7 +73,7 @@ class BackgroundScript {
     this.doubleClickTimer = Object.assign({}, DEFAULT_DOUBLE_CLICK_TIMER);
     this.targetTab = Object.assign({}, DEFAULT_TARGET_TAB);
     this.focusTab = Object.assign({}, DEFAULT_FOCUS_TAB);
-    this.state = State.STOP_OR_CLOSE;
+    this.setState(State.STOP_OR_CLOSE);
 
     this.onBrowserActionClickListener = this.onBrowserActionClickListener.bind(
       this
@@ -447,5 +443,7 @@ class BackgroundScript {
   }
 }
 
-const script = new BackgroundScript();
-script.init();
+const backgroundScript = new BackgroundScript();
+backgroundScript.init();
+const contextMenuScript = new ContextMenuScript(backgroundScript);
+contextMenuScript.init();

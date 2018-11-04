@@ -4,6 +4,8 @@ const src = path.resolve(__dirname, "src");
 const dist = path.resolve(__dirname, "dist");
 
 module.exports = {
+  mode: "development",
+
   entry: {
     content: path.join(src, "scripts/content"),
     background: path.join(src, "scripts/background"),
@@ -16,7 +18,7 @@ module.exports = {
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -28,10 +30,6 @@ module.exports = {
       {
         test: /\.html$/,
         loader: "html-loader"
-      },
-      {
-        test: /\.json$/,
-        loader: "json-loader"
       }
     ]
   },

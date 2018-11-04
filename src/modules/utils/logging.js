@@ -5,16 +5,17 @@ class Logger {
     this.DEFAULT_TAG_NAME = "AutoScrolling";
   }
 
-  argsGetter(tag, message) {
+  getMessage(tag, message) {
     if (typeof message === typeof undefined) {
       message = tag;
       tag = this.DEFAULT_TAG_NAME;
     }
-    return [tag, message];
+    return { tag, message };
   }
 
-  logging(func, tag, message) {
-    func.apply(argsGetter(tag, message));
+  logging(func, argTag, argMessage) {
+    const { tag, message } = this.getMessage(argTag, argMessage);
+    func(tag, message);
   }
 
   debug(tag, message) {

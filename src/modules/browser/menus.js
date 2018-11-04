@@ -1,4 +1,3 @@
-
 const createContextMenu = (props, callback) => {
   return browser.meuns.create(menu, callback);
 };
@@ -11,8 +10,4 @@ const addOnClickListener = listener => {
   return browser.menus.onClicked(listener);
 };
 
-export {
-  createContextMenu,
-  updateContextMenu,
-  addOnClickListener
-};
+export { createContextMenu, updateContextMenu, addOnClickListener };

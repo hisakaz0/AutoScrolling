@@ -8,16 +8,17 @@
   },
   "scripts": {
     "start": "npm run build:gulp && npm run start:webpack",
-    "start:webpack": "webpack -w --debug",
+    "start:webpack": "DEBUG=true webpack -w --debug",
     "start:gulp": "gulp watch",
-    "build": "npm run build:gulp && npm run build:webpack",
+    "build": "npm run build:gulp && npm run build:webpack -- --mode=production",
     "build:webpack": "webpack",
     "build:gulp": "gulp",
     "debug": "web-ext run",
     "test": "npm run build:gulp && karma start",
     "test:debug": "npm run build:gulp && karma start --no-single-run --auto-watch",
     "lint": "eslint src",
-    "lint:ext": "web-ext lint",
+    "lint:ext": "web-ext lint -i src/**/* tets/**/*",
+    "pack": "npm run build && npm run lint:ext && web-ext -i src/**/* tests/**/*",
     "precommit": "lint-staged"
   },
   "lint-staged": {

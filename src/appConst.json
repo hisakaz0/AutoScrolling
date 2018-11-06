@@ -34,6 +34,10 @@
     "disableDoubleClick": {
       "id": "disable-double-click",
       "value": false
+    },
+    "restoreScrollingFromSwitchBack": {
+      "id": "restore-scrolling-from-switch-back",
+      "value": false
     }
   },
 

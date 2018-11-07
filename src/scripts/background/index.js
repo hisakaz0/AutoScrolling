@@ -14,7 +14,7 @@ import {
   setBrowserActionIcon,
   addOnWindowFocusChangedListener,
   isValidWindowId
-} from "../../modules/browser";
+} from '../../modules/browser';
 import {
   KEY_ACTION,
   KEY_COMMAND,
@@ -29,14 +29,14 @@ import {
   MESSAGE_START_SCROLLING,
   MESSAGE_STOP_SCROLLING,
   MESSAGE_UPDATE_COMMAND
-} from "../../modules/messaging";
-import { OptionItem } from "../../modules/options";
-import { logger, isSystemProtocol } from "../../modules/utils";
-import { ContextMenuScript } from "../context-menu";
-import { State } from "./state";
-import { EventType } from "./event";
+} from '../../modules/messaging';
+import { OptionItem } from '../../modules/options';
+import { logger, isSystemProtocol } from '../../modules/utils';
+import { ContextMenuScript } from '../context-menu';
+import { State } from './state';
+import { EventType } from './event';
 
-import appConst from "../../appConst.json";
+import appConst from '../../appConst.json';
 const appOpts = appConst.options;
 const appBrowseActs = appConst.browserAction;
 
@@ -108,15 +108,15 @@ class BackgroundScript {
   initLoadOptions() {
     this.options = {
       stopScrollingOnFocusOut: new OptionItem(
-        "stopScrollingOnFocusOut",
+        'stopScrollingOnFocusOut',
         appOpts.stopScrollingOnFocusOut.value
       ),
       disableDoubleClick: new OptionItem(
-        "disableDoubleClick",
+        'disableDoubleClick',
         appOpts.disableDoubleClick.value
       ),
       restoreScrollingFromSwitchBack: new OptionItem(
-        "restoreScrollingFromSwitchBack",
+        'restoreScrollingFromSwitchBack',
         appOpts.restoreScrollingFromSwitchBack
       )
     };
@@ -332,6 +332,7 @@ class BackgroundScript {
         ) {
           this.startScrollingAction(eventType);
         }
+        break;
       default:
         break;
     }

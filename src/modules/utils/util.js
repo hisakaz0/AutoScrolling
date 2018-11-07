@@ -8,7 +8,7 @@ const isFunction = func => {
 
 const appendHtmlText = (parent, htmlText) => {
   const parser = new DOMParser();
-  const parsedHtml = parser.parseFromString(htmlText, "text/html");
+  const parsedHtml = parser.parseFromString(htmlText, 'text/html');
   for (const node of parsedHtml.body.children) {
     parent.appendChild(node);
   }

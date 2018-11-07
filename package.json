@@ -16,7 +16,7 @@
     "debug": "web-ext run",
     "test": "npm run build:gulp && karma start",
     "test:debug": "npm run build:gulp && karma start --no-single-run --auto-watch",
-    "lint": "eslint src",
+    "lint": "eslint src tests",
     "lint:ext": "web-ext lint -i src/**/* tets/**/*",
     "pack": "npm run build && npm run lint:ext && web-ext -i src/**/* tests/**/*",
     "precommit": "lint-staged"
@@ -24,18 +24,22 @@
   "lint-staged": {
     "src/**/*.js": [
       "prettier --write src/**/*.js",
+      "npm run lint -- --fix",
       "git add"
     ],
     "tests/**/*.js": [
       "prettier --write tests/**/*.js",
+      "npm run lint -- --fix",
       "git add"
     ],
     "gulpfile.js": [
       "prettier --write gulpfile.js",
+      "npm run lint -- --fix",
       "git add"
     ],
     "webpack.config.js": [
       "prettier --write webpack.config.js",
+      "npm run lint -- --fix",
       "git add"
     ],
     "manifest.json": [

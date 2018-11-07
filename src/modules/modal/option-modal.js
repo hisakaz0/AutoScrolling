@@ -1,12 +1,12 @@
-import appConst from "../../appConst.json";
-import { OptionItem, OptionHtml, loadOptions, initOptions } from "../options";
-import { appendHtmlText } from "../utils";
+import appConst from '../../appConst.json';
+import { OptionItem, OptionHtml, loadOptions, initOptions } from '../options';
+import { appendHtmlText } from '../utils';
 
 const appOpts = appConst.options;
 
 class OptionModal {
   constructor() {
-    this.CLASS_NAME_OPEN = "active";
+    this.CLASS_NAME_OPEN = 'active';
     this.options = null;
     this.onCloseListener = null;
     this.html = null;
@@ -29,9 +29,9 @@ class OptionModal {
 
   setOnCloseButtonClickListener() {
     document
-      .querySelectorAll("[data-close-modal-auto-scrolling]")
+      .querySelectorAll('[data-close-modal-auto-scrolling]')
       .forEach(ele => {
-        ele.addEventListener("click", this.onCloseButtonClickListener);
+        ele.addEventListener('click', this.onCloseButtonClickListener);
       });
   }
 
@@ -49,9 +49,9 @@ class OptionModal {
   }
 
   loadHtml() {
-    const wrapperEle = document.createElement("div");
+    const wrapperEle = document.createElement('div');
     wrapperEle.id = appConst.html.wrapper.id;
-    appendHtmlText(wrapperEle, require("../../../dist/modal.html"));
+    appendHtmlText(wrapperEle, require('../../../dist/modal.html'));
     this.html = wrapperEle;
   }
 

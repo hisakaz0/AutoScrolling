@@ -1,5 +1,5 @@
-import { OptionItem } from "../../../../src/modules/options";
-import appConst from "../../../../src/appConst.json";
+import { OptionItem } from '../../../../src/modules/options';
+import appConst from '../../../../src/appConst.json';
 
 const opts = appConst.options;
 

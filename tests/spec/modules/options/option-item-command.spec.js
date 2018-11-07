@@ -1,12 +1,12 @@
-import { getOptionItemWith } from ".";
+import { getOptionItemWith } from '.';
 
-describe("OptionItem:", () => {
-  describe("has command:", () => {
+describe('OptionItem:', () => {
+  describe('has command:', () => {
     beforeEach(() => {
-      this.optionItem = getOptionItemWith("string");
+      this.optionItem = getOptionItemWith('string');
     });
 
-    it("return true when hasCommand is called", () => {
+    it('return true when hasCommand is called', () => {
       expect(this.optionItem.hasCommand()).toBe(true);
     });
   });

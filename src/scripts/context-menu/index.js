@@ -2,14 +2,14 @@ import {
   createContextMenu,
   updateContextMenu,
   addOnMenuClickListener
-} from "../../modules/browser";
-import { State } from "../background/state";
+} from '../../modules/browser';
+import { State } from '../background/state';
 
-import appConst from "../../appConst.json";
+import appConst from '../../appConst.json';
 
-const ID_SWITCH_SCROLLING = "switch-scrolling";
-const TITLE_START_SCROLLING = "Start scrolling";
-const TITLE_STOP_SCROLLING = "Stop scrolling";
+const ID_SWITCH_SCROLLING = 'switch-scrolling';
+const TITLE_START_SCROLLING = 'Start scrolling';
+const TITLE_STOP_SCROLLING = 'Stop scrolling';
 
 class ContextMenuScript {
   constructor(backgroundScript) {

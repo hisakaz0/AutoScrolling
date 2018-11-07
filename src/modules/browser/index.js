@@ -8,7 +8,7 @@ import {
   getActivated as getActivatedTabs,
   get as getTab,
   isValidTabId
-} from "./tabs";
+} from './tabs';
 import {
   saveItemOnSyncStorage,
   loadItemOnSyncStorage,
@@ -16,31 +16,31 @@ import {
   removeItemOnSyncStorage,
   removeAllItemsOnSyncStorage,
   addOnChangeListenerInStorage
-} from "./storage";
+} from './storage';
 import {
   updateCommand,
   addOnCommandListener,
   createCommandObject
-} from "./commands";
+} from './commands';
 import {
   createContextMenu,
   updateContextMenu,
   addOnClickListener as addOnMenuClickListener
-} from "./menus";
-import { sendMessageToBackground, addOnMessageListener } from "./runtime";
+} from './menus';
+import { sendMessageToBackground, addOnMessageListener } from './runtime';
 import {
   addOnClickListener as addOnBrowserActionClickListener,
   setTitle as setBrowserActionTitle,
   setBadgeText as setBrowserActionBadgeText,
   setIcon as setBrowserActionIcon
-} from "./browser-action";
+} from './browser-action';
 import {
   getAllWindow,
   addOnCreatedListener as addOnWindowCreatedListener,
   addOnRemovedListener as addOnWindowRemovedListener,
   addOnFocusChangedListener as addOnWindowFocusChangedListener,
   isValidWindowId
-} from "./windows";
+} from './windows';
 
 export {
   sendMessageToTab,

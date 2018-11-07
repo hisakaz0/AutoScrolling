@@ -4,7 +4,7 @@ import {
   saveItemOnSyncStorage,
   updateCommand,
   createCommandObject
-} from "../browser";
+} from '../browser';
 
 class OptionItem {
   constructor(name, defaultValue, commandName = undefined) {
@@ -80,7 +80,7 @@ class OptionItem {
   }
 
   hasCommand() {
-    if (typeof this.commandName !== "undefined") return true;
+    if (typeof this.commandName !== 'undefined') return true;
     return false;
   }
 

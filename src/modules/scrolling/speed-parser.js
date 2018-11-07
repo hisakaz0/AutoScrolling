@@ -1,4 +1,4 @@
-import appConst from "../../appConst.json";
+import appConst from '../../appConst.json';
 
 const THOUSAND_MILLISECONDS = 1000;
 const THRESHOLD_STEP = appConst.scrolling.thresholdStep; // for smooth scrolling

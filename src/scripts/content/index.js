@@ -1,9 +1,9 @@
-import { OptionModal } from "../../modules/modal";
-import { AutoScroller } from "../../modules/scrolling";
+import { OptionModal } from '../../modules/modal';
+import { AutoScroller } from '../../modules/scrolling';
 import {
   addOnMessageListener,
   sendMessageToBackground
-} from "../../modules/browser";
+} from '../../modules/browser';
 import {
   KEY_ACTION,
   KEY_COMMAND,
@@ -15,7 +15,7 @@ import {
   MESSAGE_CLOSE_MODAL,
   MESSAGE_INIT_CONTENT_SCRIPT,
   MESSAGE_UPDATE_COMMAND
-} from "../../modules/messaging";
+} from '../../modules/messaging';
 
 class ContentScript {
   constructor() {

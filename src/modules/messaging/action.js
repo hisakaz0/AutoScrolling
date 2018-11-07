@@ -1,12 +1,12 @@
-const KEY_ACTION = "action";
-const KEY_COMMAND = "command";
+const KEY_ACTION = 'action';
+const KEY_COMMAND = 'command';
 
-const ACTION_OPEN_MODAL = "open_modal";
-const ACTION_CLOSE_MODAL = "close_modal";
-const ACTION_START_SCROLLING = "start_scrolling";
-const ACTION_STOP_SCROLLING = "stop_scrolling";
-const ACTION_UPDATE_COMMAND = "update_command";
-const ACTION_INIT_CONTENT_SCRIPT = "init_content_script";
+const ACTION_OPEN_MODAL = 'open_modal';
+const ACTION_CLOSE_MODAL = 'close_modal';
+const ACTION_START_SCROLLING = 'start_scrolling';
+const ACTION_STOP_SCROLLING = 'stop_scrolling';
+const ACTION_UPDATE_COMMAND = 'update_command';
+const ACTION_INIT_CONTENT_SCRIPT = 'init_content_script';
 
 const MESSAGE_OPEN_MODAL = { [KEY_ACTION]: ACTION_OPEN_MODAL };
 const MESSAGE_CLOSE_MODAL = { [KEY_ACTION]: ACTION_CLOSE_MODAL };

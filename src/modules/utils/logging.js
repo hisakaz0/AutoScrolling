@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 class Logger {
   constructor() {
-    this.DEFAULT_TAG_NAME = "AutoScrolling";
+    this.DEFAULT_TAG_NAME = 'AutoScrolling';
   }
 
   getMessage(tag, message) {

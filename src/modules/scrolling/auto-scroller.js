@@ -1,5 +1,5 @@
-import { SpeedParser } from "./index";
-import { loadOptionItems } from "../options";
+import { SpeedParser } from './index';
+import { loadOptionItems } from '../options';
 
 class AutoScroller {
   constructor() {
@@ -92,15 +92,15 @@ class AutoScroller {
   }
 
   addUserActionListeners() {
-    document.body.addEventListener("mouseover", this.onMouseoverListener);
-    document.body.addEventListener("mouseout", this.onMouseoutListener);
-    document.body.addEventListener("click", this.onClickListener);
+    document.body.addEventListener('mouseover', this.onMouseoverListener);
+    document.body.addEventListener('mouseout', this.onMouseoutListener);
+    document.body.addEventListener('click', this.onClickListener);
   }
 
   removeUserActionListeners() {
-    document.body.removeEventListener("mouseover", this.onMouseoverListener);
-    document.body.removeEventListener("mouseout", this.onMouseoutListener);
-    document.body.removeEventListener("click", this.onClickListener);
+    document.body.removeEventListener('mouseover', this.onMouseoverListener);
+    document.body.removeEventListener('mouseout', this.onMouseoutListener);
+    document.body.removeEventListener('click', this.onClickListener);
   }
 
   onMouseoverListener(ev) {

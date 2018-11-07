@@ -1,4 +1,4 @@
-import { loadOptions, initOptions } from "../../modules/options";
+import { loadOptions, initOptions } from '../../modules/options';
 
 class OptionScript {
   constructor() {

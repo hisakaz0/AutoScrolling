@@ -1,5 +1,5 @@
-import { OptionItem, OptionHtml } from "./index";
-import appConst from "../../appConst.json";
+import { OptionItem, OptionHtml } from './index';
+import appConst from '../../appConst.json';
 
 const appOpts = appConst.options;
 

@@ -1,5 +1,5 @@
 const typeofObject = typeof {};
-const typeofString = typeof "";
+const typeofString = typeof '';
 const storageArea = browser.storage.sync;
 
 const saveItemOnSyncStorage = item => {

@@ -16,17 +16,17 @@ class OptionHtml {
 
   setValueOnElement() {
     const ele = this.getElement();
-    if (typeof this.value === "number") {
+    if (typeof this.value === 'number') {
       ele.value = parseInt(this.value);
-    } else if (typeof this.value === "boolean") {
+    } else if (typeof this.value === 'boolean') {
       ele.checked = this.value;
-    } else if (typeof this.value === "string") {
+    } else if (typeof this.value === 'string') {
       ele.value = this.value;
     }
   }
 
   _getListenerType() {
-    return typeof this.defaultValue === "string" ? "blur" : "change";
+    return typeof this.defaultValue === 'string' ? 'blur' : 'change';
   }
 
   _getTargetValue(target) {
@@ -37,9 +37,9 @@ class OptionHtml {
       }
       return parsedInt;
     };
-    return typeof this.defaultValue === "boolean"
+    return typeof this.defaultValue === 'boolean'
       ? target.checked
-      : typeof this.defaultValue === "number"
+      : typeof this.defaultValue === 'number'
         ? parseValueAsInt(target.value)
         : target.value;
   }

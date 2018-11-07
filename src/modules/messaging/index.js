@@ -13,7 +13,7 @@ import {
   MESSAGE_STOP_SCROLLING,
   MESSAGE_UPDATE_COMMAND,
   MESSAGE_INIT_CONTENT_SCRIPT
-} from "./action";
+} from './action';
 
 export {
   KEY_ACTION,

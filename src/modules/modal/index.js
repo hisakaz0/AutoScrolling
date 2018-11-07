@@ -1,3 +1,3 @@
-import OptionModal from "./option-modal";
+import OptionModal from './option-modal';
 
 export { OptionModal };

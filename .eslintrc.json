@@ -1,39 +1,24 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true
-    },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-        "sourceType": "module"
-    },
-    "rules": {
-        "indent": [
-            "error",
-            2
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ],
-        "no-undef": "off",
-        "no-console": [
-            "error",
-            {
-                "allow": [
-                    "warn",
-                    "error"
-                ]
-            }
-        ],
-        "no-unused-vars": "warn"
-    }
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "no-undef": "off",
+    "no-console": [
+      "error",
+      {
+        "allow": ["warn", "error", "debug"]
+      }
+    ],
+    "no-unused-vars": "warn"
+  }
 }

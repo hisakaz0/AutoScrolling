@@ -8,19 +8,15 @@ import {
   addOnTabRemovedListener,
   getActivatedTabs,
   getTab,
-  isValidTabId,
   addOnBrowserActionClickListener,
   setBrowserActionTitle,
   setBrowserActionIcon,
-  addOnWindowFocusChangedListener,
-  isValidWindowId
+  addOnWindowFocusChangedListener
 } from '../../modules/browser';
 import {
   KEY_ACTION,
   KEY_COMMAND,
-  ACTION_OPEN_MODAL,
   ACTION_CLOSE_MODAL,
-  ACTION_START_SCROLLING,
   ACTION_STOP_SCROLLING,
   ACTION_INIT_CONTENT_SCRIPT,
   ACTION_UPDATE_COMMAND,
@@ -28,9 +24,10 @@ import {
   MESSAGE_CLOSE_MODAL,
   MESSAGE_START_SCROLLING,
   MESSAGE_STOP_SCROLLING,
-  MESSAGE_UPDATE_COMMAND
+  MESSAGE_CHANGE_SPEED,
+  addData as addDataToMessage
 } from '../../modules/messaging';
-import { OptionItem } from '../../modules/options';
+import { loadOptionItems } from '../../modules/options';
 import { logger, isSystemProtocol } from '../../modules/utils';
 import { ContextMenuScript } from '../context-menu';
 import { State } from './state';
@@ -44,7 +41,7 @@ const appBrowseActs = appConst.browserAction;
 const TAB_ID_NONE = browser.tabs.TAB_ID_NONE;
 const WINDOW_ID_NONE = browser.windows.WINDOW_ID_NONE;
 
-const DEFAULT_INTERVAL_DOUBLE_CLICK = 500; // mili second
+const DEFAULT_INTERVAL_DOUBLE_CLICK = 200; // mili second
 const DEFAULT_DOUBLE_CLICK_TIMER = {
   interval: DEFAULT_INTERVAL_DOUBLE_CLICK,
   timerId: -1,
@@ -68,6 +65,7 @@ class BackgroundScript {
     this.targetTab = Object.assign({}, DEFAULT_TARGET_TAB);
     this.prevTargetTab = Object.assign({}, this.targetTab);
     this.focusTab = Object.assign({}, DEFAULT_FOCUS_TAB);
+    this.onStateChangeListeners = [];
     this.setState(State.STOP_OR_CLOSE);
     // TODO: maybe need lock mecanizum
 
@@ -106,23 +104,10 @@ class BackgroundScript {
   }
 
   initLoadOptions() {
-    this.options = {
-      stopScrollingOnFocusOut: new OptionItem(
-        'stopScrollingOnFocusOut',
-        appOpts.stopScrollingOnFocusOut.value
-      ),
-      disableDoubleClick: new OptionItem(
-        'disableDoubleClick',
-        appOpts.disableDoubleClick.value
-      ),
-      restoreScrollingFromSwitchBack: new OptionItem(
-        'restoreScrollingFromSwitchBack',
-        appOpts.restoreScrollingFromSwitchBack
-      )
-    };
-    Object.entries(this.options).map(entry => {
-      const [key, value] = entry;
-      value.init();
+    this.options = loadOptionItems();
+    Object.entries(this.options).forEach(entry => {
+      const [, opt] = entry;
+      opt.init();
     });
   }
 
@@ -136,6 +121,10 @@ class BackgroundScript {
 
   isRestoreScrollingFromSwitchBack() {
     return this.options.restoreScrollingFromSwitchBack.value;
+  }
+
+  isEnabledPresetsOfScrollingSpeed() {
+    return this.options.enablePresetsOfScrollingSpeed.value;
   }
 
   setFocusTabFromActivateWindow(windowId = WINDOW_ID_NONE) {
@@ -222,6 +211,7 @@ class BackgroundScript {
 
   _setFocusTab(tab) {
     this.focusTab = { tabId: tab.tabId, windowId: tab.windowId };
+    logger.debug(this.focusTab);
     return this.focusTab;
   }
 
@@ -246,6 +236,13 @@ class BackgroundScript {
     const prevState = this.state;
     this.state = newState;
     this.onUpdateState(prevState, newState);
+    this.onStateChangeListeners.forEach(func => {
+      func(newState);
+    });
+  }
+
+  addOnStateChangeListener(listener) {
+    this.onStateChangeListeners.push(listener.bind(this));
   }
 
   onUpdateState(prevState, newState) {
@@ -258,9 +255,13 @@ class BackgroundScript {
         case State.STOP_OR_CLOSE:
           return appBrowseActs.stopOrClose;
         case State.SCROLLING:
+        case State.FAST_SCROLLING:
           return appBrowseActs.scrolling;
         case State.MODAL_OPENED:
           return appBrowseActs.modalOpened;
+        case State.SLOW_SCROLLING:
+        case State.MIDDLE_SCROLLING:
+          return appBrowseActs.accelerateScrolling;
       }
     };
     const { title, path } = getInfo(state);
@@ -282,8 +283,13 @@ class BackgroundScript {
         this.closeModalAction(eventType);
         break;
       case State.SCROLLING:
+      case State.FAST_SCROLLING:
         if (!this.isEqualTargetToFocus()) break;
         this.stopScrollingAction(eventType);
+        break;
+      case State.SLOW_SCROLLING:
+      case State.MIDDLE_SCROLLING:
+        this.accelerateScrollingAction(eventType);
         break;
     }
   }
@@ -299,8 +305,13 @@ class BackgroundScript {
         this.closeModalAction(eventType);
         break;
       case State.SCROLLING:
+      case State.FAST_SCROLLING:
         if (!this.isEqualTargetToFocus()) break;
         this.stopScrollingAction(eventType);
+        break;
+      case State.SLOW_SCROLLING:
+      case State.MIDDLE_SCROLLING:
+        this.accelerateScrollingAction(eventType);
         break;
     }
   }
@@ -308,6 +319,9 @@ class BackgroundScript {
   onActivateChanged(eventType = EventType.TAB_CHANGED) {
     switch (this.state) {
       case State.SCROLLING:
+      case State.SLOW_SCROLLING:
+      case State.MIDDLE_SCROLLING:
+      case State.FAST_SCROLLING:
         if (
           this.isStopScrollingOnFocusOut() &&
           this.focusTab.windowId === WINDOW_ID_NONE
@@ -413,20 +427,71 @@ class BackgroundScript {
     });
   }
 
+  getStartScrollingSpeed() {
+    if (this.isEnabledPresetsOfScrollingSpeed()) {
+      return this.options.presetScrollingSpeedSlow.value;
+    }
+    return this.options.scrollingSpeed.value;
+  }
+
+  getNextScrollingSpeed() {
+    if (!this.isEnabledPresetsOfScrollingSpeed()) {
+      throw new Error('Invalid call');
+    }
+    const get = () => {
+      switch (this.state) {
+        case State.SLOW_SCROLLING:
+          return this.options.presetScrollingSpeedMiddle.value;
+        case State.MIDDLE_SCROLLING:
+          return this.options.presetScrollingSpeedFast.value;
+        default:
+          throw new Error('Invalid state');
+      }
+    };
+    return get();
+  }
+
+  getNextScrollingState() {
+    if (!this.isEnabledPresetsOfScrollingSpeed()) {
+      throw new Error('Invalid call');
+    }
+    const get = () => {
+      switch (this.state) {
+        case State.SLOW_SCROLLING:
+          return State.MIDDLE_SCROLLING;
+        case State.MIDDLE_SCROLLING:
+          return State.FAST_SCROLLING;
+        default:
+          throw new Error('Invalid state');
+      }
+    };
+    return get();
+  }
+
   // begin: action area
   startScrollingAction(eventType) {
+    logger.debug(this.focusTab);
     return this.beforeAction(this.focusTab.tabId)
       .then(() => {
-        return sendMessageToTab(this.focusTab.tabId, MESSAGE_START_SCROLLING);
+        const msg = addDataToMessage(MESSAGE_START_SCROLLING, {
+          scrollingSpeed: this.getStartScrollingSpeed()
+        });
+        return sendMessageToTab(this.focusTab.tabId, msg);
       })
       .then(() => {
+        if (this.isEnabledPresetsOfScrollingSpeed()) {
+          return Promise.resolve(State.SLOW_SCROLLING);
+        }
+        return Promise.resolve(State.SCROLLING);
+      })
+      .then(state => {
         this.setTargetTab({
           tabId: this.focusTab.tabId,
           windowId: this.focusTab.windowId,
           isScrolling: true,
           firedFromEvent: eventType
         });
-        this.setState(State.SCROLLING);
+        this.setState(state);
       });
   }
 
@@ -443,6 +508,20 @@ class BackgroundScript {
           firedFromEvent: eventType
         });
         this.setState(State.STOP_OR_CLOSE);
+      });
+  }
+
+  accelerateScrollingAction(eventType) {
+    return this.beforeAction(this.targetTab.tabId)
+      .then(() => {
+        logger.debug(this.getNextScrollingSpeed());
+        const msg = addDataToMessage(MESSAGE_CHANGE_SPEED, {
+          scrollingSpeed: this.getNextScrollingSpeed()
+        });
+        return sendMessageToTab(this.targetTab.tabId, msg);
+      })
+      .then(() => {
+        return this.setState(this.getNextScrollingState());
       });
   }
 
@@ -489,3 +568,4 @@ const backgroundScript = new BackgroundScript();
 backgroundScript.init();
 const contextMenuScript = new ContextMenuScript(backgroundScript);
 contextMenuScript.init();
+backgroundScript.addOnStateChangeListener(contextMenuScript.onStateChange);

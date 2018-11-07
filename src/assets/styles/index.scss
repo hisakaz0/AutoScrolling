@@ -58,11 +58,12 @@
   @import "node_modules/spectre.css/src/buttons";
   @import "node_modules/spectre.css/src/utilities";
   @import "node_modules/spectre.css/src/typography";
+
+  .scrolling-speed {
+    width: 5em;
+  }
 }
 
-#scrolling-speed {
-  width: 5em;
-}
 
 #keybind-switch-scrolling {
   width: 15em;

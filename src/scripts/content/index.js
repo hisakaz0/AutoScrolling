@@ -7,10 +7,12 @@ import {
 import {
   KEY_ACTION,
   KEY_COMMAND,
+  KEY_DATA,
   ACTION_OPEN_MODAL,
   ACTION_CLOSE_MODAL,
   ACTION_START_SCROLLING,
   ACTION_STOP_SCROLLING,
+  ACTION_CHANGE_SPEED,
   MESSAGE_STOP_SCROLLING,
   MESSAGE_CLOSE_MODAL,
   MESSAGE_INIT_CONTENT_SCRIPT,
@@ -64,7 +66,10 @@ class ContentScript {
         this.optionModal.close();
         break;
       case ACTION_START_SCROLLING:
-        this.autoScoller.start();
+        this.autoScoller.start(msg[KEY_DATA].scrollingSpeed);
+        break;
+      case ACTION_CHANGE_SPEED:
+        this.autoScoller.stop().start(msg[KEY_DATA].scrollingSpeed);
         break;
       case ACTION_STOP_SCROLLING:
         this.autoScoller.stop();

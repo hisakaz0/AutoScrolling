@@ -70,6 +70,7 @@ export {
   setBrowserActionTitle,
   setBrowserActionBadgeText,
   setBrowserActionIcon,
+  getAllWindow,
   addOnWindowCreatedListener,
   addOnWindowFocusChangedListener,
   addOnWindowRemovedListener,

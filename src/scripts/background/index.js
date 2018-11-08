@@ -84,6 +84,7 @@ class BackgroundScript {
     this.onCommandListener = this.onCommandListener.bind(this);
   }
 
+  // start: init
   init() {
     this.initListeners();
     this.initFocusTab();
@@ -125,6 +126,7 @@ class BackgroundScript {
       value.init();
     });
   }
+  // end: init
 
   isStopScrollingOnFocusOut() {
     return this.options.stopScrollingOnFocusOut.value;

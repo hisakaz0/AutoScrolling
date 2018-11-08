@@ -6,6 +6,12 @@
     "modal": {
       "id": "modal-auto-scrolling",
       "closeAttribute": "data-close-modal-auto-scrolling"
+    },
+    "presetsWrapper": {
+      "id": "presets-wrapper-auto-scrolling"
+    },
+    "speedWrapper": {
+      "id": "scrolling-speed-wrapper"
     }
   },
 
@@ -38,6 +44,22 @@
     "restoreScrollingFromSwitchBack": {
       "id": "restore-scrolling-from-switch-back",
       "value": false
+    },
+    "enablePresetsOfScrollingSpeed": {
+      "id": "enable-presets-of-scrolling-speed",
+      "value": false
+    },
+    "presetScrollingSpeedFast": {
+      "id": "preset-scrolling-speed-fast",
+      "value": 2000
+    },
+    "presetScrollingSpeedMiddle": {
+      "id": "preset-scrolling-speed-middle",
+      "value": 500
+    },
+    "presetScrollingSpeedSlow": {
+      "id": "preset-scrolling-speed-slow",
+      "value": 20
     }
   },
 
@@ -50,29 +72,34 @@
   "browserAction": {
     "stopOrClose": {
       "title": "Start scrolling / Open modal window",
-      "badgeText": "",
       "path": {
         "16": "../icons/mouse-16.png",
         "32": "../icons/mouse-32.png",
-        "32": "../icons/mouse-48.png"
+        "48": "../icons/mouse-48.png"
       }
     },
     "scrolling": {
       "title": "Stop scrolling",
-      "badgeText": "Scroll",
       "path": {
         "16": "../icons/scrolling-mouse-16.png",
         "32": "../icons/scrolling-mouse-32.png",
-        "32": "../icons/scrolling-mouse-48.png"
+        "48": "../icons/scrolling-mouse-48.png"
       }
     },
     "modalOpened": {
       "title": "Close modal window",
-      "badgeText": "Modal",
       "path": {
         "16": "../icons/mouse-16.png",
         "32": "../icons/mouse-32.png",
-        "32": "../icons/mouse-48.png"
+        "48": "../icons/mouse-48.png"
+      }
+    },
+    "accelerateScrolling": {
+      "title": "Accelerate scrolling",
+      "path": {
+        "16": "../icons/scrolling-mouse-16.png",
+        "32": "../icons/scrolling-mouse-32.png",
+        "48": "../icons/scrolling-mouse-48.png"
       }
     }
   },

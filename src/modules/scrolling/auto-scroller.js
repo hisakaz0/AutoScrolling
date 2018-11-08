@@ -40,14 +40,19 @@ class AutoScroller {
 
   onOptionChangeListener() {} // nothing to do
 
-  start() {
-    this.scrollingElement = this.getScrollingElement();
-    this.setScrollingSpeed();
-    this.addUserActionListeners();
-    this._setScrolling();
+  isEnabledPresetsOfScrollingSpeed() {
+    return this.options.enablePresetsOfScrollingSpeed.value;
   }
 
-  _setScrolling() {
+  start(speed) {
+    this.scrollingElement = this.getScrollingElement();
+    this.setScrollingSpeed(speed);
+    this.addUserActionListeners();
+    this.setScrolling();
+    return this;
+  }
+
+  setScrolling() {
     this.intervalId = window.setInterval(
       this.scroll.bind(this),
       this.scrollingInterval
@@ -70,17 +75,16 @@ class AutoScroller {
 
   stop() {
     this.removeUserActionListeners();
-    this._clearScrolling();
+    this.clearScrolling();
+    return this;
   }
 
-  _clearScrolling() {
+  clearScrolling() {
     window.clearInterval(this.intervalId);
   }
 
-  setScrollingSpeed() {
-    const { step, interval } = this.parser.parse(
-      this.options.scrollingSpeed.value
-    );
+  setScrollingSpeed(speed) {
+    const { step, interval } = this.parser.parse(speed);
     this.scrollingStep = step;
     this.scrollingInterval = interval;
   }

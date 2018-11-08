@@ -7,7 +7,8 @@ const EventType = {
   TAB_REMOVED: 5,
   WINDOW_CHANGED: 6,
   CONTENT_SCRIPT_MESSAGE: 7,
-  INIT_CONTENT_SCRIPT: 8
+  INIT_CONTENT_SCRIPT: 8,
+  CONTEXT_MENU: 9
 };
 
 export { EventType };

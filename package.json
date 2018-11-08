@@ -24,12 +24,16 @@
   "lint-staged": {
     "src/**/*.js": [
       "prettier --write src/**/*.js",
-      "npm run lint -- --fix",
+      "eslint src --fix",
+      "git add"
+    ],
+    "src/**/*.json": [
+      "prettier --write src/**/*.json",
       "git add"
     ],
     "tests/**/*.js": [
       "prettier --write tests/**/*.js",
-      "npm run lint -- --fix",
+      "eslint tets --fix",
       "git add"
     ],
     "gulpfile.js": [

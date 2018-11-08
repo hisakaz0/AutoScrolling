@@ -1,8 +1,6 @@
 import appConst from '../../appConst.json';
-import { OptionItem, OptionHtml, loadOptions, initOptions } from '../options';
-import { appendHtmlText } from '../utils';
-
-const appOpts = appConst.options;
+import { loadOptions, initOptions } from '../options';
+import { appendHtmlText, showHtml, hideHtml } from '../utils';
 
 class OptionModal {
   constructor() {
@@ -21,6 +19,7 @@ class OptionModal {
     this.appendHtmlToBody();
     this.setOptions();
     this.setOnCloseButtonClickListener();
+    this.setPresetScrollingSection();
   }
 
   setOptions() {
@@ -40,6 +39,26 @@ class OptionModal {
     this.onCloseListener();
   }
 
+  setPresetScrollingSection() {
+    this.togglePresetSection = this.togglePresetSection.bind(this);
+    const presetOpt = this.options.enablePresetsOfScrollingSpeed.item;
+
+    presetOpt.addOnChangeListener(this.togglePresetSection);
+    this.togglePresetSection(presetOpt.value);
+  }
+
+  togglePresetSection(isEnabledPreset) {
+    const presetsWrapper = appConst.html.presetsWrapper.id;
+    const speedWrapper = appConst.html.speedWrapper.id;
+    if (isEnabledPreset === true) {
+      showHtml(presetsWrapper);
+      hideHtml(speedWrapper);
+    } else {
+      hideHtml(presetsWrapper);
+      showHtml(speedWrapper);
+    }
+  }
+
   setOnCloseListener(listener) {
     this.onCloseListener = listener;
   }
@@ -56,7 +75,10 @@ class OptionModal {
   }
 
   open() {
-    return document
+    this.togglePresetSection(
+      this.options.enablePresetsOfScrollingSpeed.item.value
+    );
+    document
       .getElementById(appConst.html.modal.id)
       .classList.add(this.CLASS_NAME_OPEN);
   }

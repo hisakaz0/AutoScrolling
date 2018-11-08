@@ -14,7 +14,7 @@ class OptionItem {
     this.commandName = commandName;
     this.onUpdateCommandListener = null;
     this.onLoadListener = null;
-    this.onChangeListener = null;
+    this.onChangeListeners = [];
 
     this.onInputChangeListener = this.onInputChangeListener.bind(this);
     this.onStorageChangeListener = this.onStorageChangeListener.bind(this);
@@ -62,8 +62,7 @@ class OptionItem {
   }
 
   addOnChangeListener(listener) {
-    this.onChangeListener = listener;
-    this.onChangeListener = this.onChangeListener.bind(this);
+    this.onChangeListeners.push(listener.bind(this));
   }
 
   onStorageChangeListener(changes) {
@@ -72,7 +71,9 @@ class OptionItem {
     const newValue = changes[this.name].newValue;
     this.value = newValue;
     if (this.hasCommand()) this.updateCommandKeyBind(newValue);
-    if (this.onChangeListener !== null) this.onChangeListener(newValue);
+    this.onChangeListeners.forEach(func => {
+      func(newValue);
+    });
   }
 
   onInputChangeListener(value) {

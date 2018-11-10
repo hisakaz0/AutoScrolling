@@ -106,7 +106,7 @@
 
   "contextMenus": [
     {
-      "id": "switch-scrolling",
+      "id": "action-menu",
       "title": "Start scrolling",
       "icons": {
         "16": "icons/mouse-16.png",

@@ -9,9 +9,10 @@ import { logger } from '../../modules/utils';
 
 import appConst from '../../appConst.json';
 
-const ID_SWITCH_SCROLLING = 'switch-scrolling';
+const ID_ACTION_MENU = 'action-menu';
 const TITLE_START_SCROLLING = 'Start scrolling';
 const TITLE_STOP_SCROLLING = 'Stop scrolling';
+const TITLE_CLOSE_MODAL = 'Close option modal';
 
 class ContextMenuScript {
   constructor(backgroundScript) {
@@ -36,8 +37,8 @@ class ContextMenuScript {
 
   onMenuClickListener(info, tab) {
     switch (info.menuItemId) {
-      case ID_SWITCH_SCROLLING:
-        this.onSwitchScrollingMenuClickListener(info, tab);
+      case ID_ACTION_MENU:
+        this.onActionMenuClick(info, tab);
         break;
       default:
         break;
@@ -50,36 +51,40 @@ class ContextMenuScript {
       case State.SLOW_SCROLLING:
       case State.MIDDLE_SCROLLING:
       case State.FAST_SCROLLING:
-        updateContextMenu(ID_SWITCH_SCROLLING, {
+        updateContextMenu(ID_ACTION_MENU, {
           title: TITLE_STOP_SCROLLING
         });
         break;
       case State.STOP_OR_CLOSE:
-        updateContextMenu(ID_SWITCH_SCROLLING, {
+        updateContextMenu(ID_ACTION_MENU, {
           title: TITLE_START_SCROLLING
         });
+        break;
+      case State.MODAL_OPENED:
+        updateContextMenu(ID_ACTION_MENU, {
+          title: TITLE_CLOSE_MODAL
+        });
+        break;
+      default:
         break;
     }
   }
 
-  onSwitchScrollingMenuClickListener(info, tab) {
+  onActionMenuClick(info, tab) {
     switch (
       this.getState() // currentState
     ) {
       case State.STOP_OR_CLOSE:
-        this.backgroundScript.startScrollingAction(EventType.CONTEXT_MENU); // start scrolling
-        updateContextMenu(ID_SWITCH_SCROLLING, {
-          title: TITLE_STOP_SCROLLING
-        });
+        this.backgroundScript.startScrollingAction(EventType.CONTEXT_MENU);
         break;
       case State.SCROLLING:
       case State.SLOW_SCROLLING:
       case State.MIDDLE_SCROLLING:
       case State.FAST_SCROLLING:
-        this.backgroundScript.stopScrollingAction(EventType.CONTEXT_MENU); // stop scrolling
-        updateContextMenu(ID_SWITCH_SCROLLING, {
-          title: TITLE_START_SCROLLING
-        });
+        this.backgroundScript.stopScrollingAction(EventType.CONTEXT_MENU);
+        break;
+      case State.MODAL_OPENED:
+        this.backgroundScript.closeModalAction(EventType.CONTEXT_MENU);
         break;
       default:
         break;

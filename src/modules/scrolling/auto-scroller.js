@@ -40,8 +40,8 @@ class AutoScroller {
 
   onOptionChangeListener() {} // nothing to do
 
-  isEnabledPresetsOfScrollingSpeed() {
-    return this.options.enablePresetsOfScrollingSpeed.value;
+  isEnabledStopWhenBottomOfWindow() {
+    return this.options.stopWhenBottomOfWindow.value;
   }
 
   start(speed) {
@@ -62,6 +62,8 @@ class AutoScroller {
   scroll() {
     if (this.needToStopScrolling()) return;
     this._oneScroll();
+    if (this.isEnabledStopWhenBottomOfWindow() && this.isBottomOfWindow())
+      this.stop(true);
   }
 
   _oneScroll() {
@@ -73,9 +75,10 @@ class AutoScroller {
     return false;
   }
 
-  stop() {
+  stop(isCallListener = false) {
     this.removeUserActionListeners();
     this.clearScrolling();
+    if (isCallListener) this.onStopListener();
     return this;
   }
 
@@ -129,13 +132,16 @@ class AutoScroller {
 
   onClickListener(ev) {
     if (this.options.stopScrollingByClick.value == true) {
-      this.stop();
-      this.onStopListener();
+      this.stop(true);
     }
   }
 
   setOnStopListener(listener) {
     this.onStopListener = listener;
+  }
+
+  isBottomOfWindow() {
+    return window.scrollY === window.scrollMaxY;
   }
 }
 

@@ -41,7 +41,7 @@ const appBrowseActs = appConst.browserAction;
 const TAB_ID_NONE = browser.tabs.TAB_ID_NONE;
 const WINDOW_ID_NONE = browser.windows.WINDOW_ID_NONE;
 
-const DEFAULT_INTERVAL_DOUBLE_CLICK = 200; // mili second
+const DEFAULT_INTERVAL_DOUBLE_CLICK = 500; // mili second
 const DEFAULT_DOUBLE_CLICK_TIMER = {
   interval: DEFAULT_INTERVAL_DOUBLE_CLICK,
   timerId: -1,

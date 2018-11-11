@@ -1,28 +1,27 @@
+import browser from './api';
+
 const addOnClickListener = listener => {
   return browser.browserAction.onClicked.addListener(listener);
 };
 
-const setTitle = (title, tabId, windowId) => {
+const setTitle = (title, tabId) => {
   return browser.browserAction.setTitle({
     title,
-    tabId,
-    windowId
+    tabId
   });
 };
 
-const setBadgeText = (text, tabId, windowId) => {
+const setBadgeText = (text, tabId) => {
   return browser.browserAction.setBadgeText({
     text,
-    tabId,
-    windowId
+    tabId
   });
 };
 
-const setIcon = (path, tabId, windowId) => {
+const setIcon = (path, tabId) => {
   return browser.browserAction.setIcon({
     path,
-    tabId,
-    windowId
+    tabId
   });
 };
 export { addOnClickListener, setTitle, setBadgeText, setIcon };

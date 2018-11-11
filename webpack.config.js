@@ -1,44 +1,44 @@
-const path = require("path");
-const webpack = require("webpack");
+const path = require('path');
+const webpack = require('webpack');
 
-const src = path.resolve(__dirname, "src");
-const dist = path.resolve(__dirname, "dist");
+const src = path.resolve(__dirname, 'src');
+const dist = path.resolve(__dirname, 'addon/dist');
 
 module.exports = {
-  mode: "development",
+  mode: 'development',
 
   entry: {
-    content: path.join(src, "scripts/content"),
-    background: path.join(src, "scripts/background"),
-    options: path.join(src, "scripts/options")
+    content: path.join(src, 'scripts/content'),
+    background: path.join(src, 'scripts/background'),
+    options: path.join(src, 'scripts/options')
   },
 
   output: {
     path: dist,
-    filename: "[name].js"
+    filename: '[name].js'
   },
 
-  devtool: "cheap-module-source-map",
+  devtool: 'cheap-module-source-map',
 
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader",
+        loader: 'babel-loader',
         query: {
-          presets: ["env"]
+          presets: ['env']
         }
       },
       {
         test: /\.html$/,
-        loader: "html-loader"
+        loader: 'html-loader'
       }
     ]
   },
 
   resolve: {
-    extensions: [".js"]
+    extensions: ['.js']
   },
 
   plugins: [

@@ -1,3 +1,5 @@
+import browser from './api';
+
 const sendMessage = (tabId, msg) => {
   return browser.tabs.sendMessage(tabId, msg);
 };

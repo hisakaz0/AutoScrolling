@@ -1,3 +1,5 @@
+import browser from './api';
+
 const typeofObject = typeof {};
 const typeofString = typeof '';
 const storageArea = browser.storage.sync;

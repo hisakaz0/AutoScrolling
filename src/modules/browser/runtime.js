@@ -1,3 +1,5 @@
+import browser from './api';
+
 const sendMessageToBackground = msg => {
   return browser.runtime.sendMessage(msg);
 };

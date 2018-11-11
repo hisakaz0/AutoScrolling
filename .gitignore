@@ -1,8 +1,9 @@
 
 .vscode
-/web-ext-artifacts
+addon/dist
+addon/manifest.json
+addon/web-ext-artifacts
 .web-extension-id
-/dist
 *~
 tags
 tests/fixture/**/*.html

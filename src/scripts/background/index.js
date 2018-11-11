@@ -13,6 +13,7 @@ import {
   setBrowserActionIcon,
   addOnWindowFocusChangedListener
 } from '../../modules/browser';
+import api from '../../modules/browser/api';
 import {
   KEY_ACTION,
   KEY_COMMAND,
@@ -38,8 +39,8 @@ const appOpts = appConst.options;
 const appBrowseActs = appConst.browserAction;
 
 // NOTE: use browser api out of module
-const TAB_ID_NONE = browser.tabs.TAB_ID_NONE;
-const WINDOW_ID_NONE = browser.windows.WINDOW_ID_NONE;
+const TAB_ID_NONE = api.tabs.TAB_ID_NONE;
+const WINDOW_ID_NONE = api.windows.WINDOW_ID_NONE;
 
 const DEFAULT_INTERVAL_DOUBLE_CLICK = 500; // mili second
 const DEFAULT_DOUBLE_CLICK_TIMER = {

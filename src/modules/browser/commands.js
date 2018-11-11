@@ -1,3 +1,5 @@
+import browser from './api';
+
 /**
  *
  * @param {Object} cmd which has property,
@@ -11,7 +13,7 @@ const updateCommand = cmd => {
 
 /**
  *
- * @param {Function} l listener
+ * @param {Function} listener
  *
  * @returns {Promise}
  */

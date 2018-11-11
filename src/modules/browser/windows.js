@@ -1,3 +1,5 @@
+import browser from './api';
+
 const getAllWindow = () => {
   return browser.windows.getAll();
 };

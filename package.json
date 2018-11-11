@@ -10,15 +10,20 @@
     "start": "npm run build:gulp && npm run start:webpack",
     "start:webpack": "DEBUG=true webpack -w --debug",
     "start:gulp": "gulp watch",
-    "build": "npm run build:gulp && npm run build:webpack -- --mode=production",
+    "build": "npm run build:firefox",
+    "build:main": "npm run build:gulp && npm run build:webpack -- --mode=production",
     "build:webpack": "webpack",
     "build:gulp": "gulp",
-    "debug": "web-ext run",
+    "build:firefox": "npm run manifest:firefox && npm run build:main",
+    "build:chrome": "npm run manifest:chrome && npm run build:main",
+    "manifest:firefox": "cd addon && cp firefox-manifest.json manifest.json",
+    "manifest:chrome": "cd addon && cp chrome-manifest.json manifest.json",
+    "debug": "cd addon && web-ext run",
     "test": "npm run build:gulp && karma start",
     "test:debug": "npm run build:gulp && karma start --no-single-run --auto-watch",
     "lint": "eslint src tests",
-    "lint:ext": "web-ext lint -i src/**/* tets/**/*",
-    "pack": "npm run build && npm run lint:ext && web-ext -i src/**/* tests/**/*",
+    "lint:ext": "cd addon && web-ext lint",
+    "pack": "npm run build && npm run lint:ext && cd addon && web-ext build",
     "precommit": "lint-staged"
   },
   "lint-staged": {
@@ -36,8 +41,8 @@
       "eslint tets --fix",
       "git add"
     ],
-    "gulpfile.js": [
-      "prettier --write gulpfile.js",
+    "gulpfile.babel.js": [
+      "prettier --write gulpfile.babel.js",
       "npm run lint -- --fix",
       "git add"
     ],
@@ -46,8 +51,8 @@
       "npm run lint -- --fix",
       "git add"
     ],
-    "manifest.json": [
-      "prettier --write manifest.json",
+    "addon/*.json": [
+      "prettier --write addon/*.json",
       "git add"
     ],
     "package.json": [
@@ -96,6 +101,7 @@
     "prettier": "1.14.3",
     "spectre.css": "^0.5.3",
     "web-ext": "^2.9.1",
+    "webextension-polyfill": "^0.3.1",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.0"
   }

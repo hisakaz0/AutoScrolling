@@ -70,7 +70,7 @@ class OptionModal {
   loadHtml() {
     const wrapperEle = document.createElement('div');
     wrapperEle.id = appConst.html.wrapper.id;
-    appendHtmlText(wrapperEle, require('../../../dist/modal.html'));
+    appendHtmlText(wrapperEle, require('../../../addon/dist/modal.html'));
     this.html = wrapperEle;
   }
 

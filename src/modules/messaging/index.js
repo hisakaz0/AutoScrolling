@@ -16,8 +16,9 @@ import {
   MESSAGE_CHANGE_SPEED,
   MESSAGE_UPDATE_COMMAND,
   MESSAGE_INIT_CONTENT_SCRIPT,
-  addData
-} from './action';
+  addData,
+  create
+} from './message';
 
 export {
   KEY_ACTION,
@@ -37,5 +38,6 @@ export {
   MESSAGE_CHANGE_SPEED,
   MESSAGE_UPDATE_COMMAND,
   MESSAGE_INIT_CONTENT_SCRIPT,
-  addData
+  addData,
+  create
 };

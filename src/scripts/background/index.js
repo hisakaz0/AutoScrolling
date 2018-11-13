@@ -558,11 +558,6 @@ class BackgroundScript {
       });
   }
   // end: action area
-
-  _getScrollingMessage(state) {
-    if (state) return MESSAGE_START_SCROLLING;
-    return MESSAGE_STOP_SCROLLING;
-  }
 }
 
 const backgroundScript = new BackgroundScript();

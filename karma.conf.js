@@ -1,8 +1,11 @@
 // Karma configuration
 // Generated on Mon Sep 24 2018 15:28:04 GMT+0900
 
+const webpackConfig = require('./webpack.config');
+
 module.exports = function(config) {
   config.set({
+
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
@@ -15,7 +18,13 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      // Test dependencies
+      'node_modules/sinon-chrome/bundle/sinon-chrome-webextensions.min.js',
+
+      // Source
       'src/modules/**/*.js',
+
+      // Tests
       'tests/spec/**/*.js',
       'tests/fixture/**/*.html'
     ],
@@ -33,6 +42,9 @@ module.exports = function(config) {
       'tests/spec/**/*.js': ['webpack'],
       'tests/fixture/**/*.html': ['html2js']
     },
+
+
+    webpack: webpackConfig,
 
 
     html2JsPreprocessor: {

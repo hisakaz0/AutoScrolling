@@ -4,6 +4,7 @@ const typeofObject = typeof {};
 const typeofString = typeof '';
 const storageArea = browser.storage.sync;
 
+// TODO: fix function name
 const saveItemOnSyncStorage = item => {
   if (typeof item !== typeofObject) {
     throw new Error(
@@ -13,6 +14,7 @@ const saveItemOnSyncStorage = item => {
   return storageArea.set(item);
 };
 
+// TODO: fix function name
 const loadItemOnSyncStorage = item => {
   if (typeof item === typeofObject) {
     return storageArea.get(item);
@@ -28,10 +30,12 @@ const loadItemOnSyncStorage = item => {
   );
 };
 
+// TODO: fix function name
 const loadAllItemsOnSyncStorage = () => {
   return storageArea.get();
 };
 
+// TODO: fix function name
 const removeItemOnSyncStorage = key => {
   if (typeof key !== typeofString) {
     throw new Error(`Typeof key must be ${typeofString}, it is ${typeof key}`);
@@ -40,7 +44,7 @@ const removeItemOnSyncStorage = key => {
 };
 
 const removeAllItemsOnSyncStorage = () => {
-  return storageArea.remove();
+  return storageArea.clear();
 };
 
 const addOnChangeListenerInStorage = l => {

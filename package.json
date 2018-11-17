@@ -38,17 +38,17 @@
     ],
     "tests/**/*.js": [
       "prettier --write tests/**/*.js",
-      "eslint tets --fix",
+      "eslint tests --fix",
       "git add"
     ],
     "gulpfile.babel.js": [
       "prettier --write gulpfile.babel.js",
-      "npm run lint -- --fix",
+      "eslint gulpfile.babel.js --fix",
       "git add"
     ],
     "webpack.config.js": [
       "prettier --write webpack.config.js",
-      "npm run lint -- --fix",
+      "eslint webpack.config.js --fix",
       "git add"
     ],
     "addon/*.json": [

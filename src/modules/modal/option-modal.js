@@ -27,11 +27,13 @@ class OptionModal {
   }
 
   setOnCloseButtonClickListener() {
-    document
-      .querySelectorAll('[data-close-modal-auto-scrolling]')
-      .forEach(ele => {
-        ele.addEventListener('click', this.onCloseButtonClickListener);
-      });
+    return this.getCloseEles().forEach(ele => {
+      ele.addEventListener('click', this.onCloseButtonClickListener);
+    });
+  }
+
+  getCloseEles() {
+    return document.querySelectorAll(`[${appConst.modal.closeAttribute}]`);
   }
 
   onCloseButtonClickListener(ev) {
@@ -60,7 +62,7 @@ class OptionModal {
   }
 
   setOnCloseListener(listener) {
-    this.onCloseListener = listener;
+    this.onCloseListener = listener.bind(this);
   }
 
   appendHtmlToBody() {

@@ -8,6 +8,7 @@ addon/web-ext-artifacts
 tags
 tests/fixture/**/*.html
 .envrc
+yarn.lock
 
 Session.vim
 

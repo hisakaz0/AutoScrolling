@@ -1,6 +1,6 @@
 import { getOptionItemWith } from './index';
 
-describe('OptionItem:', () => {
+xdescribe('OptionItem:', () => {
   describe('which has a boolean typed value: ', () => {
     beforeEach(() => {
       this.optionItem = getOptionItemWith('boolean');

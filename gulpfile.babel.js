@@ -40,9 +40,9 @@ gulp.task('test:html', () => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch(srcScssPath, ['css']);
-  gulp.watch(srcTemplatePath, ['html']);
-  gulp.watch(srcTestTemplatePath, ['test:html']);
+  gulp.watch(srcScssPath, gulp.parallel('css')),
+  gulp.watch(srcTemplatePath, gulp.parallel('html')),
+  gulp.watch(srcTestTemplatePath, gulp.parallel('test:html'));
 });
 
-gulp.task('default', ['css', 'html', 'test:html']);
+gulp.task('default', gulp.parallel('css', 'html', 'test:html'));

@@ -63,7 +63,7 @@
     },
     "stopWhenBottomOfWindow": {
       "id": "stop-when-bottom-of-window",
-      "value": false
+      "value": true
     }
   },
 

@@ -1,5 +1,8 @@
 import { SpeedParser } from './index';
 import { loadOptionItems } from '../options';
+import { isValidTimerId, INVALID_TIMER_ID } from '../utils';
+
+const DELAY_TIME_TO_ACTIVE = 30; // mili
 
 class AutoScroller {
   constructor() {
@@ -7,13 +10,16 @@ class AutoScroller {
     this.scrollingElement = null;
     this.scrollingStep = -1;
     this.scrollingInterval = -1;
-    this.isCursorOnText = false;
+    this.cursorOnText = false;
+    this.userScrolling = false;
+    this.userScrollingTimerId = -1;
     this.onStopListener = null;
     this.parser = null;
     this.options = null;
 
     this.onMouseoverListener = this.onMouseoverListener.bind(this);
     this.onMouseoutListener = this.onMouseoutListener.bind(this);
+    this.onWheelListener = this.onWheelListener.bind(this);
     this.onClickListener = this.onClickListener.bind(this);
     this.onOptionLoadListener = this.onOptionLoadListener.bind(this);
     this.onOptionChangeListener = this.onOptionChangeListener.bind(this);
@@ -60,19 +66,19 @@ class AutoScroller {
   }
 
   scroll() {
-    if (this.needToStopScrolling()) return;
-    this._oneScroll();
     if (this.isEnabledStopWhenBottomOfWindow() && this.isBottomOfWindow())
-      this.stop(true);
+      return this.stop(true);
+    if (this.isUserScrolling()) return;
+    if (this.isEnabledStopScrollingOnHover() && this.isCursorOnText()) return;
+    this._oneScroll();
   }
 
   _oneScroll() {
     this.scrollingElement.scrollBy(0, this.scrollingStep);
   }
 
-  needToStopScrolling() {
-    if (this.isCursorOnText) return true;
-    return false;
+  isCursorOnText() {
+    return this.cursorOnText;
   }
 
   stop(isCallListener = false) {
@@ -101,13 +107,19 @@ class AutoScroller {
   addUserActionListeners() {
     document.body.addEventListener('mouseover', this.onMouseoverListener);
     document.body.addEventListener('mouseout', this.onMouseoutListener);
+    document.body.addEventListener('wheel', this.onWheelListener);
     document.body.addEventListener('click', this.onClickListener);
   }
 
   removeUserActionListeners() {
     document.body.removeEventListener('mouseover', this.onMouseoverListener);
     document.body.removeEventListener('mouseout', this.onMouseoutListener);
+    document.body.removeEventListener('wheel', this.onWheelListener);
     document.body.removeEventListener('click', this.onClickListener);
+  }
+
+  isEnabledStopScrollingOnHover() {
+    return this.options.stopScrollingOnHover.value;
   }
 
   onMouseoverListener(ev) {
@@ -122,12 +134,26 @@ class AutoScroller {
         return true;
       return false;
     };
-    if (!this.options.stopScrollingOnHover.value) return;
-    this.isCursorOnText = isCursorOnTextFunc(ev);
+    if (this.isEnabledStopScrollingOnHover()) return;
+    this.cursorOnText = isCursorOnTextFunc(ev);
   }
 
   onMouseoutListener() {
-    this.isCursorOnText = false;
+    this.cursorOnText = false;
+  }
+
+  onWheelListener(ev) {
+    this.userScrolling = true;
+    const timerId = this.userScrollingTimerId;
+    if (isValidTimerId(timerId)) clearTimeout(timerId);
+    this.userScrollingTimerId = setTimeout(() => {
+      this.userScrolling = false;
+      this.userScrollingTimerId = INVALID_TIMER_ID;
+    }, DELAY_TIME_TO_ACTIVE);
+  }
+
+  isUserScrolling() {
+    return this.userScrolling;
   }
 
   onClickListener(ev) {

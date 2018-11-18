@@ -1,11 +1,15 @@
 import browser from './api';
 
-// if (
-//   typeof browser.contextMenus === 'undefined' &&
-//   typeof browser.menus === 'object'
-// ) {
-//   browser.contextMenus = browser.menus;
-// }
+const isChrome = () => {
+  return (
+    typeof browser.contextMenus === 'object' &&
+    typeof browser.menus === 'undefined'
+  );
+};
+
+if (isChrome()) {
+  browser.menus = browser.contextMenus;
+}
 
 const createContextMenu = (props, callback) => {
   return browser.menus.create(props, callback);

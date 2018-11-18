@@ -1,0 +1,41 @@
+<div>
+  <strong>Enable transmission scrolling:</strong>
+  <input type="checkbox"
+    id="<%= appConst.options.enableTransmissionScrolling.id %>" />
+  <p class="mb-0">
+    If enabled, you can change scrolling speed per gear.
+    The gears are Slow / Middle / Fast.
+    The gears are cycled between
+    <mark>Slow</mark>, <mark>Middle</mark>, <mark>Fast</mark>
+    by <i>single/double-clicking</i> browser icon.
+  </p>
+  <table id="<%= appConst.html.transmissionWrapper.id %>">
+    <tbody>
+      <tr>
+        <th>Fast:</th>
+        <td><input type="number"
+          class="scrolling-speed"
+          id="<%= appConst.options.transmissionGearOfFast.id %>"
+          value=<%= appConst.options.transmissionGearOfFast.value %> />
+        </td>
+      </tr>
+      <tr>
+        <th>Middle:</th>
+        <td><input type="number"
+          class="scrolling-speed"
+          id="<%= appConst.options.transmissionGearOfMiddle.id %>"
+          value=<%= appConst.options.transmissionGearOfMiddle.value %> />
+        </td>
+      </tr>
+      <tr>
+        <th>Slow:</th>
+        <td><input type="number"
+          class="scrolling-speed"
+          id="<%= appConst.options.transmissionGearOfSlow.id %>"
+          value=<%= appConst.options.transmissionGearOfSlow.value %> />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p></p>
+</div>

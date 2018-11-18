@@ -7,11 +7,11 @@
       "id": "modal-auto-scrolling",
       "closeAttribute": "data-close-modal-auto-scrolling"
     },
-    "presetsWrapper": {
-      "id": "presets-wrapper-auto-scrolling"
+    "transmissionWrapper": {
+      "id": "transmission-wrapper-auto-scrolling"
     },
     "speedWrapper": {
-      "id": "scrolling-speed-wrapper"
+      "id": "speed-wrapper-auto-scrolling"
     }
   },
 
@@ -45,20 +45,20 @@
       "id": "restore-scrolling-from-switch-back",
       "value": false
     },
-    "enablePresetsOfScrollingSpeed": {
-      "id": "enable-presets-of-scrolling-speed",
+    "enableTransmissionScrolling": {
+      "id": "enable-transmission-scrolling",
       "value": false
     },
-    "presetScrollingSpeedFast": {
-      "id": "preset-scrolling-speed-fast",
+    "transmissionGearOfFast": {
+      "id": "transmission-gear-of-fast",
       "value": 2000
     },
-    "presetScrollingSpeedMiddle": {
-      "id": "preset-scrolling-speed-middle",
+    "transmissionGearOfMiddle": {
+      "id": "transmission-gear-of-middle",
       "value": 500
     },
-    "presetScrollingSpeedSlow": {
-      "id": "preset-scrolling-speed-slow",
+    "transmissionGearOfSlow": {
+      "id": "transmission-gear-of-slow",
       "value": 20
     },
     "stopWhenBottomOfWindow": {

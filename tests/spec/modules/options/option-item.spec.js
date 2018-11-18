@@ -1,6 +1,6 @@
 import { getOptionItemWith } from './index';
 
-describe('OptionItem:', () => {
+xdescribe('OptionItem:', () => {
   beforeEach(() => {
     this.optionItem = getOptionItemWith('boolean');
     document.body.innerHTML = __html__['options.html'];

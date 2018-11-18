@@ -7,7 +7,7 @@ import {
   isValidTimerId,
   INVALID_TIMER_ID
 } from './util';
-import { showHtml, hideHtml, appendHtmlText } from './html';
+import { showHtml, hideHtml, appendHtmlText, CLASS_NAME_OF_HIDE } from './html';
 
 export {
   logger,
@@ -17,5 +17,6 @@ export {
   INVALID_TIMER_ID,
   appendHtmlText,
   showHtml,
-  hideHtml
+  hideHtml,
+  CLASS_NAME_OF_HIDE
 };

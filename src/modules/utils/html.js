@@ -16,4 +16,4 @@ const appendHtmlText = (parent, htmlText) => {
   }
 };
 
-export { showHtml, hideHtml, appendHtmlText };
+export { showHtml, hideHtml, appendHtmlText, CLASS_NAME_OF_HIDE };

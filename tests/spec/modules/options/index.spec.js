@@ -1,7 +1,7 @@
 import { getOptionItemWith } from './index';
 import { OptionItem } from '../../../../src//modules/options';
 
-describe('getOptionItemWith:', () => {
+xdescribe('getOptionItemWith:', () => {
   it('return a instanceof OptionItem when called with \'boolean\'', () => {
     expect(getOptionItemWith('boolean') instanceof OptionItem).toBe(true);
   });

@@ -2,7 +2,7 @@ import { SpeedParser } from './index';
 import { loadOptionItems } from '../options';
 import { isValidTimerId, INVALID_TIMER_ID } from '../utils';
 
-const DELAY_TIME_TO_ACTIVE = 30; // mili
+const DELAY_TIME_TO_ACTIVE = 50; // mili
 
 class AutoScroller {
   constructor() {
@@ -134,7 +134,7 @@ class AutoScroller {
         return true;
       return false;
     };
-    if (this.isEnabledStopScrollingOnHover()) return;
+    if (!this.isEnabledStopScrollingOnHover()) return;
     this.cursorOnText = isCursorOnTextFunc(ev);
   }
 

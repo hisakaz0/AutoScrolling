@@ -19,7 +19,7 @@ class OptionModal {
     this.appendHtmlToBody();
     this.setOptions();
     this.setOnCloseButtonClickListener();
-    this.setPresetScrollingSection();
+    this.setTransmissionSection();
   }
 
   setOptions() {
@@ -41,22 +41,22 @@ class OptionModal {
     this.onCloseListener();
   }
 
-  setPresetScrollingSection() {
-    this.togglePresetSection = this.togglePresetSection.bind(this);
-    const presetOpt = this.options.enablePresetsOfScrollingSpeed.item;
+  setTransmissionSection() {
+    this.toggleTransmissionSection = this.toggleTransmissionSection.bind(this);
+    const transmissionOpt = this.options.enableTransmissionScrolling.item;
 
-    presetOpt.addOnChangeListener(this.togglePresetSection);
-    this.togglePresetSection(presetOpt.value);
+    transmissionOpt.addOnChangeListener(this.toggleTransmissionSection);
+    this.toggleTransmissionSection(transmissionOpt.value);
   }
 
-  togglePresetSection(isEnabledPreset) {
-    const presetsWrapper = appConst.html.presetsWrapper.id;
+  toggleTransmissionSection(isEnabledTransmission) {
+    const transmissionWrapper = appConst.html.transmissionWrapper.id;
     const speedWrapper = appConst.html.speedWrapper.id;
-    if (isEnabledPreset === true) {
-      showHtml(presetsWrapper);
+    if (isEnabledTransmission === true) {
+      showHtml(transmissionWrapper);
       hideHtml(speedWrapper);
     } else {
-      hideHtml(presetsWrapper);
+      hideHtml(transmissionWrapper);
       showHtml(speedWrapper);
     }
   }
@@ -77,8 +77,8 @@ class OptionModal {
   }
 
   open() {
-    this.togglePresetSection(
-      this.options.enablePresetsOfScrollingSpeed.item.value
+    this.toggleTransmissionSection(
+      this.options.enableTransmissionScrolling.item.value
     );
     document
       .getElementById(appConst.html.modal.id)

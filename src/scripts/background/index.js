@@ -124,8 +124,8 @@ class BackgroundScript {
     return this.options.restoreScrollingFromSwitchBack.value;
   }
 
-  isEnabledPresetsOfScrollingSpeed() {
-    return this.options.enablePresetsOfScrollingSpeed.value;
+  isEnabledTransmissionScrolling() {
+    return this.options.enableTransmissionScrolling.value;
   }
 
   setFocusTabFromActivateWindow(windowId = WINDOW_ID_NONE) {
@@ -167,6 +167,7 @@ class BackgroundScript {
   }
 
   onBrowserActionClickListener(tab) {
+    logger.debug('onBrowserActionClicked');
     if (this.isDisableDoubleClick()) return this.onSingleClickEvent();
     if (!this.isWaitingDoubleClick()) return this.setDoubleClickTimer();
     this.clearDoubleClickTimer();
@@ -234,6 +235,7 @@ class BackgroundScript {
   }
 
   setState(newState) {
+    logger.debug('state', [newState, this.state]);
     const prevState = this.state;
     this.state = newState;
     this.onUpdateState(prevState, newState);
@@ -275,6 +277,7 @@ class BackgroundScript {
   // begin: event area
   onSingleClickEvent() {
     const eventType = EventType.SINGLE_CLICK;
+    logger.debug('single click');
     switch (this.state) {
       case State.STOP_OR_CLOSE:
         this.startScrollingAction(eventType);
@@ -396,28 +399,23 @@ class BackgroundScript {
   // end: event area
 
   needToStopScrollingOnTabChanged() {
-    if (
+    return (
       this.targetTab.isScrolling &&
       this.targetTab.tabId !== this.focusTab.tabId &&
       this.targetTab.windowId === this.focusTab.windowId
-    )
-      return true;
-    return false;
+    );
   }
 
   needToCloseModalOnTabChanged() {
-    if (
+    return (
       this.targetTab.isModalOpened &&
       this.targetTab.tabId !== this.focusTab.tabId &&
       this.targetTab.windowId === this.focusTab.windowId
-    )
-      return true;
-    return false;
+    );
   }
 
   isEqualTargetToFocus() {
-    if (this.targetTab.tabId === this.focusTab.tabId) return true;
-    return false;
+    return this.targetTab.tabId === this.focusTab.tabId;
   }
 
   beforeAction(tabId) {
@@ -429,22 +427,22 @@ class BackgroundScript {
   }
 
   getStartScrollingSpeed() {
-    if (this.isEnabledPresetsOfScrollingSpeed()) {
-      return this.options.presetScrollingSpeedSlow.value;
+    if (this.isEnabledTransmissionScrolling()) {
+      return this.options.transmissionGearOfSlow.value;
     }
     return this.options.scrollingSpeed.value;
   }
 
   getNextScrollingSpeed() {
-    if (!this.isEnabledPresetsOfScrollingSpeed()) {
+    if (!this.isEnabledTransmissionScrolling()) {
       throw new Error('Invalid call');
     }
     const get = () => {
       switch (this.state) {
         case State.SLOW_SCROLLING:
-          return this.options.presetScrollingSpeedMiddle.value;
+          return this.options.transmissionGearOfMiddle.value;
         case State.MIDDLE_SCROLLING:
-          return this.options.presetScrollingSpeedFast.value;
+          return this.options.transmissionGearOfFast.value;
         default:
           throw new Error('Invalid state');
       }
@@ -453,7 +451,7 @@ class BackgroundScript {
   }
 
   getNextScrollingState() {
-    if (!this.isEnabledPresetsOfScrollingSpeed()) {
+    if (!this.isEnabledTransmissionScrolling()) {
       throw new Error('Invalid call');
     }
     const get = () => {
@@ -480,7 +478,7 @@ class BackgroundScript {
         return sendMessageToTab(this.focusTab.tabId, msg);
       })
       .then(() => {
-        if (this.isEnabledPresetsOfScrollingSpeed()) {
+        if (this.isEnabledTransmissionScrolling()) {
           return Promise.resolve(State.SLOW_SCROLLING);
         }
         return Promise.resolve(State.SCROLLING);

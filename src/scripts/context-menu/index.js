@@ -5,7 +5,6 @@ import {
 } from '../../modules/browser';
 import { State } from '../background/state';
 import { EventType } from '../background/event';
-import { logger } from '../../modules/utils';
 
 import appConst from '../../appConst.json';
 

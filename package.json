@@ -1,6 +1,6 @@
 {
   "name": "autoscrolling",
-  "version": "1.0.0",
+  "version": "1.5.9",
   "description": "Browser extension for Firefox",
   "main": "background.js",
   "directories": {
@@ -24,6 +24,7 @@
     "lint": "eslint src tests",
     "lint:ext": "cd addon && web-ext lint",
     "pack": "npm run build && npm run lint:ext && cd addon && web-ext build",
+    "pack:src": "git archive HEAD --output=AutoScrolling.zip",
     "precommit": "lint-staged"
   },
   "lint-staged": {

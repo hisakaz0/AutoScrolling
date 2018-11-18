@@ -33,7 +33,7 @@ class OptionModal {
   }
 
   getCloseEles() {
-    return document.querySelectorAll(`[${appConst.modal.closeAttribute}]`);
+    return document.querySelectorAll(`[${appConst.html.modal.closeAttribute}]`);
   }
 
   onCloseButtonClickListener(ev) {

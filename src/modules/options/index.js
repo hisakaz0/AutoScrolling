@@ -1,5 +1,17 @@
 import OptionItem from './option-item';
 import OptionHtml from './option-html';
-import { loadOptions, initOptions, loadOptionItems } from './load-options';
+import {
+  loadOptions,
+  initOptions,
+  loadOptionItems,
+  initOptionItems,
+} from './load-options';
 
-export { OptionItem, OptionHtml, loadOptions, initOptions, loadOptionItems };
+export {
+  OptionItem,
+  OptionHtml,
+  loadOptions,
+  initOptions,
+  loadOptionItems,
+  initOptionItems,
+};

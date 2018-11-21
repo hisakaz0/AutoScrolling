@@ -1,9 +1,10 @@
-import { OptionModal } from '../../modules/modal';
+import OptionModal from '../../modules/modal';
 import { AutoScroller } from '../../modules/scrolling';
 import {
   addOnMessageListener,
-  sendMessageToBackground
+  sendMessageToBackground,
 } from '../../modules/browser';
+import { logger } from '../../modules/utils';
 import {
   KEY_ACTION,
   KEY_COMMAND,
@@ -16,7 +17,7 @@ import {
   MESSAGE_STOP_SCROLLING,
   MESSAGE_CLOSE_MODAL,
   MESSAGE_INIT_CONTENT_SCRIPT,
-  MESSAGE_UPDATE_COMMAND
+  MESSAGE_UPDATE_COMMAND,
 } from '../../modules/messaging';
 
 class ContentScript {
@@ -42,19 +43,19 @@ class ContentScript {
     sendMessageToBackground(MESSAGE_INIT_CONTENT_SCRIPT);
   }
 
-  onStopListener() {
-    sendMessageToBackground(MESSAGE_STOP_SCROLLING);
+  static onStopListener() {
+    return sendMessageToBackground(MESSAGE_STOP_SCROLLING);
   }
 
-  onCloseListener() {
-    sendMessageToBackground(MESSAGE_CLOSE_MODAL);
+  static onCloseListener() {
+    return sendMessageToBackground(MESSAGE_CLOSE_MODAL);
   }
 
-  onUpdateCommandListener(cmd) {
-    const message = Object.assign(MESSAGE_UPDATE_COMMAND, {
-      [KEY_COMMAND]: cmd
+  static onUpdateCommandListener(cmd) {
+    return sendMessageToBackground({
+      ...MESSAGE_UPDATE_COMMAND,
+      [KEY_COMMAND]: cmd,
     });
-    sendMessageToBackground(message);
   }
 
   onMessageListener(msg) {
@@ -73,6 +74,9 @@ class ContentScript {
         break;
       case ACTION_STOP_SCROLLING:
         this.autoScoller.stop();
+        break;
+      default:
+        logger.error(`Invalid action: ${msg[KEY_ACTION]}`);
         break;
     }
   }

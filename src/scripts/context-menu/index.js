@@ -1,10 +1,10 @@
 import {
   createContextMenu,
   updateContextMenu,
-  addOnMenuClickListener
+  addOnMenuClickListener,
 } from '../../modules/browser';
-import { State } from '../background/state';
-import { EventType } from '../background/event';
+import State from '../background/state';
+import EventType from '../background/event';
 
 import appConst from '../../appConst.json';
 
@@ -25,9 +25,8 @@ class ContextMenuScript {
   }
 
   createMenus() {
-    appConst.contextMenus.map(menu => {
-      createContextMenu(menu);
-    });
+    appConst.contextMenus.forEach(menu => createContextMenu(menu));
+    return this;
   }
 
   getState() {
@@ -51,22 +50,23 @@ class ContextMenuScript {
       case State.MIDDLE_SCROLLING:
       case State.FAST_SCROLLING:
         updateContextMenu(ID_ACTION_MENU, {
-          title: TITLE_STOP_SCROLLING
+          title: TITLE_STOP_SCROLLING,
         });
         break;
       case State.STOP_OR_CLOSE:
         updateContextMenu(ID_ACTION_MENU, {
-          title: TITLE_START_SCROLLING
+          title: TITLE_START_SCROLLING,
         });
         break;
       case State.MODAL_OPENED:
         updateContextMenu(ID_ACTION_MENU, {
-          title: TITLE_CLOSE_MODAL
+          title: TITLE_CLOSE_MODAL,
         });
         break;
       default:
         break;
     }
+    return this;
   }
 
   onActionMenuClick(info, tab) {
@@ -91,4 +91,4 @@ class ContextMenuScript {
   }
 }
 
-export { ContextMenuScript };
+export default ContextMenuScript;

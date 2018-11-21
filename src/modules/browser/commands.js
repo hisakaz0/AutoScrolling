@@ -1,12 +1,8 @@
 import browser from './api';
 
-const updateCommand = cmd => {
-  return browser.commands.update(cmd);
-};
+const updateCommand = cmd => browser.commands.update(cmd);
 
-const addOnCommandListener = listener => {
-  return browser.commands.onCommand.addListener(listener);
-};
+const addOnCommandListener = listener => browser.commands.onCommand.addListener(listener);
 
 const KEY_COMMAND_NAME = 'name';
 const KEY_COMMAND_SHORTCUT = 'shortcut';

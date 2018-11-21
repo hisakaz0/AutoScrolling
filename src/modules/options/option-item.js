@@ -1,9 +1,9 @@
 import {
-  addOnChangeListenerInStorage,
-  loadItemOnSyncStorage,
-  saveItemOnSyncStorage,
+  addOnStorageChangeListener,
+  loadItemOnStorage,
+  saveItemOnStorage,
   updateCommand,
-  createCommandObject
+  createCommandObject,
 } from '../browser';
 
 class OptionItem {
@@ -21,59 +21,54 @@ class OptionItem {
   }
 
   init() {
-    addOnChangeListenerInStorage(this.onStorageChangeListener);
+    addOnStorageChangeListener(this.onStorageChangeListener);
     this.load();
+    return this;
   }
 
   load() {
-    return loadItemOnSyncStorage({
-      [this.name]: this.defaultValue
-    }).then(data => {
+    return loadItemOnStorage({
+      [this.name]: this.defaultValue,
+    }).then((data) => {
       this.value = data[this.name];
       if (this.onLoadListener !== null) this.onLoadListener(this.value);
-      return new Promise(resolve => {
-        resolve(data[this.name]);
-      });
+      return Promise.resolve(data[this.name]);
     });
   }
 
   save(newValue) {
     this.assertValue(newValue);
-    return saveItemOnSyncStorage({
-      [this.name]: newValue
+    return saveItemOnStorage({
+      [this.name]: newValue,
     }).then(() => {
       this.value = newValue;
-      return new Promise(resolve => {
-        resolve(newValue);
-      });
+      return Promise.resolve(newValue);
     });
   }
 
   assertValue(value) {
-    const correctType = typeof this.defaultValue;
-    if (correctType !== typeof value) {
-      throw new Error(`Typeof value should be ${correctType}`);
+    if (typeof this.defaultValue !== typeof value) {
+      throw new Error(`Typeof value should be ${typeof this.defaultValue}`);
     }
   }
 
   addOnLoadListener(listener) {
-    this.onLoadListener = listener;
-    this.onLoadListener = this.onLoadListener.bind(this);
+    this.onLoadListener = listener.bind(this);
+    return this;
   }
 
   addOnChangeListener(listener) {
     this.onChangeListeners.push(listener.bind(this));
+    return this;
   }
 
   onStorageChangeListener(changes) {
     // from storage
     if (!Object.keys(changes).includes(this.name)) return;
-    const newValue = changes[this.name].newValue;
+    const { newValue } = changes[this.name];
     this.value = newValue;
     if (this.hasCommand()) this.updateCommandKeyBind(newValue);
-    this.onChangeListeners.forEach(func => {
-      func(newValue);
-    });
+    this.onChangeListeners.forEach(func => func(newValue));
   }
 
   onInputChangeListener(value) {
@@ -81,8 +76,7 @@ class OptionItem {
   }
 
   hasCommand() {
-    if (typeof this.commandName !== 'undefined') return true;
-    return false;
+    return typeof this.commandName !== 'undefined';
   }
 
   updateCommandKeyBind(value) {
@@ -90,13 +84,14 @@ class OptionItem {
     try {
       return updateCommand(cmd);
     } catch (e) {
-      if (!this.onUpdateCommandListener) return;
-      this.onUpdateCommandListener(cmd);
+      if (!this.onUpdateCommandListener) return Promise.reject();
+      return this.onUpdateCommandListener(cmd);
     }
   }
 
   setOnUpdateCommandListener(listener) {
-    this.onUpdateCommandListener = listener;
+    this.onUpdateCommandListener = listener.bind(this);
+    return this;
   }
 }
 

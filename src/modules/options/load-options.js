@@ -1,42 +1,39 @@
-import { OptionItem, OptionHtml } from './index';
+import OptionItem from './option-item';
+import OptionHtml from './option-html';
 import appConst from '../../appConst.json';
 
 const appOpts = appConst.options;
 
-const loadOptions = () => {
-  const map = {};
-  Object.keys(appOpts).map(key => {
-    const value = appOpts[key].value;
-    const optItem = new OptionItem(key, value, appOpts[key].commandName);
-    const optHtml = new OptionHtml(appOpts[key].id, value);
-    map[key] = { item: optItem, html: optHtml };
-  });
-  return map;
-};
+const loadOptions = () => Object.fromEntries(
+  Object.entries(appOpts).map(([key, val]) => {
+    const item = new OptionItem(key, val.value, val.commandName);
+    const html = new OptionHtml(val.id, val.value);
+    return [key, { item, html }];
+  }),
+);
 
-const initOptions = opts => {
-  for (const key of Object.keys(opts)) {
-    const opt = opts[key];
-    opt.item.addOnChangeListener(opt.html.onChangeStorageListener);
-    opt.item.addOnLoadListener(opt.html.onLoadStorageListener);
-    opt.html.addOnChangeListener(opt.item.onInputChangeListener);
-    opt.item.init();
-    opt.html.init();
-  }
-  return opts;
-};
+const initOptions = opts => Object.fromEntries(
+  Object.entries(opts).map(([id, opt]) => {
+    const { item, html } = opt;
+    item.addOnChangeListener(html.onChangeStorageListener)
+      .addOnLoadListener(html.onLoadStorageListener);
+    html.addOnChangeListener(item.onInputChangeListener);
+    item.init();
+    return [id, { item, html }];
+  }),
+);
 
-const loadOptionItems = () => {
-  const map = {};
-  Object.keys(appOpts).map(key => {
-    const opt = new OptionItem(
-      key,
-      appOpts[key].value,
-      appOpts[key].commandName
-    );
-    map[key] = opt;
-  });
-  return map;
-};
+const loadOptionItems = () => Object.fromEntries(
+  Object.entries(appOpts).map(([key, val]) => [
+    key,
+    new OptionItem(key, val.value, val.commandName),
+  ]),
+);
 
-export { loadOptions, initOptions, loadOptionItems };
+const initOptionItems = opts => Object.fromEntries(
+  Object.entries(opts).map(([key, opt]) => [key, opt.init()]),
+);
+
+export {
+  loadOptions, initOptions, loadOptionItems, initOptionItems,
+};

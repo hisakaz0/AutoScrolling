@@ -1,31 +1,22 @@
 import browser from './api';
 
-const getAllWindow = () => {
-  return browser.windows.getAll();
-};
+const getAllWindow = () => browser.windows.getAll();
 
-const addOnCreatedListener = listener => {
-  return browser.windows.onCreated.addListener(listener);
-};
+const addOnCreatedListener = listener => browser.windows.onCreated.addListener(listener);
 
-const addOnRemovedListener = listener => {
-  return browser.windows.onRemoved.addListener(listener);
-};
+const addOnRemovedListener = listener => browser.windows.onRemoved.addListener(listener);
 
-const addOnFocusChangedListener = listener => {
-  return browser.windows.onFocusChanged.addListener(listener);
-};
+const addOnFocusChangedListener = listener => browser.windows.onFocusChanged.addListener(listener);
 
-const isValidWindowId = id => {
-  return (
-    id !== undefined && id !== null && id !== browser.windows.WINDOW_ID_NONE
-  );
-};
+const isValidWindowId = id => (
+  id !== null
+  && id !== browser.windows.WINDOW_ID_NONE
+);
 
 export {
   getAllWindow,
   addOnCreatedListener,
   addOnRemovedListener,
   addOnFocusChangedListener,
-  isValidWindowId
+  isValidWindowId,
 };

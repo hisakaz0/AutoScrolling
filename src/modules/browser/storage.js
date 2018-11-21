@@ -1,61 +1,43 @@
 import browser from './api';
 
-const typeofObject = typeof {};
-const typeofString = typeof '';
 const storageArea = browser.storage.sync;
 
-// TODO: fix function name
-const saveItemOnSyncStorage = item => {
-  if (typeof item !== typeofObject) {
-    throw new Error(
-      `Typeof item must be ${typeofObject}, it is ${typeof item}`
-    );
+const saveItemOnStorage = (item) => {
+  if (typeof item !== typeof {}) {
+    throw new Error(`Typeof item must be object, it is ${typeof item}`);
   }
   return storageArea.set(item);
 };
 
-// TODO: fix function name
-const loadItemOnSyncStorage = item => {
-  if (typeof item === typeofObject) {
-    return storageArea.get(item);
-  }
-  if (typeof item === typeofString) {
+const loadItemOnStorage = (item) => {
+  if (typeof item === typeof {}) return storageArea.get(item);
+  if (typeof item === typeof '') {
     const key = item; // item is key
     const itemObj = {};
     itemObj[key] = undefined;
     return storageArea.get(itemObj);
   }
-  throw new Error(
-    `Typeof item must be ${typeofObject} or ${typeofString}, it is ${typeof item}`
-  );
+  throw new Error(`Typeof item must be object or string, it is ${typeof item}`);
 };
 
-// TODO: fix function name
-const loadAllItemsOnSyncStorage = () => {
-  return storageArea.get();
-};
+const loadAllItemsOnStorage = () => storageArea.get();
 
-// TODO: fix function name
-const removeItemOnSyncStorage = key => {
-  if (typeof key !== typeofString) {
-    throw new Error(`Typeof key must be ${typeofString}, it is ${typeof key}`);
+const removeItemOnStorage = (key) => {
+  if (typeof key !== typeof '') {
+    throw new Error(`Typeof key must be string, it is ${typeof key}`);
   }
   return storageArea.remove(key);
 };
 
-const removeAllItemsOnSyncStorage = () => {
-  return storageArea.clear();
-};
+const clearOnStorage = () => storageArea.clear();
 
-const addOnChangeListenerInStorage = l => {
-  return browser.storage.onChanged.addListener(l);
-};
+const addOnStorageChangeListener = listener => browser.storage.onChanged.addListener(listener);
 
 export {
-  saveItemOnSyncStorage,
-  loadItemOnSyncStorage,
-  loadAllItemsOnSyncStorage,
-  removeItemOnSyncStorage,
-  removeAllItemsOnSyncStorage,
-  addOnChangeListenerInStorage
+  saveItemOnStorage,
+  loadItemOnStorage,
+  loadAllItemsOnStorage,
+  removeItemOnStorage,
+  clearOnStorage,
+  addOnStorageChangeListener,
 };

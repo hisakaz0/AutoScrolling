@@ -1,6 +1,6 @@
 {
   "name": "autoscrolling",
-  "version": "1.5.9",
+  "version": "1.0.0",
   "description": "Browser extension for Firefox",
   "main": "background.js",
   "directories": {
@@ -16,8 +16,8 @@
     "build:gulp": "gulp",
     "build:firefox": "npm run manifest:firefox && npm run build:main",
     "build:chrome": "npm run manifest:chrome && npm run build:main",
-    "manifest:firefox": "cpy addon/firefox-manifest.json addon --rename manifest.json",
-    "manifest:chrome": "cpy addon/chrome-manifest.json addon --rename manifest.json",
+    "manifest:firefox": "cpy src/firefox-manifest.json addon --rename manifest.json",
+    "manifest:chrome": "cpy src/chrome-manifest.json addon --rename manifest.json",
     "debug": "npm run manifest:firefox && cd addon && web-ext run",
     "test": "npm run build:gulp && karma start",
     "test:debug": "npm run build:gulp && karma start --no-single-run --auto-watch",

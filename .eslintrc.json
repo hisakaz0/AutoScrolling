@@ -1,24 +1,35 @@
 {
   "env": {
     "browser": true,
-    "es6": true
+    "jasmine": true,
+    "node": true,
+    "webextensions": true
   },
-  "extends": "eslint:recommended",
+  "extends": "airbnb-base",
   "parserOptions": {
+    "ecmaVersion": 9,
     "sourceType": "module"
   },
   "rules": {
-    "indent": ["error", 2, { "SwitchCase": 1 }],
-    "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "single"],
-    "semi": ["error", "always"],
-    "no-undef": "off",
     "no-console": [
       "error",
       {
         "allow": ["warn", "error", "debug"]
       }
     ],
-    "no-unused-vars": "warn"
-  }
+    "no-unused-vars": "warn",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true,
+        "optionalDependencies": false
+      }
+    ]
+  },
+  "globals": {
+    "__html__": true
+  },
+  "plugins": [
+    "json"
+  ]
 }

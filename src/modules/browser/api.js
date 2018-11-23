@@ -1,1 +1,3 @@
-export default require('webextension-polyfill');
+const api = require('webextension-polyfill');
+
+export default api;

@@ -7,11 +7,10 @@ import {
   addOnTabUpdatedListener,
   addOnTabRemovedListener,
   getActivatedTabs,
-  getTab,
   addOnBrowserActionClickListener,
   setBrowserActionTitle,
   setBrowserActionIcon,
-  addOnWindowFocusChangedListener
+  addOnWindowFocusChangedListener,
 } from '../../modules/browser';
 import api from '../../modules/browser/api';
 import {
@@ -26,56 +25,57 @@ import {
   MESSAGE_START_SCROLLING,
   MESSAGE_STOP_SCROLLING,
   MESSAGE_CHANGE_SPEED,
-  addData as addDataToMessage
+  addData as addDataToMessage,
 } from '../../modules/messaging';
-import { loadOptionItems } from '../../modules/options';
-import { logger, isSystemProtocol } from '../../modules/utils';
-import { ContextMenuScript } from '../context-menu';
-import { State } from './state';
-import { EventType } from './event';
+import { loadOptionItems, initOptionItems } from '../../modules/options';
+import { logger, isNotSystemTabWith } from '../../modules/utils';
+import ContextMenuScript from '../context-menu';
+import State from './state';
+import EventType from './event';
 
 import appConst from '../../appConst.json';
+
 const appOpts = appConst.options;
 const appBrowseActs = appConst.browserAction;
 
 // NOTE: use browser api out of module
-const TAB_ID_NONE = api.tabs.TAB_ID_NONE;
-const WINDOW_ID_NONE = api.windows.WINDOW_ID_NONE;
+const { TAB_ID_NONE } = api.tabs;
+const { WINDOW_ID_NONE } = api.windows;
 
 const DEFAULT_INTERVAL_DOUBLE_CLICK = 500; // mili second
 const DEFAULT_DOUBLE_CLICK_TIMER = {
   interval: DEFAULT_INTERVAL_DOUBLE_CLICK,
   timerId: -1,
-  isWaiting: false
+  isWaiting: false,
 };
 const DEFAULT_TARGET_TAB = {
   tabId: TAB_ID_NONE,
   windowId: WINDOW_ID_NONE,
   isScrolling: false,
   isModalOpened: false,
-  firedFromEvent: EventType.EVENT_ID_NONE
+  firedFromEvent: EventType.EVENT_ID_NONE,
 };
 const DEFAULT_FOCUS_TAB = {
   tabId: TAB_ID_NONE,
-  windowId: WINDOW_ID_NONE
+  windowId: WINDOW_ID_NONE,
 };
 
 class BackgroundScript {
   constructor() {
-    this.doubleClickTimer = Object.assign({}, DEFAULT_DOUBLE_CLICK_TIMER);
-    this.targetTab = Object.assign({}, DEFAULT_TARGET_TAB);
-    this.prevTargetTab = Object.assign({}, this.targetTab);
-    this.focusTab = Object.assign({}, DEFAULT_FOCUS_TAB);
+    this.doubleClickTimer = { ...DEFAULT_DOUBLE_CLICK_TIMER };
+    this.targetTab = { ...DEFAULT_TARGET_TAB };
+    this.prevTargetTab = { ...this.targetTab };
+    this.focusTab = { ...DEFAULT_FOCUS_TAB };
     this.onStateChangeListeners = [];
     this.setState(State.STOP_OR_CLOSE);
     // TODO: maybe need lock mecanizum
 
     this.onBrowserActionClickListener = this.onBrowserActionClickListener.bind(
-      this
+      this,
     );
     this.onTabActivatedListener = this.onTabActivatedListener.bind(this);
     this.onWindowFocusChangedListener = this.onWindowFocusChangedListener.bind(
-      this
+      this,
     );
     this.onTabUpdatedListener = this.onTabUpdatedListener.bind(this);
     this.onTabRemovedListener = this.onTabRemovedListener.bind(this);
@@ -86,8 +86,9 @@ class BackgroundScript {
   init() {
     this.initListeners();
     this.initFocusTab();
-    this.initLoadOptions();
-    this.updateBrowerAction(this.state);
+    this.updateBrowerAction();
+
+    initOptionItems(loadOptionItems);
   }
 
   initFocusTab() {
@@ -102,14 +103,6 @@ class BackgroundScript {
     addOnTabRemovedListener(this.onTabRemovedListener);
     addOnMessageListener(this.onMessageListener);
     addOnCommandListener(this.onCommandListener);
-  }
-
-  initLoadOptions() {
-    this.options = loadOptionItems();
-    Object.entries(this.options).forEach(entry => {
-      const [, opt] = entry;
-      opt.init();
-    });
   }
 
   isStopScrollingOnFocusOut() {
@@ -128,14 +121,12 @@ class BackgroundScript {
     return this.options.enableTransmissionScrolling.value;
   }
 
-  setFocusTabFromActivateWindow(windowId = WINDOW_ID_NONE) {
+  setFocusTabFromActivateWindow(targetWindowId = WINDOW_ID_NONE) {
     const getFocusTab = (windowId, tabs) => {
       if (windowId === WINDOW_ID_NONE) {
         return DEFAULT_FOCUS_TAB;
       }
-      const filtered = tabs.filter(tab => {
-        return tab.windowId === windowId;
-      });
+      const filtered = tabs.filter(tab => tab.windowId === windowId);
       if (filtered.length === 0) {
         const tab = tabs[0];
         return { tabId: tab.id, windowId: tab.windowId };
@@ -143,10 +134,9 @@ class BackgroundScript {
       const focusTab = filtered[0];
       return { tabId: focusTab.id, windowId: focusTab.windowId };
     };
-    return getActivatedTabs().then(tabs => {
-      const tab = this._setFocusTab(getFocusTab(windowId, tabs));
-      return Promise.resolve(tab);
-    });
+    return getActivatedTabs().then(tabs => Promise.resolve(this.setFocusTab(
+      getFocusTab(targetWindowId, tabs),
+    )));
   }
 
   onMessageListener(message, tab, sendResponse) {
@@ -163,55 +153,59 @@ class BackgroundScript {
       case ACTION_INIT_CONTENT_SCRIPT:
         this.onRecieveInitContentScript();
         break;
+      default:
+        logger.error(`Invalid action: ${message[KEY_ACTION]}`);
+        break;
     }
   }
 
   onBrowserActionClickListener(tab) {
-    logger.debug('onBrowserActionClicked');
     if (this.isDisableDoubleClick()) return this.onSingleClickEvent();
     if (!this.isWaitingDoubleClick()) return this.setDoubleClickTimer();
-    this.clearDoubleClickTimer();
-    this.onDoubleClickEvent();
+    return this.clearDoubleClickTimer().onDoubleClickEvent();
   }
 
   onTabActivatedListener(activeInfo) {
-    this._setFocusTab(activeInfo);
+    this.setFocusTab(activeInfo);
     this.onActivateChanged(EventType.TAB_CHANGED);
   }
 
   onWindowFocusChangedListener(windowId) {
-    this.setFocusTabFromActivateWindow(windowId).then(tab => {
-      this.onActivateChanged(EventType.WINDOW_CHANGED);
-    });
+    this.setFocusTabFromActivateWindow(windowId).then(tab => this
+      .onActivateChanged(EventType.WINDOW_CHANGED));
   }
 
   onTabUpdatedListener(tab) {
     if (this.targetTab.tabId === tab.id) {
-      this.resetTargetTab(EventType.TAB_UPDATED);
+      this
+        .resetTargetTab(EventType.TAB_UPDATED);
     }
   }
 
   onTabRemovedListener(tabId) {
     if (this.targetTab.tabId === tabId) {
-      this.resetTargetTab(EventType.TAB_REMOVED);
+      this
+        .resetTargetTab(EventType.TAB_REMOVED);
     }
   }
 
   resetTargetTab(eventType) {
-    this.targetTab = Object.assign(this.targetTab, {
+    this.targetTab = {
+      ...this.targetTab,
       isScrolling: false,
       isModalOpened: false,
-      firedFromEvent: eventType
-    });
+      firedFromEvent: eventType,
+    };
     this.setState(State.STOP_OR_CLOSE);
   }
 
   setTargetTab(props) {
-    this.prevTargetTab = Object.assign(this.prevTargetTab, this.targetTab);
-    this.targetTab = Object.assign(this.targetTab, props);
+    this.prevTargetTab = { ...this.prevTargetTab, ...this.targetTab };
+    this.targetTab = { ...this.targetTab, ...props };
+    return this;
   }
 
-  _setFocusTab(tab) {
+  setFocusTab(tab) {
     this.focusTab = { tabId: tab.tabId, windowId: tab.windowId };
     logger.debug(this.focusTab);
     return this.focusTab;
@@ -227,11 +221,13 @@ class BackgroundScript {
       this.onSingleClickEvent();
     }, this.doubleClickTimer.interval);
     this.doubleClickTimer.isWaiting = true;
+    return this;
   }
 
   clearDoubleClickTimer() {
     clearTimeout(this.doubleClickTimer.timerId);
     this.doubleClickTimer.isWaiting = false;
+    return this;
   }
 
   setState(newState) {
@@ -239,9 +235,7 @@ class BackgroundScript {
     const prevState = this.state;
     this.state = newState;
     this.onUpdateState(prevState, newState);
-    this.onStateChangeListeners.forEach(func => {
-      func(newState);
-    });
+    this.onStateChangeListeners.forEach(func => func(newState));
   }
 
   addOnStateChangeListener(listener) {
@@ -252,9 +246,9 @@ class BackgroundScript {
     this.updateBrowerAction(newState);
   }
 
-  updateBrowerAction(state) {
-    const getInfo = state => {
-      switch (state) {
+  updateBrowerAction() {
+    const getInfo = (currState) => {
+      switch (currState) {
         case State.STOP_OR_CLOSE:
           return appBrowseActs.stopOrClose;
         case State.SCROLLING:
@@ -265,59 +259,58 @@ class BackgroundScript {
         case State.SLOW_SCROLLING:
         case State.MIDDLE_SCROLLING:
           return appBrowseActs.accelerateScrolling;
+        default:
+          throw new Error(`Invalid state: ${currState}`);
       }
     };
-    const { title, path } = getInfo(state);
+    const { title, path } = getInfo(this.state);
     return Promise.all([
       setBrowserActionTitle(title),
-      setBrowserActionIcon(path)
+      setBrowserActionIcon(path),
     ]);
   }
 
   // begin: event area
   onSingleClickEvent() {
     const eventType = EventType.SINGLE_CLICK;
-    logger.debug('single click');
     switch (this.state) {
       case State.STOP_OR_CLOSE:
-        this.startScrollingAction(eventType);
-        break;
+        return this.startScrollingAction(eventType);
       case State.MODAL_OPENED:
         if (!this.isEqualTargetToFocus()) break;
-        this.closeModalAction(eventType);
-        break;
+        return this.closeModalAction(eventType);
       case State.SCROLLING:
       case State.FAST_SCROLLING:
         if (!this.isEqualTargetToFocus()) break;
-        this.stopScrollingAction(eventType);
-        break;
+        return this.stopScrollingAction(eventType);
       case State.SLOW_SCROLLING:
       case State.MIDDLE_SCROLLING:
-        this.accelerateScrollingAction(eventType);
-        break;
+        return this.accelerateScrollingAction(eventType);
+      default:
+        throw new Error(`Invalid State: ${this.state}`);
     }
+    return Promise.reject();
   }
 
   onDoubleClickEvent() {
     const eventType = EventType.DOUBLE_CLICK;
     switch (this.state) {
       case State.STOP_OR_CLOSE:
-        this.openModalAction(eventType);
-        break;
+        return this.openModalAction(eventType);
       case State.MODAL_OPENED:
         if (!this.isEqualTargetToFocus()) break;
-        this.closeModalAction(eventType);
-        break;
+        return this.closeModalAction(eventType);
       case State.SCROLLING:
       case State.FAST_SCROLLING:
         if (!this.isEqualTargetToFocus()) break;
-        this.stopScrollingAction(eventType);
-        break;
+        return this.stopScrollingAction(eventType);
       case State.SLOW_SCROLLING:
       case State.MIDDLE_SCROLLING:
-        this.accelerateScrollingAction(eventType);
-        break;
+        return this.accelerateScrollingAction(eventType);
+      default:
+        throw new Error(`Invalid State: ${this.state}`);
     }
+    return Promise.reject();
   }
 
   onActivateChanged(eventType = EventType.TAB_CHANGED) {
@@ -327,8 +320,8 @@ class BackgroundScript {
       case State.MIDDLE_SCROLLING:
       case State.FAST_SCROLLING:
         if (
-          this.isStopScrollingOnFocusOut() &&
-          this.focusTab.windowId === WINDOW_ID_NONE
+          this.isStopScrollingOnFocusOut()
+          && this.focusTab.windowId === WINDOW_ID_NONE
         ) {
           this.stopScrollingAction(eventType);
           break;
@@ -342,17 +335,17 @@ class BackgroundScript {
         break;
       case State.STOP_OR_CLOSE:
         if (
-          this.isRestoreScrollingFromSwitchBack() &&
-          eventType === EventType.TAB_CHANGED &&
-          this.targetTab.firedFromEvent === EventType.TAB_CHANGED &&
-          this.prevTargetTab.isScrolling === true &&
-          this.prevTargetTab.tabId === this.focusTab.tabId
+          this.isRestoreScrollingFromSwitchBack()
+          && eventType === EventType.TAB_CHANGED
+          && this.targetTab.firedFromEvent === EventType.TAB_CHANGED
+          && this.prevTargetTab.isScrolling === true
+          && this.prevTargetTab.tabId === this.focusTab.tabId
         ) {
           this.startScrollingAction(eventType);
         }
         break;
       default:
-        break;
+        throw new Error(`Invalid State: ${this.state}`);
     }
   }
 
@@ -360,10 +353,9 @@ class BackgroundScript {
     switch (name) {
       case appOpts.keybindSingleClick.commandName:
         // this command acts as SINGLE_CLICK
-        this.onSingleClickEvent();
-        break;
+        return this.onSingleClickEvent();
       default:
-        break;
+        return Promise.reject();
     }
   }
 
@@ -372,7 +364,7 @@ class BackgroundScript {
     this.setTargetTab({
       isScrolling: false,
       isModalOpened: false,
-      firedFromEvent: EventType.INIT_CONTENT_SCRIPT
+      firedFromEvent: EventType.INIT_CONTENT_SCRIPT,
     });
     this.setState(State.STOP_OR_CLOSE);
   }
@@ -382,7 +374,7 @@ class BackgroundScript {
       tabId: TAB_ID_NONE,
       windowId: WINDOW_ID_NONE,
       isScrolling: false,
-      firedFromEvent: EventType.CONTENT_SCRIPT_MESSAGE
+      firedFromEvent: EventType.CONTENT_SCRIPT_MESSAGE,
     });
     this.setState(State.STOP_OR_CLOSE);
   }
@@ -392,7 +384,7 @@ class BackgroundScript {
       tabId: TAB_ID_NONE,
       windowId: WINDOW_ID_NONE,
       isModalOpened: false,
-      firedFromEvent: EventType.CONTENT_SCRIPT_MESSAGE
+      firedFromEvent: EventType.CONTENT_SCRIPT_MESSAGE,
     });
     this.setState(State.STOP_OR_CLOSE);
   }
@@ -400,30 +392,22 @@ class BackgroundScript {
 
   needToStopScrollingOnTabChanged() {
     return (
-      this.targetTab.isScrolling &&
-      this.targetTab.tabId !== this.focusTab.tabId &&
-      this.targetTab.windowId === this.focusTab.windowId
+      this.targetTab.isScrolling
+      && this.targetTab.tabId !== this.focusTab.tabId
+      && this.targetTab.windowId === this.focusTab.windowId
     );
   }
 
   needToCloseModalOnTabChanged() {
     return (
-      this.targetTab.isModalOpened &&
-      this.targetTab.tabId !== this.focusTab.tabId &&
-      this.targetTab.windowId === this.focusTab.windowId
+      this.targetTab.isModalOpened
+      && this.targetTab.tabId !== this.focusTab.tabId
+      && this.targetTab.windowId === this.focusTab.windowId
     );
   }
 
   isEqualTargetToFocus() {
     return this.targetTab.tabId === this.focusTab.tabId;
-  }
-
-  beforeAction(tabId) {
-    // if (!isValidTabId(this.focusTab.tabId)) return Promise.reject();
-    return getTab(tabId).then(tab => {
-      if (isSystemProtocol(tab.url)) return Promise.reject();
-      return Promise.resolve();
-    });
   }
 
   getStartScrollingSpeed() {
@@ -469,88 +453,71 @@ class BackgroundScript {
 
   // begin: action area
   startScrollingAction(eventType) {
-    logger.debug(this.focusTab);
-    return this.beforeAction(this.focusTab.tabId)
-      .then(() => {
-        const msg = addDataToMessage(MESSAGE_START_SCROLLING, {
-          scrollingSpeed: this.getStartScrollingSpeed()
-        });
-        return sendMessageToTab(this.focusTab.tabId, msg);
-      })
-      .then(() => {
-        if (this.isEnabledTransmissionScrolling()) {
-          return Promise.resolve(State.SLOW_SCROLLING);
-        }
-        return Promise.resolve(State.SCROLLING);
-      })
-      .then(state => {
+    return isNotSystemTabWith(this.focusTab.tabId)
+      .then(() => sendMessageToTab(this.focusTab.tabId,
+        addDataToMessage(MESSAGE_START_SCROLLING, {
+          scrollingSpeed: this.getStartScrollingSpeed(),
+        })))
+      .then(() => Promise.resolve(
+        this.isEnabledTransmissionScrolling() ? State.SLOW_SCROLLING : State.SCROLLING,
+      ))
+      .then((state) => {
         this.setTargetTab({
           tabId: this.focusTab.tabId,
           windowId: this.focusTab.windowId,
           isScrolling: true,
-          firedFromEvent: eventType
+          firedFromEvent: eventType,
         });
         this.setState(state);
       });
   }
 
   stopScrollingAction(eventType) {
-    return this.beforeAction(this.targetTab.tabId)
-      .then(() => {
-        return sendMessageToTab(this.targetTab.tabId, MESSAGE_STOP_SCROLLING);
-      })
+    return isNotSystemTabWith(this.targetTab.tabId)
+      .then(() => sendMessageToTab(this.targetTab.tabId, MESSAGE_STOP_SCROLLING))
       .then(() => {
         this.setTargetTab({
           tabId: TAB_ID_NONE,
           windowId: WINDOW_ID_NONE,
           isScrolling: false,
-          firedFromEvent: eventType
+          firedFromEvent: eventType,
         });
         this.setState(State.STOP_OR_CLOSE);
       });
   }
 
   accelerateScrollingAction(eventType) {
-    return this.beforeAction(this.targetTab.tabId)
-      .then(() => {
-        logger.debug(this.getNextScrollingSpeed());
-        const msg = addDataToMessage(MESSAGE_CHANGE_SPEED, {
-          scrollingSpeed: this.getNextScrollingSpeed()
-        });
-        return sendMessageToTab(this.targetTab.tabId, msg);
-      })
-      .then(() => {
-        return this.setState(this.getNextScrollingState());
-      });
+    return isNotSystemTabWith(this.targetTab.tabId)
+      .then(() => sendMessageToTab(this.targetTab.tabId,
+        addDataToMessage(MESSAGE_CHANGE_SPEED, {
+          scrollingSpeed: this.getNextScrollingSpeed(),
+        })))
+      .then(() => this.setState(this.getNextScrollingState()));
   }
 
   openModalAction(eventType) {
-    return this.beforeAction(this.focusTab.tabId)
-      .then(() => {
-        return sendMessageToTab(this.focusTab.tabId, MESSAGE_OPEN_MODAL);
-      })
+    return isNotSystemTabWith(this.focusTab.tabId)
+      .then(() => sendMessageToTab(this.focusTab.tabId, MESSAGE_OPEN_MODAL))
       .then(() => {
         this.setTargetTab({
           tabId: this.focusTab.tabId,
           windowId: this.focusTab.windowId,
           isModalOpened: true,
-          firedFromEvent: eventType
+          firedFromEvent: eventType,
         });
         this.setState(State.MODAL_OPENED);
       });
   }
 
   closeModalAction(eventType) {
-    return this.beforeAction(this.targetTab.tabId)
-      .then(() => {
-        return sendMessageToTab(this.targetTab.tabId, MESSAGE_CLOSE_MODAL);
-      })
+    return isNotSystemTabWith(this.targetTab.tabId)
+      .then(() => sendMessageToTab(this.targetTab.tabId, MESSAGE_CLOSE_MODAL))
       .then(() => {
         this.setTargetTab({
           tabId: TAB_ID_NONE,
           windowId: WINDOW_ID_NONE,
           isModalOpened: false,
-          firedFromEvent: eventType
+          firedFromEvent: eventType,
         });
         this.setState(State.STOP_OR_CLOSE);
       });

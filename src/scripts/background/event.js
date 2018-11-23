@@ -8,7 +8,7 @@ const EventType = {
   WINDOW_CHANGED: 6,
   CONTENT_SCRIPT_MESSAGE: 7,
   INIT_CONTENT_SCRIPT: 8,
-  CONTEXT_MENU: 9
+  CONTEXT_MENU: 9,
 };
 
-export { EventType };
+export default EventType;

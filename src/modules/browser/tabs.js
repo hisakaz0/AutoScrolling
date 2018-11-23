@@ -1,40 +1,22 @@
 import browser from './api';
 
-const sendMessage = (tabId, msg) => {
-  return browser.tabs.sendMessage(tabId, msg);
-};
+const sendMessage = (tabId, msg) => browser.tabs.sendMessage(tabId, msg);
 
-const addOnActivatedListener = listener => {
-  return browser.tabs.onActivated.addListener(listener);
-};
+const addOnActivatedListener = listener => browser.tabs.onActivated.addListener(listener);
 
-const addOnAttachedListener = listener => {
-  return browser.tabs.onAttached.addListener(listener);
-};
+const addOnAttachedListener = listener => browser.tabs.onAttached.addListener(listener);
 
-const addOnUpdatedListener = listener => {
-  return browser.tabs.onUpdated.addListener(listener);
-};
+const addOnUpdatedListener = listener => browser.tabs.onUpdated.addListener(listener);
 
-const addOnRemovedListener = listener => {
-  return browser.tabs.onRemoved.addListener(listener);
-};
+const addOnRemovedListener = listener => browser.tabs.onRemoved.addListener(listener);
 
-const getCurrent = () => {
-  return browser.tabs.getCurrent();
-};
+const getCurrent = () => browser.tabs.getCurrent();
 
-const getActivated = () => {
-  return browser.tabs.query({ active: true });
-};
+const getActivated = () => browser.tabs.query({ active: true });
 
-const get = tabId => {
-  return browser.tabs.get(tabId);
-};
+const get = tabId => browser.tabs.get(tabId);
 
-const isValidTabId = id => {
-  return id !== undefined && id !== null && id !== browser.tabs.TAB_ID_NONE;
-};
+const isValidTabId = id => id !== undefined && id !== null && id !== browser.tabs.TAB_ID_NONE;
 
 export {
   sendMessage,
@@ -45,5 +27,5 @@ export {
   getCurrent,
   getActivated,
   get,
-  isValidTabId
+  isValidTabId,
 };

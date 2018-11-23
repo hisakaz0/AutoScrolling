@@ -1,4 +1,4 @@
-import SpeedParser from './speed-parser';
+import parseSpeed from './speed-parser';
 import AutoScroller from './auto-scroller';
 
-export { SpeedParser, AutoScroller };
+export { parseSpeed, AutoScroller };

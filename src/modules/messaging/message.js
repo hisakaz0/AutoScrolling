@@ -15,22 +15,19 @@ const MESSAGE_CLOSE_MODAL = { [KEY_ACTION]: ACTION_CLOSE_MODAL };
 const MESSAGE_START_SCROLLING = { [KEY_ACTION]: ACTION_START_SCROLLING };
 const MESSAGE_STOP_SCROLLING = { [KEY_ACTION]: ACTION_STOP_SCROLLING };
 const MESSAGE_CHANGE_SPEED = {
-  [KEY_ACTION]: ACTION_CHANGE_SPEED
+  [KEY_ACTION]: ACTION_CHANGE_SPEED,
 };
 const MESSAGE_UPDATE_COMMAND = { [KEY_ACTION]: ACTION_UPDATE_COMMAND };
 const MESSAGE_INIT_CONTENT_SCRIPT = {
-  [KEY_ACTION]: ACTION_INIT_CONTENT_SCRIPT
+  [KEY_ACTION]: ACTION_INIT_CONTENT_SCRIPT,
 };
 
-const create = action => {
-  return { [KEY_ACTION]: action };
-};
+const create = action => ({ [KEY_ACTION]: action });
 
-const addData = (message, data) => {
-  return Object.assign(message, {
-    [KEY_DATA]: data
-  });
-};
+const addData = (message, data) => ({
+  ...message,
+  [KEY_DATA]: data,
+});
 
 export {
   KEY_ACTION,
@@ -51,5 +48,5 @@ export {
   MESSAGE_UPDATE_COMMAND,
   MESSAGE_INIT_CONTENT_SCRIPT,
   addData,
-  create
+  create,
 };

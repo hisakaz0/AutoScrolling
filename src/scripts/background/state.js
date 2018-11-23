@@ -4,7 +4,7 @@ const State = {
   MODAL_OPENED: 2,
   SLOW_SCROLLING: 3,
   MIDDLE_SCROLLING: 4,
-  FAST_SCROLLING: 5
+  FAST_SCROLLING: 5,
 };
 
-export { State };
+export default State;

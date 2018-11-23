@@ -28,39 +28,35 @@
   },
   "lint-staged": {
     "src/**/*.js": [
-      "prettier --write src/**/*.js",
       "eslint src --fix",
       "git add"
     ],
     "src/**/*.json": [
-      "prettier --write src/**/*.json",
+      "eslint src/**/*.json --fix",
       "git add"
     ],
     "tests/**/*.js": [
-      "prettier --write tests/**/*.js",
       "eslint tests --fix",
       "git add"
     ],
     "gulpfile.babel.js": [
-      "prettier --write gulpfile.babel.js",
       "eslint gulpfile.babel.js --fix",
       "git add"
     ],
     "webpack.config.js": [
-      "prettier --write webpack.config.js",
       "eslint webpack.config.js --fix",
       "git add"
     ],
     "addon/*.json": [
-      "prettier --write addon/*.json",
+      "eslint addon/*.json --fix",
       "git add"
     ],
     "package.json": [
-      "prettier --write package.json",
+      "eslint package.json --fix",
       "git add"
     ],
     ".eslintrc.json": [
-      "prettier --write .eslintrc.json",
+      "eslint .eslintrc.json --fix",
       "git add"
     ]
   },
@@ -84,7 +80,10 @@
     "@babel/preset-env": "^7.0.0",
     "babel-loader": "^8.0.4",
     "cpy-cli": "^2.0.0",
-    "eslint": "^5.6.0",
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-json": "^1.2.1",
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-ejs": "^3.2.0",
@@ -100,7 +99,6 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
     "lint-staged": "^8.0.0",
-    "prettier": "1.15.2",
     "sinon-chrome": "^2.3.2",
     "spectre.css": "^0.5.3",
     "web-ext": "^2.9.1",

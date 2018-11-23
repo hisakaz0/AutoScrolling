@@ -1,8 +1,14 @@
-import { SpeedParser } from './index';
-import { loadOptionItems } from '../options';
+import parseSpeed from './speed-parser';
+import { loadOptionItems, initOptionItems } from '../options';
 import { isValidTimerId, INVALID_TIMER_ID } from '../utils';
 
 const DELAY_TIME_TO_ACTIVE = 50; // mili
+
+const isBottomOfWindow = () => window.scrollY === window.scrollMaxY;
+
+const getScrollingElement = () => (document.scrollingElement
+  ? document.scrollingElement
+  : document.documentElement);
 
 class AutoScroller {
   constructor() {
@@ -14,7 +20,7 @@ class AutoScroller {
     this.userScrolling = false;
     this.userScrollingTimerId = -1;
     this.onStopListener = null;
-    this.parser = null;
+    this.parse = null;
     this.options = null;
 
     this.onMouseoverListener = this.onMouseoverListener.bind(this);
@@ -26,32 +32,16 @@ class AutoScroller {
   }
 
   init() {
-    this.parser = new SpeedParser();
-    this.options = this.initLoadOptionItems(loadOptionItems());
+    this.parse = parseSpeed;
+    this.options = initOptionItems(loadOptionItems());
   }
-
-  initLoadOptionItems(options) {
-    const map = {};
-    for (const key of Object.keys(options)) {
-      const opt = options[key];
-      opt.addOnLoadListener(this.onOptionLoadListener);
-      opt.addOnChangeListener(this.onOptionChangeListener);
-      opt.init();
-      map[key] = opt;
-    }
-    return map;
-  }
-
-  onOptionLoadListener() {} // nothing to do
-
-  onOptionChangeListener() {} // nothing to do
 
   isEnabledStopWhenBottomOfWindow() {
     return this.options.stopWhenBottomOfWindow.value;
   }
 
   start(speed) {
-    this.scrollingElement = this.getScrollingElement();
+    this.scrollingElement = getScrollingElement();
     this.setScrollingSpeed(speed);
     this.addUserActionListeners();
     this.setScrolling();
@@ -61,20 +51,20 @@ class AutoScroller {
   setScrolling() {
     this.intervalId = window.setInterval(
       this.scroll.bind(this),
-      this.scrollingInterval
+      this.scrollingInterval,
     );
   }
 
   scroll() {
-    if (this.isEnabledStopWhenBottomOfWindow() && this.isBottomOfWindow())
-      return this.stop(true);
-    if (this.isUserScrolling()) return;
-    if (this.isEnabledStopScrollingOnHover() && this.isCursorOnText()) return;
-    this._oneScroll();
+    if (this.isEnabledStopWhenBottomOfWindow() && isBottomOfWindow()) return this.stop(true);
+    if (this.isUserScrolling()) return this;
+    if (this.isEnabledStopScrollingOnHover() && this.isCursorOnText()) return this;
+    return this.oneScroll();
   }
 
-  _oneScroll() {
+  oneScroll() {
     this.scrollingElement.scrollBy(0, this.scrollingStep);
+    return this;
   }
 
   isCursorOnText() {
@@ -93,15 +83,9 @@ class AutoScroller {
   }
 
   setScrollingSpeed(speed) {
-    const { step, interval } = this.parser.parse(speed);
+    const { step, interval } = this.parse(speed);
     this.scrollingStep = step;
     this.scrollingInterval = interval;
-  }
-
-  getScrollingElement() {
-    return document.scrollingElement
-      ? document.scrollingElement
-      : document.documentElement;
   }
 
   addUserActionListeners() {
@@ -122,20 +106,18 @@ class AutoScroller {
     return this.options.stopScrollingOnHover.value;
   }
 
-  onMouseoverListener(ev) {
-    const isCursorOnTextFunc = ev => {
-      const target = ev.target;
+  onMouseoverListener(event) {
+    const isCursorOnTextFunc = (ev) => {
+      const { target } = ev;
       if (target === document.body) return false;
-      const targetRect = target.getBoundingClientRect();
-      if (
-        targetRect.width !== document.body.clientWidth &&
-        (targetRect.right > ev.pageX || targetRect.top > ev.pageY)
-      )
-        return true;
-      return false;
+      const rect = target.getBoundingClientRect();
+      return (
+        rect.width !== document.body.clientWidth
+        && (rect.right > ev.pageX || rect.top > ev.pageY)
+      );
     };
     if (!this.isEnabledStopScrollingOnHover()) return;
-    this.cursorOnText = isCursorOnTextFunc(ev);
+    this.cursorOnText = isCursorOnTextFunc(event);
   }
 
   onMouseoutListener() {
@@ -157,17 +139,13 @@ class AutoScroller {
   }
 
   onClickListener(ev) {
-    if (this.options.stopScrollingByClick.value == true) {
+    if (this.options.stopScrollingByClick.value === true) {
       this.stop(true);
     }
   }
 
   setOnStopListener(listener) {
     this.onStopListener = listener;
-  }
-
-  isBottomOfWindow() {
-    return window.scrollY === window.scrollMaxY;
   }
 }
 

@@ -17,7 +17,7 @@ import {
   MESSAGE_UPDATE_COMMAND,
   MESSAGE_INIT_CONTENT_SCRIPT,
   addData,
-  create
+  create,
 } from './message';
 
 export {
@@ -39,5 +39,5 @@ export {
   MESSAGE_UPDATE_COMMAND,
   MESSAGE_INIT_CONTENT_SCRIPT,
   addData,
-  create
+  create,
 };

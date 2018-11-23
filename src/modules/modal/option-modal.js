@@ -10,29 +10,31 @@ class OptionModal {
     this.html = null;
 
     this.onCloseButtonClickListener = this.onCloseButtonClickListener.bind(
-      this
+      this,
     );
   }
 
   init() {
-    this.loadHtml();
-    this.appendHtmlToBody();
-    this.setOptions();
-    this.setOnCloseButtonClickListener();
-    this.setTransmissionSection();
+    this.loadHtml()
+      .appendHtmlToBody()
+      .setOptions()
+      .setOnCloseButtonClickListener()
+      .setTransmissionSection();
   }
 
   setOptions() {
     this.options = initOptions(loadOptions());
+    return this;
   }
 
   setOnCloseButtonClickListener() {
-    return this.getCloseEles().forEach(ele => {
+    this.getCloseEles().forEach((ele) => {
       ele.addEventListener('click', this.onCloseButtonClickListener);
     });
+    return this;
   }
 
-  getCloseEles() {
+  static getCloseEles() {
     return document.querySelectorAll(`[${appConst.html.modal.closeAttribute}]`);
   }
 
@@ -47,9 +49,10 @@ class OptionModal {
 
     transmissionOpt.addOnChangeListener(this.toggleTransmissionSection);
     this.toggleTransmissionSection(transmissionOpt.value);
+    return this;
   }
 
-  toggleTransmissionSection(isEnabledTransmission) {
+  static toggleTransmissionSection(isEnabledTransmission) {
     const transmissionWrapper = appConst.html.transmissionWrapper.id;
     const speedWrapper = appConst.html.speedWrapper.id;
     if (isEnabledTransmission === true) {
@@ -66,19 +69,22 @@ class OptionModal {
   }
 
   appendHtmlToBody() {
-    return document.body.appendChild(this.html);
+    document.body.appendChild(this.html);
+    return this;
   }
 
   loadHtml() {
     const wrapperEle = document.createElement('div');
     wrapperEle.id = appConst.html.wrapper.id;
+    // eslint-disable-next-line global-require
     appendHtmlText(wrapperEle, require('../../../addon/dist/modal.html'));
     this.html = wrapperEle;
+    return this;
   }
 
   open() {
     this.toggleTransmissionSection(
-      this.options.enableTransmissionScrolling.item.value
+      this.options.enableTransmissionScrolling.item.value,
     );
     document
       .getElementById(appConst.html.modal.id)
@@ -92,10 +98,11 @@ class OptionModal {
   }
 
   setOnUpdateCommandListener(listener) {
-    for (const key of Object.keys(this.options)) {
-      const opt = this.options[key].item;
-      if (opt.hasCommand()) opt.setOnUpdateCommandListener(listener);
-    }
+    Object.values(this.options)
+      .map(opt => opt.item)
+      .forEach((item) => {
+        if (item.hasCommand()) item.setOnUpdateCommandListener(listener);
+      });
   }
 }
 

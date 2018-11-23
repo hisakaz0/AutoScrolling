@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "npm run build:gulp && npm run start:webpack",
-    "start:webpack": "DEBUG=true webpack -w --debug",
+    "start:webpack": "cross-env DEBUG=true webpack -w --debug",
     "start:gulp": "gulp watch",
     "build": "npm run build:firefox",
     "build:main": "npm run build:gulp && npm run build:webpack",
@@ -74,13 +74,16 @@
     "url": "https://github.com/pinkienort/AutoScrolling/issues"
   },
   "homepage": "https://github.com/pinkienort/AutoScrolling#readme",
-  "dependencies": {},
+  "dependencies": {
+    "object.fromentries": "^2.0.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "babel-loader": "^8.0.4",
     "cpy-cli": "^2.0.0",
+    "cross-env": "^5.2.0",
     "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",

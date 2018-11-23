@@ -52,6 +52,7 @@ const DEFAULT_TARGET_TAB = {
   tabId: TAB_ID_NONE,
   windowId: WINDOW_ID_NONE,
   isScrolling: false,
+  scrollingSpeed: null,
   isModalOpened: false,
   firedFromEvent: EventType.EVENT_ID_NONE,
 };
@@ -88,7 +89,7 @@ class BackgroundScript {
     this.initFocusTab();
     this.updateBrowerAction();
 
-    initOptionItems(loadOptionItems);
+    this.options = initOptionItems(loadOptionItems());
   }
 
   initFocusTab() {
@@ -200,7 +201,7 @@ class BackgroundScript {
   }
 
   setTargetTab(props) {
-    this.prevTargetTab = { ...this.prevTargetTab, ...this.targetTab };
+    this.prevTargetTab = { ...this.targetTab };
     this.targetTab = { ...this.targetTab, ...props };
     return this;
   }
@@ -231,7 +232,6 @@ class BackgroundScript {
   }
 
   setState(newState) {
-    logger.debug('state', [newState, this.state]);
     const prevState = this.state;
     this.state = newState;
     this.onUpdateState(prevState, newState);
@@ -285,6 +285,7 @@ class BackgroundScript {
         return this.stopScrollingAction(eventType);
       case State.SLOW_SCROLLING:
       case State.MIDDLE_SCROLLING:
+        if (!this.isEqualTargetToFocus()) break;
         return this.accelerateScrollingAction(eventType);
       default:
         throw new Error(`Invalid State: ${this.state}`);
@@ -306,6 +307,7 @@ class BackgroundScript {
         return this.stopScrollingAction(eventType);
       case State.SLOW_SCROLLING:
       case State.MIDDLE_SCROLLING:
+        if (!this.isEqualTargetToFocus()) break;
         return this.accelerateScrollingAction(eventType);
       default:
         throw new Error(`Invalid State: ${this.state}`);
@@ -340,9 +342,7 @@ class BackgroundScript {
           && this.targetTab.firedFromEvent === EventType.TAB_CHANGED
           && this.prevTargetTab.isScrolling === true
           && this.prevTargetTab.tabId === this.focusTab.tabId
-        ) {
-          this.startScrollingAction(eventType);
-        }
+        ) this.startScrollingAction(eventType, this.prevTargetTab.scrollingSpeed);
         break;
       default:
         throw new Error(`Invalid State: ${this.state}`);
@@ -410,28 +410,19 @@ class BackgroundScript {
     return this.targetTab.tabId === this.focusTab.tabId;
   }
 
-  getStartScrollingSpeed() {
-    if (this.isEnabledTransmissionScrolling()) {
-      return this.options.transmissionGearOfSlow.value;
+  getScrollingSpeed(state) {
+    switch (state) {
+      case State.SCROLLING:
+        return this.options.scrollingSpeed.value;
+      case State.SLOW_SCROLLING:
+        return this.options.transmissionGearOfSlow.value;
+      case State.MIDDLE_SCROLLING:
+        return this.options.transmissionGearOfMiddle.value;
+      case State.FAST_SCROLLING:
+        return this.options.transmissionGearOfFast.value;
+      default:
+        throw new Error('Invalid state');
     }
-    return this.options.scrollingSpeed.value;
-  }
-
-  getNextScrollingSpeed() {
-    if (!this.isEnabledTransmissionScrolling()) {
-      throw new Error('Invalid call');
-    }
-    const get = () => {
-      switch (this.state) {
-        case State.SLOW_SCROLLING:
-          return this.options.transmissionGearOfMiddle.value;
-        case State.MIDDLE_SCROLLING:
-          return this.options.transmissionGearOfFast.value;
-        default:
-          throw new Error('Invalid state');
-      }
-    };
-    return get();
   }
 
   getNextScrollingState() {
@@ -452,23 +443,28 @@ class BackgroundScript {
   }
 
   // begin: action area
-  startScrollingAction(eventType) {
+  startScrollingAction(eventType, startState = null) {
+    let scrollingState;
+    if (this.isEnabledTransmissionScrolling()) {
+      scrollingState = startState || State.SLOW_SCROLLING;
+    } else {
+      scrollingState = State.SCROLLING;
+    }
+
     return isNotSystemTabWith(this.focusTab.tabId)
       .then(() => sendMessageToTab(this.focusTab.tabId,
         addDataToMessage(MESSAGE_START_SCROLLING, {
-          scrollingSpeed: this.getStartScrollingSpeed(),
+          scrollingSpeed: this.getScrollingSpeed(scrollingState),
         })))
-      .then(() => Promise.resolve(
-        this.isEnabledTransmissionScrolling() ? State.SLOW_SCROLLING : State.SCROLLING,
-      ))
-      .then((state) => {
+      .then(() => {
         this.setTargetTab({
           tabId: this.focusTab.tabId,
           windowId: this.focusTab.windowId,
           isScrolling: true,
+          scrollingSpeed: scrollingState,
           firedFromEvent: eventType,
         });
-        this.setState(state);
+        this.setState(scrollingState);
       });
   }
 
@@ -480,6 +476,7 @@ class BackgroundScript {
           tabId: TAB_ID_NONE,
           windowId: WINDOW_ID_NONE,
           isScrolling: false,
+          scrollingSpeed: null,
           firedFromEvent: eventType,
         });
         this.setState(State.STOP_OR_CLOSE);
@@ -487,12 +484,17 @@ class BackgroundScript {
   }
 
   accelerateScrollingAction(eventType) {
+    const state = this.getNextScrollingState();
+
     return isNotSystemTabWith(this.targetTab.tabId)
       .then(() => sendMessageToTab(this.targetTab.tabId,
         addDataToMessage(MESSAGE_CHANGE_SPEED, {
-          scrollingSpeed: this.getNextScrollingSpeed(),
+          scrollingSpeed: this.getScrollingSpeed(state),
         })))
-      .then(() => this.setState(this.getNextScrollingState()));
+      .then(() => {
+        this.targetTab = { ...this.targetTab, scrollingSpeed: state };
+        this.setState(state);
+      });
   }
 
   openModalAction(eventType) {

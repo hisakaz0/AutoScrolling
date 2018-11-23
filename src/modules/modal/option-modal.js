@@ -34,7 +34,8 @@ class OptionModal {
     return this;
   }
 
-  static getCloseEles() {
+  // eslint-disable-next-line class-methods-use-this
+  getCloseEles() {
     return document.querySelectorAll(`[${appConst.html.modal.closeAttribute}]`);
   }
 
@@ -52,7 +53,8 @@ class OptionModal {
     return this;
   }
 
-  static toggleTransmissionSection(isEnabledTransmission) {
+  // eslint-disable-next-line class-methods-use-this
+  toggleTransmissionSection(isEnabledTransmission) {
     const transmissionWrapper = appConst.html.transmissionWrapper.id;
     const speedWrapper = appConst.html.speedWrapper.id;
     if (isEnabledTransmission === true) {

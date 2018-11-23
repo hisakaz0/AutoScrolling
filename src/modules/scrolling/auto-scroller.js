@@ -27,8 +27,6 @@ class AutoScroller {
     this.onMouseoutListener = this.onMouseoutListener.bind(this);
     this.onWheelListener = this.onWheelListener.bind(this);
     this.onClickListener = this.onClickListener.bind(this);
-    this.onOptionLoadListener = this.onOptionLoadListener.bind(this);
-    this.onOptionChangeListener = this.onOptionChangeListener.bind(this);
   }
 
   init() {

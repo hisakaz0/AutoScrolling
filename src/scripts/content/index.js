@@ -43,15 +43,18 @@ class ContentScript {
     sendMessageToBackground(MESSAGE_INIT_CONTENT_SCRIPT);
   }
 
-  static onStopListener() {
+  // eslint-disable-next-line class-methods-use-this
+  onStopListener() {
     return sendMessageToBackground(MESSAGE_STOP_SCROLLING);
   }
 
-  static onCloseListener() {
+  // eslint-disable-next-line class-methods-use-this
+  onCloseListener() {
     return sendMessageToBackground(MESSAGE_CLOSE_MODAL);
   }
 
-  static onUpdateCommandListener(cmd) {
+  // eslint-disable-next-line class-methods-use-this
+  onUpdateCommandListener(cmd) {
     return sendMessageToBackground({
       ...MESSAGE_UPDATE_COMMAND,
       [KEY_COMMAND]: cmd,

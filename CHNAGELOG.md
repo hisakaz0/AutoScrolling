@@ -79,3 +79,16 @@
         - Thanks for @jpsouzasilva
     Other improvement
       - scrolling speed is change more slower / faster
+
+2018-11-18: Version 1.5.9
+
+	Add new option
+		- stopScrollingOnFocusOut
+		- transmissionScrolling
+		- restoreScrollingFromSwitchBack
+		- disableDoubleClick
+		- stopWhenBottomOfWindow
+   	Support context-menu
+		- Start/stop scrolling from context-menu
+	Other improvement
+		- Change browser icon from scroling or not

@@ -68,3 +68,9 @@
 #keybind-switch-scrolling {
   width: 15em;
 }
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

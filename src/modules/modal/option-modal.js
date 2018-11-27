@@ -2,6 +2,9 @@ import appConst from '../../appConst.json';
 import { loadOptions, initOptions } from '../options';
 import { appendHtmlText, showHtml, hideHtml } from '../utils';
 
+const wrapperId = appConst.html.wrapper.id;
+const modalId = appConst.html.modal.id;
+
 class OptionModal {
   constructor() {
     this.CLASS_NAME_OPEN = 'active';
@@ -78,6 +81,7 @@ class OptionModal {
   loadHtml() {
     const wrapperEle = document.createElement('div');
     wrapperEle.id = appConst.html.wrapper.id;
+    wrapperEle.style.display = 'none';
     // eslint-disable-next-line global-require
     appendHtmlText(wrapperEle, require('../../../addon/dist/modal.html'));
     this.html = wrapperEle;
@@ -89,14 +93,20 @@ class OptionModal {
       this.options.enableTransmissionScrolling.item.value,
     );
     document
-      .getElementById(appConst.html.modal.id)
+      .getElementById(modalId)
       .classList.add(this.CLASS_NAME_OPEN);
+    document
+      .getElementById(wrapperId)
+      .style.display = null;
   }
 
   close() {
-    return document
-      .getElementById(appConst.html.modal.id)
+    document
+      .getElementById(modalId)
       .classList.remove(this.CLASS_NAME_OPEN);
+    document
+      .getElementById(wrapperId)
+      .style.display = 'none';
   }
 
   setOnUpdateCommandListener(listener) {

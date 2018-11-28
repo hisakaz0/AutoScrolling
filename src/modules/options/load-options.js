@@ -2,9 +2,13 @@ import OptionItem from './option-item';
 import OptionHtml from './option-html';
 import appConst from '../../appConst.json';
 
+const fromEntries = Object.fromEntries
+  ? Object.fromEntries
+  : require('object.fromentries');
+
 const appOpts = appConst.options;
 
-const loadOptions = () => Object.fromEntries(
+const loadOptions = () => fromEntries(
   Object.entries(appOpts).map(([key, val]) => {
     const item = new OptionItem(key, val.value, val.commandName);
     const html = new OptionHtml(val.id, val.value);
@@ -12,7 +16,7 @@ const loadOptions = () => Object.fromEntries(
   }),
 );
 
-const initOptions = opts => Object.fromEntries(
+const initOptions = opts => fromEntries(
   Object.entries(opts).map(([id, opt]) => {
     const { item, html } = opt;
     item.addOnChangeListener(html.onChangeStorageListener)
@@ -23,14 +27,14 @@ const initOptions = opts => Object.fromEntries(
   }),
 );
 
-const loadOptionItems = () => Object.fromEntries(
+const loadOptionItems = () => fromEntries(
   Object.entries(appOpts).map(([key, val]) => [
     key,
     new OptionItem(key, val.value, val.commandName),
   ]),
 );
 
-const initOptionItems = opts => Object.fromEntries(
+const initOptionItems = opts => fromEntries(
   Object.entries(opts).map(([key, opt]) => [key, opt.init()]),
 );
 

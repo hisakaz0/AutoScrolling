@@ -1,6 +1,6 @@
 {
   "name": "autoscrolling",
-  "version": "1.5.9",
+  "version": "1.0.0",
   "description": "Browser extension for Firefox",
   "main": "background.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "npm run build:gulp && npm run start:webpack",
-    "start:webpack": "DEBUG=true webpack -w --debug",
+    "start:webpack": "cross-env DEBUG=true webpack -w --debug",
     "start:gulp": "gulp watch",
     "build": "npm run build:firefox",
     "build:main": "npm run build:gulp && npm run build:webpack",
@@ -16,8 +16,8 @@
     "build:gulp": "gulp",
     "build:firefox": "npm run manifest:firefox && npm run build:main",
     "build:chrome": "npm run manifest:chrome && npm run build:main",
-    "manifest:firefox": "cpy addon/firefox-manifest.json addon --rename manifest.json",
-    "manifest:chrome": "cpy addon/chrome-manifest.json addon --rename manifest.json",
+    "manifest:firefox": "cpy src/firefox-manifest.json addon --rename manifest.json",
+    "manifest:chrome": "cpy src/chrome-manifest.json addon --rename manifest.json",
     "debug": "npm run manifest:firefox && cd addon && web-ext run",
     "test": "npm run build:gulp && karma start",
     "test:debug": "npm run build:gulp && karma start --no-single-run --auto-watch",
@@ -74,13 +74,16 @@
     "url": "https://github.com/pinkienort/AutoScrolling/issues"
   },
   "homepage": "https://github.com/pinkienort/AutoScrolling#readme",
-  "dependencies": {},
+  "dependencies": {
+    "object.fromentries": "^2.0.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "babel-loader": "^8.0.4",
     "cpy-cli": "^2.0.0",
+    "cross-env": "^5.2.0",
     "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",

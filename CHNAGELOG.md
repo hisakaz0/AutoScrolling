@@ -82,13 +82,20 @@
 
 2018-11-18: Version 1.5.9
 
-	Add new option
-		- stopScrollingOnFocusOut
-		- transmissionScrolling
-		- restoreScrollingFromSwitchBack
-		- disableDoubleClick
-		- stopWhenBottomOfWindow
-   	Support context-menu
-		- Start/stop scrolling from context-menu
-	Other improvement
-		- Change browser icon from scroling or not
+    Add new option
+      - stopScrollingOnFocusOut
+      - transmissionScrolling
+      - restoreScrollingFromSwitchBack
+      - disableDoubleClick
+      - stopWhenBottomOfWindow
+      Support context-menu
+      - Start/stop scrolling from context-menu
+    Other improvement
+      - Change browser icon from scroling or not
+
+2018-11-24: Chrome 1.0.0
+
+    Fix bugs in transmission mode
+    Support chrome extension
+
+

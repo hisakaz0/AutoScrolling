@@ -161,19 +161,32 @@ class BackgroundScript {
   }
 
   onBrowserActionClickListener(tab) {
-    if (this.isDisableDoubleClick()) return this.onSingleClickEvent();
-    if (!this.isWaitingDoubleClick()) return this.setDoubleClickTimer();
-    return this.clearDoubleClickTimer().onDoubleClickEvent();
+    try {
+      if (this.isDisableDoubleClick()) return this.onSingleClickEvent();
+      if (!this.isWaitingDoubleClick()) return this.setDoubleClickTimer();
+      return this.clearDoubleClickTimer().onDoubleClickEvent();
+    } catch (e) {
+      logger.error(e);
+    }
+    return Promise.resolve();
   }
 
   onTabActivatedListener(activeInfo) {
     this.setFocusTab(activeInfo);
-    this.onActivateChanged(EventType.TAB_CHANGED);
+    try {
+      this.onActivateChanged(EventType.TAB_CHANGED);
+    } catch (e) {
+      logger.error(e);
+    }
   }
 
   onWindowFocusChangedListener(windowId) {
-    this.setFocusTabFromActivateWindow(windowId).then(tab => this
-      .onActivateChanged(EventType.WINDOW_CHANGED));
+    try {
+      this.setFocusTabFromActivateWindow(windowId).then(tab => this
+        .onActivateChanged(EventType.WINDOW_CHANGED));
+    } catch (e) {
+      logger.error(e);
+    }
   }
 
   onTabUpdatedListener(tab) {
@@ -288,9 +301,9 @@ class BackgroundScript {
         if (!this.isEqualTargetToFocus()) break;
         return this.accelerateScrollingAction(eventType);
       default:
-        throw new Error(`Invalid State: ${this.state}`);
+        return Promise.reject(new Error(`Invalid State: ${this.state}`));
     }
-    return Promise.reject();
+    return Promise.resolve();
   }
 
   onDoubleClickEvent() {
@@ -310,9 +323,9 @@ class BackgroundScript {
         if (!this.isEqualTargetToFocus()) break;
         return this.accelerateScrollingAction(eventType);
       default:
-        throw new Error(`Invalid State: ${this.state}`);
+        return Promise.reject(new Error(`Invalid State: ${this.state}`));
     }
-    return Promise.reject();
+    return Promise.resolve();
   }
 
   onActivateChanged(eventType = EventType.TAB_CHANGED) {
@@ -324,17 +337,12 @@ class BackgroundScript {
         if (
           this.isStopScrollingOnFocusOut()
           && this.focusTab.windowId === WINDOW_ID_NONE
-        ) {
-          this.stopScrollingAction(eventType);
-          break;
-        }
+        ) return this.stopScrollingAction(eventType);
         if (!this.needToStopScrollingOnTabChanged()) break;
-        this.stopScrollingAction(eventType);
-        break;
+        return this.stopScrollingAction(eventType);
       case State.MODAL_OPENED:
         if (!this.needToCloseModalOnTabChanged()) break;
-        this.closeModalAction(eventType);
-        break;
+        return this.closeModalAction(eventType);
       case State.STOP_OR_CLOSE:
         if (
           this.isRestoreScrollingFromSwitchBack()
@@ -342,20 +350,27 @@ class BackgroundScript {
           && this.targetTab.firedFromEvent === EventType.TAB_CHANGED
           && this.prevTargetTab.isScrolling === true
           && this.prevTargetTab.tabId === this.focusTab.tabId
-        ) this.startScrollingAction(eventType, this.prevTargetTab.scrollingSpeed);
+        ) return this.startScrollingAction(eventType, this.prevTargetTab.scrollingSpeed);
         break;
       default:
-        throw new Error(`Invalid State: ${this.state}`);
+        return Promise.reject(new Error(`Invalid State: ${this.state}`));
     }
+    return Promise.resolve();
   }
 
   onCommandListener(name) {
     switch (name) {
       case appOpts.keybindSingleClick.commandName:
         // this command acts as SINGLE_CLICK
-        return this.onSingleClickEvent();
+        try {
+          this.onSingleClickEvent();
+        } catch (e) {
+          logger.error(e);
+        }
+        break;
       default:
-        return Promise.reject();
+        logger.error(new Error(`Undefined command: ${name}`));
+        break;
     }
   }
 

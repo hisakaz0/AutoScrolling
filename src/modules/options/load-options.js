@@ -2,13 +2,12 @@ import OptionItem from './option-item';
 import OptionHtml from './option-html';
 import appConst from '../../appConst.json';
 
-const fromEntries = Object.fromEntries
-  ? Object.fromEntries
-  : require('object.fromentries');
+// eslint-disable-next-line global-require
+Object.fromEntries = require('object.fromentries');
 
 const appOpts = appConst.options;
 
-const loadOptions = () => fromEntries(
+const loadOptions = () => Object.fromEntries(
   Object.entries(appOpts).map(([key, val]) => {
     const item = new OptionItem(key, val.value, val.commandName);
     const html = new OptionHtml(val.id, val.value);
@@ -16,7 +15,7 @@ const loadOptions = () => fromEntries(
   }),
 );
 
-const initOptions = opts => fromEntries(
+const initOptions = opts => Object.fromEntries(
   Object.entries(opts).map(([id, opt]) => {
     const { item, html } = opt;
     item.addOnChangeListener(html.onChangeStorageListener)
@@ -27,14 +26,14 @@ const initOptions = opts => fromEntries(
   }),
 );
 
-const loadOptionItems = () => fromEntries(
+const loadOptionItems = () => Object.fromEntries(
   Object.entries(appOpts).map(([key, val]) => [
     key,
     new OptionItem(key, val.value, val.commandName),
   ]),
 );
 
-const initOptionItems = opts => fromEntries(
+const initOptionItems = opts => Object.fromEntries(
   Object.entries(opts).map(([key, opt]) => [key, opt.init()]),
 );
 

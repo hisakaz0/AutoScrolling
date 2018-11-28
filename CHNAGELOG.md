@@ -93,9 +93,12 @@
     Other improvement
       - Change browser icon from scroling or not
 
-2018-11-24: Chrome 1.0.0
+2018-11-24: Chrome Version 1.0.0
 
     Fix bugs in transmission mode
     Support chrome extension
 
+2018-11-28: Firefox Version 1.5.10
 
+    Fix bugs:
+      - Appear a option modal window when printing

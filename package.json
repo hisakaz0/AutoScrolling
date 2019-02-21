@@ -105,7 +105,7 @@
     "lint-staged": "^8.0.0",
     "sinon-chrome": "^2.3.2",
     "spectre.css": "^0.5.3",
-    "web-ext": "^2.9.1",
+    "web-ext": "^3.0.0",
     "webextension-polyfill": "^0.3.1",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.0"

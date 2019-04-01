@@ -103,7 +103,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
     "lint-staged": "^8.0.0",
-    "sinon-chrome": "^2.3.2",
+    "sinon-chrome": "^3.0.1",
     "spectre.css": "^0.5.3",
     "web-ext": "^2.9.1",
     "webextension-polyfill": "^0.3.1",

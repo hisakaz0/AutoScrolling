@@ -96,7 +96,7 @@
     "husky": "^1.0.0-rc.13",
     "jasmine": "^3.2.0",
     "json-loader": "^0.5.7",
-    "karma": "^3.1.1",
+    "karma": "^4.1.0",
     "karma-firefox-launcher": "^1.1.0",
     "karma-html2js-preprocessor": "^1.1.0",
     "karma-jasmine": "^2.0.1",

@@ -101,7 +101,7 @@
     "karma-html2js-preprocessor": "^1.1.0",
     "karma-jasmine": "^2.0.1",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^3.0.5",
+    "karma-webpack": "^4.0.2",
     "lint-staged": "^8.0.0",
     "sinon-chrome": "^2.3.2",
     "spectre.css": "^0.5.3",

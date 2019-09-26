@@ -106,7 +106,7 @@
     "sinon-chrome": "^2.3.2",
     "spectre.css": "^0.5.3",
     "web-ext": "^2.9.1",
-    "webextension-polyfill": "^0.3.1",
+    "webextension-polyfill": "^0.5.0",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.0"
   }

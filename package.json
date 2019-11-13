@@ -102,7 +102,7 @@
     "karma-jasmine": "^2.0.1",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
-    "lint-staged": "^8.0.0",
+    "lint-staged": "^9.4.3",
     "sinon-chrome": "^2.3.2",
     "spectre.css": "^0.5.3",
     "web-ext": "^2.9.1",
